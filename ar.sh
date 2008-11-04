@@ -1,11 +1,13 @@
 #!/bin/sh
 
 AR="$1"
+rm "$AR"
+
 shift
 for file in "$@" ; do
   if [ -f "$file" ] ; then
-    echo "---> $file"
-    printf -- "--%d:%s:--\n" `stat -c '%s' $file` $(dirname $file) >> $AR
+    printf -- "--%d:%s:--\n" `stat -c '%s' $file` $(basename $file)
+    printf -- "--%d:%s:--\n" `stat -c '%s' $file` $(basename $file) >> $AR
     cat $file >> $AR
   fi
 done
