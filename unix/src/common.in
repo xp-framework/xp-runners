@@ -1,0 +1,107 @@
+if [ "$OS" = "Windows_NT" ]; then
+  PATHSEP=';'
+  DIRSEP='\'
+else
+  PATHSEP=':'
+  DIRSEP='/'
+fi
+
+if [ -L "$0" ] ; then
+  link="$(readlink "$0")"
+  case "$link" in
+    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
+  esac
+else
+  DIRNAME=$(dirname "$0")
+fi
+
+translate_path() {
+  base="$1"
+  path="$2"
+  
+  case "$path" in
+    ?:*) ;;                                # C:\xp
+    \\*) ;;                                # \\filesrv\shares
+    /*) ;;                                 # /usr/local/lib */
+    ~*) path=$HOME$DIRSEP${path#"~"} ;;    # ~/lib
+    *) path=$base$DIRSEP$path ;;           # lib, ../lib, ./classes
+  esac
+  
+  if [ "$OS" = "Windows_NT" ]; then
+    echo $(cygpath -m "$path")
+  else
+    echo $path
+  fi
+}
+
+translate_paths() {
+  base="$1"
+  path="$2"
+
+  translated=""
+  IFS="$PATHSEP"
+  for i in $path ; do
+    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
+  done
+  echo "${translated#$PATHSEP}"
+}
+
+locate() {
+  path="$1"
+  file="$2"
+  expect=$3
+  
+  IFS="$PATHSEP"
+  for i in $path ; do
+    qualified="$i/$file"
+    if [ -e "$qualified" ] ; then
+      echo "$qualified"
+      if [ $expect = 1 ] ; then return ; fi
+    fi
+  done
+  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+
+execute() {
+  base="$1"
+  runner="$2"
+  include="$3"
+  xppath="$1"
+  ifs="|"
+
+  if [ "" = "$USE_XP" ] ; then
+    while read line ; do
+      case "$line" in
+        use=*)
+          USE_XP=$(translate_paths "$base" "${line#*=}")
+        ;;
+      esac
+    done < "$base"/xp.ini
+  else
+    USE_XP=$(translate_paths "." "$USE_XP")
+  fi
+
+  executor="php"
+  args="-dinclude_path=\"$include\"${ifs}-duser_dir=\"$USE_XP\"${ifs}-dmagic_quotes_gpc=0"
+  IFS="
+"
+  for ini in $(locate "$USE_XP" "php.ini" 0) ; do
+    while read line ; do 
+      case "$line" in
+        *=*)
+          key=${line%=*}
+          if [ "executor" = "$key" ]; then
+            executor="${line#*=}"
+          else 
+            args="$args${ifs}-d$key=\"${line#*=}\""
+          fi
+        ;;
+      esac
+    done < $ini
+  done
+
+  IFS=" "
+  echo ${executor}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${runner}".php" 1)
+}

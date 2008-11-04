@@ -1,0 +1,30 @@
+XP Runners with C#
+========================================================================
+$Id: README 10454 2008-11-02 16:21:28Z friebe $
+
+Howto: Build
+------------
+Run "make" to build the XP runners. If you don't have "csc" (the C Sharp
+Compiler) in your path, you may tell make where to find it as follows:
+
+<pre>
+  CSC=/cygdrive/c/Windows/Microsoft.NET/Framework/v3.5/csc.exe make
+</pre>
+
+This step will produce the following binaries:
+<pre>
+  xp.exe xpcli.exe xar.exe unittest.exe cgen.exe doclet.exe
+</pre>
+
+Howto: Install
+--------------
+After building the binaries, copy them to a location in your $PATH and 
+create a file called "xp.ini" in the same directory. Inside that, define
+the location where you have your XP framework installation.
+
+Example xp.ini in ~/bin:
+<pre>
+  use=../devel/xp/trunk
+</pre>
+
+<EOF>
