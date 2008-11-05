@@ -1,25 +1,26 @@
 CSC?=csc
-CLASSES=Executor.cs Paths.cs BaseRunner.cs
+CLASSES=src\\Executor.cs src\\Paths.cs src\\BaseRunner.cs
 
 all: xp.exe xpcli.exe xar.exe unittest.exe cgen.exe doclet.exe
 
-xp.exe: Xp.cs $(CLASSES)
-	$(CSC) /nologo /target:exe /out:$@ Xp.cs $(CLASSES)
+xp.exe: src\\Xp.cs $(CLASSES)
+	$(CSC) /nologo /target:exe /out:$@ src\\Xp.cs $(CLASSES)
 
-xpcli.exe: XpCli.cs $(CLASSES)
-	$(CSC) /nologo /target:exe /out:$@ XpCli.cs $(CLASSES)
+xpcli.exe: src\\XpCli.cs $(CLASSES)
+	$(CSC) /nologo /target:exe /out:$@ src\\XpCli.cs $(CLASSES)
 
-xar.exe: Xar.cs $(CLASSES)
-	$(CSC) /nologo /target:exe /out:$@ Xar.cs $(CLASSES)
+xar.exe: src\\Xar.cs $(CLASSES)
+	$(CSC) /nologo /target:exe /out:$@ src\\Xar.cs $(CLASSES)
 
-unittest.exe: Unittest.cs $(CLASSES)
-	$(CSC) /nologo /target:exe /out:$@ Unittest.cs $(CLASSES)
+unittest.exe: src\\Unittest.cs $(CLASSES)
+	$(CSC) /nologo /target:exe /out:$@ src\\Unittest.cs $(CLASSES)
 
-cgen.exe: Cgen.cs $(CLASSES)
-	$(CSC) /nologo /target:exe /out:$@ Cgen.cs $(CLASSES)
+cgen.exe: src\\Cgen.cs $(CLASSES)
+	$(CSC) /nologo /target:exe /out:$@ src\\Cgen.cs $(CLASSES)
 
-doclet.exe: Doclet.cs $(CLASSES)
-	$(CSC) /nologo /target:exe /out:$@ Doclet.cs $(CLASSES)
+doclet.exe: src\\Doclet.cs $(CLASSES)
+	$(CSC) /nologo /target:exe /out:$@ src\\Doclet.cs $(CLASSES)
 
 clean:
-	-rm xp.exe
+	-rm xp.exe xpcli.exe xar.exe unittest.exe cgen.exe doclet.exe
+
