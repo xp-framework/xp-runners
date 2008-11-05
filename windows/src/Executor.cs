@@ -24,7 +24,8 @@ namespace Net.XpFramework.Runner
         public static int Execute(string base_dir, string runner, string tool, string[] includes, string[] args)
         {
             // Determine USE_XP path from either environment option or from xp.ini
-            string env = System.Environment.GetEnvironmentVariable("USE_XP");
+            string env = Environment.GetEnvironmentVariable("USE_XP");
+            string executor = Environment.GetEnvironmentVariable("XP_RT") ?? "php";
             IEnumerable<string> use_xp = null;
             if (null == env)
             {
@@ -33,14 +34,34 @@ namespace Net.XpFramework.Runner
                     throw new FileNotFoundException("Cannot find xp.ini in " + base_dir);
                 }
 
+                string section = "default";
                 foreach (string line in File.ReadAllLines(base_dir + "xp.ini"))
                 {
+                    if (line == "" || line.StartsWith(";")) continue;
+
                     string[] parsed = line.Split(KVAL_SEPARATOR, 2);
-                    if (parsed[KEY] == "use")
-                    {
-                        use_xp = Paths.Translate(base_dir, parsed[VALUE].Split(PATH_SEPARATOR));
+                    if (parsed[KEY].StartsWith("[")) {
+                        section = parsed[KEY].Substring(1, parsed[KEY].Length - 1 - 1);
+                        continue;
                     }
-                }
+
+                    switch (section)
+                    {
+                        case "default":
+                            if ("use" == parsed[KEY])
+                            {
+                                use_xp = Paths.Translate(base_dir, parsed[VALUE].Split(PATH_SEPARATOR));
+                                break;
+                            }
+                            goto default;
+
+                        case "runtime":
+                            executor = parsed[VALUE];
+                            break;
+
+                        default:
+                            throw new FormatException("Unknown key '" + parsed[KEY] + "' in " + section + " section");
+                    }                }
             }
             else
             {
@@ -48,7 +69,6 @@ namespace Net.XpFramework.Runner
             }
             
             // Search for tool
-            string executor = "php";
             string argv = String.Format(
                 "-dinclude_path=\".;{0}\" -duser_dir=\"{1}\" -dmagic_quotes_gpc=0",
                 String.Join(new string(PATH_SEPARATOR), includes),
