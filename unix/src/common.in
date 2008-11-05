@@ -71,19 +71,32 @@ execute() {
   xppath="$1"
   ifs="|"
 
+  executor=${XP_RT-php}
   if [ "" = "$USE_XP" ] ; then
+    section=default
     while read line ; do
       case "$line" in
         use=*)
           USE_XP=$(translate_paths "$base" "${line#*=}")
         ;;
+        
+        \[*\])
+          section=${line:1:${#line}-2}
+        ;;
+        
+        *=*)
+          if [ runtime = $section ] ; then
+            key=${line%=*}
+            executor="${line#*=}"
+          else
+            echo "*** Unknown configuration $line in section $section" >&2
+          fi
       esac
     done < "$base"/xp.ini
   else
     USE_XP=$(translate_paths "." "$USE_XP")
   fi
 
-  executor="php"
   args="-dinclude_path=\"$include\"${ifs}-duser_dir=\"$USE_XP\"${ifs}-dmagic_quotes_gpc=0"
   IFS="
 "
