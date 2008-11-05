@@ -50,24 +50,27 @@ namespace Net.XpFramework.Runner
         /// <returns></returns>
         public static IEnumerable<string> Translate(string root, string[] paths)
         {
-            var HOME = Environment.GetEnvironmentVariable("HOME") ?? Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            string HOME = Environment.GetEnvironmentVariable("HOME") ?? Environment.GetFolderPath(Environment.SpecialFolder.Personal);
 
             foreach (string path in paths)
             {
-                if (path.StartsWith("~"))
+                // Normalize path
+                string normalized = path.Replace('/', Path.DirectorySeparatorChar);
+
+                if (normalized.StartsWith("~"))
                 {
                     // Path in home directory
-                    yield return HOME + path.Substring(1);
+                    yield return HOME + normalized.Substring(1);
                 } 
-                else if (path.Substring(1).StartsWith(":\\") || path.StartsWith("\\\\")) 
+                else if (normalized.Substring(1).StartsWith(":\\") || normalized.StartsWith("\\\\")) 
                 {
                     // Fully qualified path
-                    yield return path;
+                    yield return normalized;
                 }
                 else
                 {
                     // Relative path, prepend root
-                    yield return root + Path.DirectorySeparatorChar + path;
+                    yield return root + Path.DirectorySeparatorChar + normalized;
                 }
             }
         }

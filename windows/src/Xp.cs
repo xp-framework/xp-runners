@@ -8,9 +8,9 @@ namespace Net.XpFramework.Runner
 
         static void Main(string[] args)
         {
-            var tool = "";
-            var runner = "class";
-            var shift = 0;
+            string tool = "";
+            string runner = "class";
+            int shift = 0;
             var includes = new List<string>();
 
             for (var i = 0; i < args.Length ; i++) {
