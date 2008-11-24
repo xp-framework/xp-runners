@@ -12,6 +12,7 @@ namespace Net.XpFramework.Runner
             string runner = "class";
             int shift = 0;
             var includes = new List<string>();
+            includes.Add(".");
 
             for (var i = 0; i < args.Length ; i++) {
                 switch (args[i])

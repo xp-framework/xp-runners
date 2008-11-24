@@ -68,11 +68,20 @@ namespace Net.XpFramework.Runner
                 use_xp = Paths.Translate(System.Environment.CurrentDirectory, env.Split(PATH_SEPARATOR));
             }
             
-            // Search for tool
+            // Pass "USE_XP" and includes inside include_path separated by two path 
+            // separators. Prepend "." for the oddity that if the first element does
+            // not exist, PHP scraps all the others(!)
+            //
+            // E.g.: -dinclude_path=".;xp\5.7.0;..\dialog;;..\impl.xar;..\log.xar"
+            //                       ^ ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^
+            //                       | |                   include_path
+            //                       | USE_XP
+            //                       Dot
             string argv = String.Format(
-                "-dinclude_path=\".;{0}\" -duser_dir=\"{1}\" -dmagic_quotes_gpc=0",
-                String.Join(new string(PATH_SEPARATOR), includes),
-                String.Join(new string(PATH_SEPARATOR), use_xp.ToArray())
+                "-dinclude_path=\".{1}{0}{1}{1}{2}\" -dmagic_quotes_gpc=0",
+                String.Join(new string(PATH_SEPARATOR), use_xp.ToArray()),
+                new string(PATH_SEPARATOR),
+                String.Join(new string(PATH_SEPARATOR), includes)
             );
             foreach (string ini in Paths.Locate(use_xp, "php.ini", false))
             {
@@ -98,6 +107,7 @@ namespace Net.XpFramework.Runner
             {
                 proc.StartInfo.Arguments +=  " \"" + String.Join("\" \"", args) + "\"";
             }
+            
             proc.StartInfo.UseShellExecute = false;
             try
             {
