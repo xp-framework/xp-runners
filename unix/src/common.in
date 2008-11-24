@@ -81,7 +81,8 @@ execute() {
         ;;
         
         \[*\])
-          section=${line:1:${#line}-2}
+          section=${line#[}
+          section=${section%]}
         ;;
         
         *=*)

@@ -1,4 +1,4 @@
---3411:xp:--
+--3431:xp:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -83,7 +83,8 @@ execute() {
         ;;
 
         \[*\])
-          section=${line:1:${#line}-2}
+          section=${line#[}
+          section=${section%]}
         ;;
 
         *=*)
@@ -162,7 +163,7 @@ done
 shift $OPTIND
 
 cmd=$(execute "$DIRNAME" $RUNNER $INCLUDE_PATH); IFS="|"; $cmd $TOOL "$@";
---2598:xar:--
+--2618:xar:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -247,7 +248,8 @@ execute() {
         ;;
 
         \[*\])
-          section=${line:1:${#line}-2}
+          section=${line#[}
+          section=${section%]}
         ;;
 
         *=*)
@@ -286,7 +288,7 @@ execute() {
 }
 
 cmd=$(execute "$DIRNAME" "class" "."); IFS="|"; $cmd xp.xar.Runner "$@";
---2600:xpcli:--
+--2622:xpcli:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -371,7 +373,8 @@ execute() {
         ;;
 
         \[*\])
-          section=${line:1:${#line}-2}
+          section=${line#[}
+          section=${section%]}
         ;;
 
         *=*)
@@ -409,8 +412,8 @@ execute() {
   echo ${executor}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${runner}".php" 1)
 }
 
-cmd=$(execute "$DIRNAME" "class" "."); IFS="|"; $cmd util.cmd.Runner "$@";
---2603:unittest:--
+cmd=$(execute "$DIRNAME" "class" "."); IFS="|"; $cmd xp.command.Runner "$@";
+--2623:unittest:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -495,7 +498,8 @@ execute() {
         ;;
 
         \[*\])
-          section=${line:1:${#line}-2}
+          section=${line#[}
+          section=${section%]}
         ;;
 
         *=*)
@@ -534,7 +538,7 @@ execute() {
 }
 
 cmd=$(execute "$DIRNAME" "class" "."); IFS="|"; $cmd xp.unittest.Runner "$@";
---2601:doclet:--
+--2621:doclet:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -619,7 +623,8 @@ execute() {
         ;;
 
         \[*\])
-          section=${line:1:${#line}-2}
+          section=${line#[}
+          section=${section%]}
         ;;
 
         *=*)
@@ -658,7 +663,7 @@ execute() {
 }
 
 cmd=$(execute "$DIRNAME" "class" "."); IFS="|"; $cmd xp.doclet.Runner "$@";
---2602:cgen:--
+--2622:cgen:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -743,7 +748,8 @@ execute() {
         ;;
 
         \[*\])
-          section=${line:1:${#line}-2}
+          section=${line#[}
+          section=${section%]}
         ;;
 
         *=*)
