@@ -115,7 +115,7 @@ execute() {
       esac
     done < $ini
   done
-echo "A $args" >&2
+
   IFS=" "
   echo ${executor}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${runner}".php" 1)
 }
