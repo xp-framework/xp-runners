@@ -1,4 +1,4 @@
---3453:xp:--
+--3435:xp:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -117,7 +117,7 @@ execute() {
       esac
     done < $ini
   done
-echo "A $args" >&2
+
   IFS=" "
   echo ${executor}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${runner}".php" 1)
 }
@@ -163,7 +163,7 @@ done
 shift $OPTIND
 
 cmd=$(execute "$DIRNAME" $RUNNER $INCLUDE_PATH); IFS="|"; $cmd $TOOL "$@";
---2640:xar:--
+--2622:xar:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -282,13 +282,13 @@ execute() {
       esac
     done < $ini
   done
-echo "A $args" >&2
+
   IFS=" "
   echo ${executor}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${runner}".php" 1)
 }
 
 cmd=$(execute "$DIRNAME" "class" "."); IFS="|"; $cmd xp.xar.Runner "$@";
---2644:xpcli:--
+--2626:xpcli:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -407,13 +407,13 @@ execute() {
       esac
     done < $ini
   done
-echo "A $args" >&2
+
   IFS=" "
   echo ${executor}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${runner}".php" 1)
 }
 
 cmd=$(execute "$DIRNAME" "class" "."); IFS="|"; $cmd xp.command.Runner "$@";
---2645:unittest:--
+--2627:unittest:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -532,13 +532,13 @@ execute() {
       esac
     done < $ini
   done
-echo "A $args" >&2
+
   IFS=" "
   echo ${executor}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${runner}".php" 1)
 }
 
 cmd=$(execute "$DIRNAME" "class" "."); IFS="|"; $cmd xp.unittest.Runner "$@";
---2643:doclet:--
+--2625:doclet:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -657,13 +657,13 @@ execute() {
       esac
     done < $ini
   done
-echo "A $args" >&2
+
   IFS=" "
   echo ${executor}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${runner}".php" 1)
 }
 
 cmd=$(execute "$DIRNAME" "class" "."); IFS="|"; $cmd xp.doclet.Runner "$@";
---2644:cgen:--
+--2626:cgen:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -782,7 +782,7 @@ execute() {
       esac
     done < $ini
   done
-echo "A $args" >&2
+
   IFS=" "
   echo ${executor}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${runner}".php" 1)
 }
