@@ -15,3 +15,7 @@ windows: windows/src/*
 
 release:
 	scp *.ar xpdoku@php3.de:/home/httpd/xp.php3.de/doc_root/downloads/releases/bin/
+
+clean:
+	cd unix && $(MAKE) clean
+	cd windows && $(MAKE) clean
