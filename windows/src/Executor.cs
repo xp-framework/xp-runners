@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.IO;
 
@@ -79,7 +78,7 @@ namespace Net.XpFramework.Runner
             //                       Dot
             string argv = String.Format(
                 "-dinclude_path=\".{1}{0}{1}{1}{2}\" -dmagic_quotes_gpc=0",
-                String.Join(new string(PATH_SEPARATOR), use_xp.ToArray()),
+                String.Join(new string(PATH_SEPARATOR), new List<string>(use_xp).ToArray()),
                 new string(PATH_SEPARATOR),
                 String.Join(new string(PATH_SEPARATOR), includes)
             );
@@ -102,7 +101,7 @@ namespace Net.XpFramework.Runner
             // Spawn runtime
             var proc = new System.Diagnostics.Process();
             proc.StartInfo.FileName = executor;
-            proc.StartInfo.Arguments = argv + " \"" + Paths.Locate(use_xp, "tools\\" + runner + ".php", true).First() + "\" " + tool;
+            proc.StartInfo.Arguments = argv + " \"" + new List<string>(Paths.Locate(use_xp, "tools\\" + runner + ".php", true))[0] + "\" " + tool;
             if (args.Length > 0)
             {
                 proc.StartInfo.Arguments +=  " \"" + String.Join("\" \"", args) + "\"";

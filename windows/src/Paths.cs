@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 
 namespace Net.XpFramework.Runner
@@ -27,18 +26,20 @@ namespace Net.XpFramework.Runner
         /// <returns></returns>
         public static IEnumerable<string> Locate(IEnumerable<string> bases, string file, bool expect)
         {
+            bool found = false;
             foreach (string path in bases)
             {
 
                 string qualified = path + Path.DirectorySeparatorChar + file;
                 if (File.Exists(qualified))
                 {
+                    found = true;
                     yield return qualified;
                 }
             }
-            if (expect)
+            if (expect && !found)
             {
-                throw new FileNotFoundException("Cannot find " + file + " in [" + String.Join(", ", bases.ToArray()) + "]");
+                throw new FileNotFoundException("Cannot find " + file + " in [" + String.Join(", ", new List<string>(bases).ToArray()) + "]");
             }
         }
 
