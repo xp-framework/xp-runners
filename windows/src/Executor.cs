@@ -114,6 +114,9 @@ namespace Net.XpFramework.Runner
                 proc.WaitForExit();
                 return proc.ExitCode;
             }
+            catch (SystemException e) {
+                throw new ExecutionEngineException(executor + ": " + e.Message, e);
+            }
             finally
             {
                 proc.Close();
