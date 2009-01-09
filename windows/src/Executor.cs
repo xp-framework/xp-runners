@@ -60,7 +60,8 @@ namespace Net.XpFramework.Runner
 
                         default:
                             throw new FormatException("Unknown key '" + parsed[KEY] + "' in " + section + " section");
-                    }                }
+                    }
+                }
             }
             else
             {

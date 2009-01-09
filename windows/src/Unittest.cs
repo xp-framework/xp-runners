@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Net.XpFramework.Runner
 {
-    class XpCli : BaseRunner
+    class Unittest : BaseRunner
     {
 
         static void Main(string[] args)
