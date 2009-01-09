@@ -112,7 +112,7 @@
 
   // {{{ usage()
   function usage() {
-    println('*** Usage: setup [-d <runner-dir>] [-b <php-bin>] [-p <proxy-url>] [-e <runner-env>]');
+    println('*** Usage: setup [-d <runner-dir>] [-p <proxy-url>] [-e <runner-env>]');
     println('- <runner-dir>: Path to where XP runners should be installed (default: $CWD)');
     println('- <proxy-url> : HTTP proxy to use (default: none), e.g. http://proxy.example.com:3128/');
     println('- <runner-env>: Runner environment to use (windows | unix, default: auto-detect)');
