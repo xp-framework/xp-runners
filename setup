@@ -113,17 +113,16 @@
   // {{{ usage()
   function usage() {
     println('*** Usage: setup [-d <runner-dir>] [-b <php-bin>] [-p <proxy-url>] [-e <runner-env>]');
-    println('- <runner-dir>: Path to where XP runners should be installed');
-    println('- <php-bin>   : Path to PHP binary (default: `which php5 || php)`');
+    println('- <runner-dir>: Path to where XP runners should be installed (default: $CWD)');
     println('- <proxy-url> : HTTP proxy to use (default: none), e.g. http://proxy.example.com:3128/');
-    println('- <runner-env>: Runner environment to use (default: auto-detect)');
+    println('- <runner-env>: Runner environment to use (windows | unix, default: auto-detect)');
     return 1;
   }
   // }}}
 
   // {{{ main
   error_reporting(E_ALL);
-  $runtime= $runners= $proxy= NULL;
+  $runners= $proxy= NULL;
   $warnings= array();
   $uname= php_uname();
   $bin= getcwd();
@@ -133,7 +132,6 @@
   for ($i= 0; $i < $argc; $i++) {
     switch ($argv[$i]) {
       case '-d': $bin= $argv[++$i]; break;
-      case '-b': $runtime= $argv[++$i]; break;
       case '-e': $runners= $argv[++$i]; break;
       case '-p': $proxy= $argv[++$i]; break;
       case '-?': case '--help': usage() && exit(1);
@@ -149,16 +147,6 @@
     $warnings[]= 'Bindir '.$bin.' is not in PATH, you might want to consider adding it!';
   }
 
-  // Check for PHP runtime
-  if (!$runtime) {
-    if (!($runtime= which('php5', TRUE))) {
-      if (!($runtime= which('php', TRUE))) {
-        println('*** PHP command not in path (', getenv('PATH'), ') ***');
-        exit(1);
-      }
-    }
-  }
-  
   // Detect environment
   println('===> Environment');
   switch (TRUE) {
@@ -166,19 +154,16 @@
       break;
 
     case TRUE == preg_match('/^Windows/i', $uname):
-      println('---> Windows');
       $runners= 'windows';
       break;
     
     default:
-      println('---> Un*x');
       $runners= 'unix';
       break;
   }
   println('---> Using ', $runners, ' runners');
 
   // Create directories
-  println('---> Target: ', $bin);
   foreach (array($bin) as $dir) {
     if (is_dir($dir)) continue;
     if (mkdir($dir)) continue;
@@ -198,34 +183,6 @@
     }
   }
   
-  // Check to see if it works.
-  println('===> Configuration:');
-  
-  // Found it, execute
-  unset($pipes);
-  putenv('XP_RT='.realpath($runtime));
-  $xp= realpath($bin).DIRECTORY_SEPARATOR.'xp';
-  $proc= proc_open('"'.$xp.'" -v', array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'w')), $pipes);
-  if (!$proc) {
-    println('*** XP runners ', $xp, ' could not be forked ***');
-    exit(1); 
-  }
-  
-  fclose($pipes[0]);
-  
-  // Read the rest
-  for ($out= ''; !feof($pipes[1]); ) echo fread($pipes[1], 0x1000);
-  for ($err= ''; !feof($pipes[2]); ) echo fread($pipes[2], 0x1000);
-  fclose($pipes[1]);
-  fclose($pipes[2]);
-  
-  // xp.tools.Version exits w/ exitcode 1
-  $exitcode= proc_close($proc);
-  if (1 != $exitcode) {
-    println('*** XP runner ', $xp, ' exited with unexpected exitcode ', $exitcode);
-    exit(4);
-  }
-  
-  println('===> Done');
+  println('===> XP runners installed to the directory <'.$bin.'>');
   // }}}  
 ?>
