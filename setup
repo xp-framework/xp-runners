@@ -1,0 +1,231 @@
+<?php
+/* This file is part of the XP framework
+ *
+ * $Id$
+ */
+
+  define('BASE_URL',   'http://xp-framework.net/downloads/releases/');
+
+  // {{{ println(string* args)
+  function println() {
+    foreach (func_get_args() as $a) { echo $a; }
+    echo PHP_EOL;
+  }
+  // }}}  
+
+  // {{{ ardl(string url, string targetdir)
+  function ardl($url, $targetdir, $permissions= -1) {
+    static $pw= 10;
+
+    println('---> ', $url);
+    $u= parse_url($url);    
+    $fd= fsockopen($u['host'], isset($u['port']) ? $u['port'] : 80, $errno, $errstr);
+    if (!$fd) {
+      println('*** Failed (#', $errno, ': ', $errstr, ' ***');
+      return FALSE;
+    }
+
+    // Send HTTP request
+    fputs($fd, sprintf(
+      "GET %s HTTP/1.0\r\nHost: %s\r\n\r\n",
+      $u['path'].'.ar',
+      $u['host']
+    ));
+    
+    // Read HTTP response
+    $status= fgets($fd, 1024);
+    sscanf($status, "HTTP/1.%*d %d %[^\r]", $code, $message);
+    if (200 != $code) {
+      println('*** Failed (HTTP ', $code, ': ', $message, ' ***');
+      return FALSE;
+    }
+    do {
+      if (FALSE === ($header= fgets($fd, 1024))) return FALSE;
+      if ('' === ($header= rtrim($header))) break;
+    } while ($header);
+    
+    while ($line= fgets($fd, 0xFF)) {
+      if (2 != sscanf($line, '--%d:%[^:]--', $length, $filename)) continue;
+
+      printf(
+        '---> %s (%.2f kB) [%s]%s', 
+        $filename, 
+        $length / 1024,
+        str_repeat('.', $pw),
+        str_repeat("\x08", $pw+ 1)
+      );
+
+      $target= $targetdir.DIRECTORY_SEPARATOR.$filename;
+      $ft= fopen($target, 'wb');
+      if (!$ft) {
+        println('*** I/O Error w/ ', $filename, ' ***');
+        return FALSE;
+      }
+      
+      $s= 0; $c= 0;
+      while ($s < $length) {
+        $s+= fwrite($ft, fread($fd, min(0x1000, $length- $s)));
+
+        // Update progress
+        $d= ceil(($s / $length) * $pw);
+        if ($d == $c) continue;
+        echo str_repeat('#', $d- $c); flush();
+        $c= $d;
+      }
+      fclose($ft);
+
+      // Change permissions if requested
+      if (-1 != $permissions) {
+        chmod($target, fileperms($target) | $permissions);
+      }
+
+      println();
+    }
+    fclose($fd);
+    return TRUE;
+  }
+  // }}}
+  
+  // {{{ which(string command [, bool ext])
+  function which($command, $ext= FALSE) {
+    $search= explode(PATH_SEPARATOR, getenv('PATH'));
+    $extensions= array('');
+    $ext && $extensions+= explode(PATH_SEPARATOR, getenv('PATHEXT'));
+    foreach ($search as $path) {
+      foreach ($extensions as $ext) {
+        if (file_exists($q= $path.DIRECTORY_SEPARATOR.$command.$ext)) return realpath($q);
+      }
+    }
+    return NULL;
+  }
+  // }}}
+
+  // {{{ inpath(string dir)
+  function inpath($dir) {
+    $realpath= realpath($dir);
+    foreach (explode(PATH_SEPARATOR, getenv('PATH')) as $path) {
+      if (realpath($path) == $realpath) return TRUE;
+    }
+    return FALSE;
+  }
+  // }}}
+
+  // {{{ usage()
+  function usage() {
+    println('*** Usage: setup [-d <runner-dir>] [-b <php-bin>] [-p <proxy-url>] [-e <runner-env>]');
+    println('- <runner-dir>: Path to where XP runners should be installed');
+    println('- <php-bin>   : Path to PHP binary (default: `which php5 || php)`');
+    println('- <proxy-url> : HTTP proxy to use (default: none), e.g. http://proxy.example.com:3128/');
+    println('- <runner-env>: Runner environment to use (default: auto-detect)');
+    return 1;
+  }
+  // }}}
+
+  // {{{ main
+  error_reporting(E_ALL);
+  $runtime= $runners= $proxy= NULL;
+  $warnings= array();
+  $uname= php_uname();
+  $bin= getcwd();
+  println('===> Setup xp runners @ ', $uname);
+
+  // Parse command line arguments  
+  for ($i= 0; $i < $argc; $i++) {
+    switch ($argv[$i]) {
+      case '-d': $bin= $argv[++$i]; break;
+      case '-b': $runtime= $argv[++$i]; break;
+      case '-e': $runners= $argv[++$i]; break;
+      case '-p': $proxy= $argv[++$i]; break;
+      case '-?': case '--help': usage() && exit(1);
+    }
+  }
+  if (!$bin) usage() && exit(1);
+
+  // Runner path: Check whether "bin" exists and is in PATH
+  if (!is_dir($bin)) {
+    $warnings[]= 'Bindir '.$bin.' does not exist, created it for you';
+  }
+  if (!inpath($bin)) {
+    $warnings[]= 'Bindir '.$bin.' is not in PATH, you might want to consider adding it!';
+  }
+
+  // Check for PHP runtime
+  if (!$runtime) {
+    if (!($runtime= which('php5', TRUE))) {
+      if (!($runtime= which('php', TRUE))) {
+        println('*** PHP command not in path (', getenv('PATH'), ') ***');
+        exit(1);
+      }
+    }
+  }
+  
+  // Detect environment
+  println('===> Environment');
+  switch (TRUE) {
+    case NULL !== $runners:
+      break;
+
+    case TRUE == preg_match('/^Windows/i', $uname):
+      println('---> Windows');
+      $runners= 'windows';
+      break;
+    
+    default:
+      println('---> Un*x');
+      $runners= 'unix';
+      break;
+  }
+  println('---> Using ', $runners, ' runners');
+
+  // Create directories
+  println('---> Target: ', $bin);
+  foreach (array($bin) as $dir) {
+    if (is_dir($dir)) continue;
+    if (mkdir($dir)) continue;
+    
+    println('*** Failed to create directory ', $dir, ' ***');
+    exit(1);
+  }
+  
+  // Download runners
+  ardl(BASE_URL.'bin/'.$runners, $bin, 0700) || exit(3);
+ 
+  // Print warnings
+  if (!empty($warnings)) {
+    println('===> Warnings:');
+    foreach ($warnings as $warning) {
+      println('!!! ', $warning);
+    }
+  }
+  
+  // Check to see if it works.
+  println('===> Configuration:');
+  
+  // Found it, execute
+  unset($pipes);
+  putenv('XP_RT='.realpath($runtime));
+  $xp= realpath($bin).DIRECTORY_SEPARATOR.'xp';
+  $proc= proc_open('"'.$xp.'" -v', array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'w')), $pipes);
+  if (!$proc) {
+    println('*** XP runners ', $xp, ' could not be forked ***');
+    exit(1); 
+  }
+  
+  fclose($pipes[0]);
+  
+  // Read the rest
+  for ($out= ''; !feof($pipes[1]); ) echo fread($pipes[1], 0x1000);
+  for ($err= ''; !feof($pipes[2]); ) echo fread($pipes[2], 0x1000);
+  fclose($pipes[1]);
+  fclose($pipes[2]);
+  
+  // xp.tools.Version exits w/ exitcode 1
+  $exitcode= proc_close($proc);
+  if (1 != $exitcode) {
+    println('*** XP runner ', $xp, ' exited with unexpected exitcode ', $exitcode);
+    exit(4);
+  }
+  
+  println('===> Done');
+  // }}}  
+?>
