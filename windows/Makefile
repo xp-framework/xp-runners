@@ -1,5 +1,5 @@
 CSC?=csc
-CLASSES=src\\Executor.cs src\\Paths.cs src\\BaseRunner.cs
+CLASSES=src\\Executor.cs src\\Paths.cs src\\BaseRunner.cs src\\XpConfigSource.cs src\\EnvironmentConfigSource.cs src\\IniConfigSource.cs src\\CompositeConfigSource.cs src\\Ini.cs
 
 all: xp.exe xpcli.exe xar.exe unittest.exe cgen.exe doclet.exe
 

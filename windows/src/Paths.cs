@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.IO;
 
 namespace Net.XpFramework.Runner
@@ -42,7 +43,7 @@ namespace Net.XpFramework.Runner
                 throw new FileNotFoundException("Cannot find " + file + " in [" + String.Join(", ", new List<string>(bases).ToArray()) + "]");
             }
         }
-
+        
         /// <summary>
         /// Translate a list of paths
         /// </summary>
@@ -61,7 +62,7 @@ namespace Net.XpFramework.Runner
                 if (normalized.StartsWith("~"))
                 {
                     // Path in home directory
-                    yield return HOME + normalized.Substring(1);
+                    yield return Compose(HOME, normalized.Substring(1));
                 } 
                 else if (normalized.Substring(1).StartsWith(":\\") || normalized.StartsWith("\\\\")) 
                 {
@@ -71,9 +72,35 @@ namespace Net.XpFramework.Runner
                 else
                 {
                     // Relative path, prepend root
-                    yield return root + Path.DirectorySeparatorChar + normalized;
+                    yield return Compose(root, normalized);
                 }
             }
+        }
+        
+        /// <summary>
+        /// Composes a path name of two or more components - varargs
+        /// </summary>
+        /// <param name="components"></param>
+        /// <returns></returns>
+        public static string Compose(params string[] components) 
+        {
+            var s = new StringBuilder();
+            foreach (string component in components) {
+                s.Append(component.TrimEnd(new char[] { Path.DirectorySeparatorChar })).Append(Path.DirectorySeparatorChar);
+            }
+            s.Length--;           // Remove last directory separator
+            return s.ToString();
+        }
+        
+        /// <summary>
+        /// Composes a path name of a special folder and a string component
+        /// </summary>
+        /// <param name="kind"></param>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public static string Compose(Environment.SpecialFolder special, string component) 
+        {
+            return Compose(Environment.GetFolderPath(special), component);
         }
 
         /// <summary>
