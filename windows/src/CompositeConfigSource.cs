@@ -9,15 +9,10 @@ namespace Net.XpFramework.Runner
     {
         private List<XpConfigSource> sources;
         
-        private static bool Nulls(XpConfigSource p) 
-        {
-            return p == null;
-        }
-    
         public CompositeConfigSource(params XpConfigSource[] sources) 
         {
             this.sources = new List<XpConfigSource>(sources);
-            this.sources.RemoveAll(Nulls);
+            this.sources.RemoveAll(delegate(XpConfigSource o) { return o == null; });
         }
     
         /// <summary>
