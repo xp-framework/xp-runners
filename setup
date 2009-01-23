@@ -182,7 +182,8 @@
     fwrite($fp, 'use=[PLEASE EDIT "'.$config.'"]'.PHP_EOL);
     fwrite($fp, PHP_EOL);
     fclose($fp);
-    $warnings[]= 'No configuration file found - created '.$config.' for you';
+    $warnings[]= 'No configuration file found - created it for you';
+    $warnings[]= 'Please edit '.$config;
   }
  
   // Print warnings
