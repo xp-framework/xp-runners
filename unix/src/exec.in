@@ -26,7 +26,7 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 
-args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$include\"${ifs}-dmagic_quotes_gpc=0"
+args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0"
 IFS="
 "
 for ini in $(locate "$USE_XP" "php.ini" 0) ; do
