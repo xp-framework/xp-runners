@@ -41,3 +41,5 @@ done
 shift $OPTIND
 
 EXEC($RUNNER, $INCLUDE_PATH, $TOOL)
+
+#include <exec.in> 

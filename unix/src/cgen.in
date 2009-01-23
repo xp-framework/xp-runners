@@ -1,3 +1,5 @@
 #include <common.in>
 
 EXEC("class", ".", xp.codegen.Runner)
+
+#include <exec.in> 

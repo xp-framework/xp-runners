@@ -1,5 +1,7 @@
 #define EXEC(runner, includes, args)         \
-  cmd=$(execute "$DIRNAME" runner includes); \
-  IFS="|";                                   \
-  $cmd args "$@";                            \
-
+  base="$DIRNAME"                            \
+  RUNNER=runner                              \
+  INCLUDE=includes                           \
+  xppath="$DIRNAME"                          \
+  ARGS=args                                  \
+  IFS="|";                                   

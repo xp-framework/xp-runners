@@ -1,3 +1,5 @@
 #include <common.in>
 
 EXEC("class", ".", xp.doclet.Runner)
+
+#include <exec.in> 

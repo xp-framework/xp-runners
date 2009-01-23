@@ -8,5 +8,5 @@ all: xp xar xpcli unittest doclet cgen
 clean: 
 	-rm xp xar xpcli unittest doclet cgen
 
-%: src/%.in src/common.in src/macros.h
+%: src/%.in src/common.in src/exec.in src/macros.h
 	(echo "#!/bin/sh" ; $(CC) -E -I. -I./src -x c -C -P -imacros src/macros.h $< ) > $@

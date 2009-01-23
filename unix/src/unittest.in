@@ -1,3 +1,5 @@
 #include <common.in>
 
 EXEC("class", ".", xp.unittest.Runner)
+
+#include <exec.in> 

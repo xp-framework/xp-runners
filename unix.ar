@@ -1,4 +1,4 @@
---3435:xp:--
+--3305:xp:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -64,62 +64,6 @@ locate() {
   done
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
-}
-
-execute() {
-  base="$1"
-  runner="$2"
-  include="$3"
-  xppath="$1"
-  ifs="|"
-
-  executor=${XP_RT-php}
-  if [ "" = "$USE_XP" ] ; then
-    section=default
-    while read line ; do
-      case "$line" in
-        use=*)
-          USE_XP=$(translate_paths "$base" "${line#*=}")
-        ;;
-
-        \[*\])
-          section=${line#[}
-          section=${section%]}
-        ;;
-
-        *=*)
-          if [ runtime = $section ] ; then
-            key=${line%=*}
-            executor="${line#*=}"
-          else
-            echo "*** Unknown configuration $line in section $section" >&2
-          fi
-      esac
-    done < "$base"/xp.ini
-  else
-    USE_XP=$(translate_paths "." "$USE_XP")
-  fi
-
-  args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$include\"${ifs}-dmagic_quotes_gpc=0"
-  IFS="
-"
-  for ini in $(locate "$USE_XP" "php.ini" 0) ; do
-    while read line ; do
-      case "$line" in
-        *=*)
-          key=${line%=*}
-          if [ "executor" = "$key" ]; then
-            executor="${line#*=}"
-          else
-            args="$args${ifs}-d$key=\"${line#*=}\""
-          fi
-        ;;
-      esac
-    done < $ini
-  done
-
-  IFS=" "
-  echo ${executor}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${runner}".php" 1)
 }
 
 OPTIND=0
@@ -162,8 +106,59 @@ for arg in "$@" ; do
 done
 shift $OPTIND
 
-cmd=$(execute "$DIRNAME" $RUNNER $INCLUDE_PATH); IFS="|"; $cmd $TOOL "$@";
---2622:xar:--
+base="$DIRNAME" RUNNER=$RUNNER INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
+
+
+XP_RT=${XP_RT-php}
+ifs="|"
+if [ "" = "$USE_XP" ] ; then
+  section=default
+  while read line ; do
+    case "$line" in
+      use=*)
+        USE_XP=$(translate_paths "$base" "${line#*=}")
+      ;;
+
+      \[*\])
+        section=${line#[}
+        section=${section%]}
+      ;;
+
+      *=*)
+        if [ runtime = $section ] ; then
+          key=${line%=*}
+          XP_RT="${line#*=}"
+        else
+          echo "*** Unknown configuration $line in section $section" >&2
+        fi
+    esac
+  done < "$base"/xp.ini
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
+
+args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$include\"${ifs}-dmagic_quotes_gpc=0"
+IFS="
+"
+for ini in $(locate "$USE_XP" "php.ini" 0) ; do
+  while read line ; do
+    case "$line" in
+      *=*)
+        key=${line%=*}
+        if [ "executor" = "$key" ]; then
+          XP_RT="${line#*=}"
+        else
+          args="$args${ifs}-d$key=\"${line#*=}\""
+        fi
+      ;;
+    esac
+  done < $ini
+done
+
+export XP_RT
+IFS="|"
+${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
+--2492:xar:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -231,64 +226,59 @@ locate() {
   echo ""
 }
 
-execute() {
-  base="$1"
-  runner="$2"
-  include="$3"
-  xppath="$1"
-  ifs="|"
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.xar.Runner IFS="|";
 
-  executor=${XP_RT-php}
-  if [ "" = "$USE_XP" ] ; then
-    section=default
-    while read line ; do
-      case "$line" in
-        use=*)
-          USE_XP=$(translate_paths "$base" "${line#*=}")
-        ;;
 
-        \[*\])
-          section=${line#[}
-          section=${section%]}
-        ;;
+XP_RT=${XP_RT-php}
+ifs="|"
+if [ "" = "$USE_XP" ] ; then
+  section=default
+  while read line ; do
+    case "$line" in
+      use=*)
+        USE_XP=$(translate_paths "$base" "${line#*=}")
+      ;;
 
-        *=*)
-          if [ runtime = $section ] ; then
-            key=${line%=*}
-            executor="${line#*=}"
-          else
-            echo "*** Unknown configuration $line in section $section" >&2
-          fi
-      esac
-    done < "$base"/xp.ini
-  else
-    USE_XP=$(translate_paths "." "$USE_XP")
-  fi
+      \[*\])
+        section=${line#[}
+        section=${section%]}
+      ;;
 
-  args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$include\"${ifs}-dmagic_quotes_gpc=0"
-  IFS="
-"
-  for ini in $(locate "$USE_XP" "php.ini" 0) ; do
-    while read line ; do
-      case "$line" in
-        *=*)
+      *=*)
+        if [ runtime = $section ] ; then
           key=${line%=*}
-          if [ "executor" = "$key" ]; then
-            executor="${line#*=}"
-          else
-            args="$args${ifs}-d$key=\"${line#*=}\""
-          fi
-        ;;
-      esac
-    done < $ini
-  done
+          XP_RT="${line#*=}"
+        else
+          echo "*** Unknown configuration $line in section $section" >&2
+        fi
+    esac
+  done < "$base"/xp.ini
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
 
-  IFS=" "
-  echo ${executor}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${runner}".php" 1)
-}
+args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$include\"${ifs}-dmagic_quotes_gpc=0"
+IFS="
+"
+for ini in $(locate "$USE_XP" "php.ini" 0) ; do
+  while read line ; do
+    case "$line" in
+      *=*)
+        key=${line%=*}
+        if [ "executor" = "$key" ]; then
+          XP_RT="${line#*=}"
+        else
+          args="$args${ifs}-d$key=\"${line#*=}\""
+        fi
+      ;;
+    esac
+  done < $ini
+done
 
-cmd=$(execute "$DIRNAME" "class" "."); IFS="|"; $cmd xp.xar.Runner "$@";
---2626:xpcli:--
+export XP_RT
+IFS="|"
+${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
+--2496:xpcli:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -356,64 +346,59 @@ locate() {
   echo ""
 }
 
-execute() {
-  base="$1"
-  runner="$2"
-  include="$3"
-  xppath="$1"
-  ifs="|"
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.command.Runner IFS="|";
 
-  executor=${XP_RT-php}
-  if [ "" = "$USE_XP" ] ; then
-    section=default
-    while read line ; do
-      case "$line" in
-        use=*)
-          USE_XP=$(translate_paths "$base" "${line#*=}")
-        ;;
 
-        \[*\])
-          section=${line#[}
-          section=${section%]}
-        ;;
+XP_RT=${XP_RT-php}
+ifs="|"
+if [ "" = "$USE_XP" ] ; then
+  section=default
+  while read line ; do
+    case "$line" in
+      use=*)
+        USE_XP=$(translate_paths "$base" "${line#*=}")
+      ;;
 
-        *=*)
-          if [ runtime = $section ] ; then
-            key=${line%=*}
-            executor="${line#*=}"
-          else
-            echo "*** Unknown configuration $line in section $section" >&2
-          fi
-      esac
-    done < "$base"/xp.ini
-  else
-    USE_XP=$(translate_paths "." "$USE_XP")
-  fi
+      \[*\])
+        section=${line#[}
+        section=${section%]}
+      ;;
 
-  args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$include\"${ifs}-dmagic_quotes_gpc=0"
-  IFS="
-"
-  for ini in $(locate "$USE_XP" "php.ini" 0) ; do
-    while read line ; do
-      case "$line" in
-        *=*)
+      *=*)
+        if [ runtime = $section ] ; then
           key=${line%=*}
-          if [ "executor" = "$key" ]; then
-            executor="${line#*=}"
-          else
-            args="$args${ifs}-d$key=\"${line#*=}\""
-          fi
-        ;;
-      esac
-    done < $ini
-  done
+          XP_RT="${line#*=}"
+        else
+          echo "*** Unknown configuration $line in section $section" >&2
+        fi
+    esac
+  done < "$base"/xp.ini
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
 
-  IFS=" "
-  echo ${executor}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${runner}".php" 1)
-}
+args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$include\"${ifs}-dmagic_quotes_gpc=0"
+IFS="
+"
+for ini in $(locate "$USE_XP" "php.ini" 0) ; do
+  while read line ; do
+    case "$line" in
+      *=*)
+        key=${line%=*}
+        if [ "executor" = "$key" ]; then
+          XP_RT="${line#*=}"
+        else
+          args="$args${ifs}-d$key=\"${line#*=}\""
+        fi
+      ;;
+    esac
+  done < $ini
+done
 
-cmd=$(execute "$DIRNAME" "class" "."); IFS="|"; $cmd xp.command.Runner "$@";
---2627:unittest:--
+export XP_RT
+IFS="|"
+${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
+--2497:unittest:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -481,64 +466,59 @@ locate() {
   echo ""
 }
 
-execute() {
-  base="$1"
-  runner="$2"
-  include="$3"
-  xppath="$1"
-  ifs="|"
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.unittest.Runner IFS="|";
 
-  executor=${XP_RT-php}
-  if [ "" = "$USE_XP" ] ; then
-    section=default
-    while read line ; do
-      case "$line" in
-        use=*)
-          USE_XP=$(translate_paths "$base" "${line#*=}")
-        ;;
 
-        \[*\])
-          section=${line#[}
-          section=${section%]}
-        ;;
+XP_RT=${XP_RT-php}
+ifs="|"
+if [ "" = "$USE_XP" ] ; then
+  section=default
+  while read line ; do
+    case "$line" in
+      use=*)
+        USE_XP=$(translate_paths "$base" "${line#*=}")
+      ;;
 
-        *=*)
-          if [ runtime = $section ] ; then
-            key=${line%=*}
-            executor="${line#*=}"
-          else
-            echo "*** Unknown configuration $line in section $section" >&2
-          fi
-      esac
-    done < "$base"/xp.ini
-  else
-    USE_XP=$(translate_paths "." "$USE_XP")
-  fi
+      \[*\])
+        section=${line#[}
+        section=${section%]}
+      ;;
 
-  args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$include\"${ifs}-dmagic_quotes_gpc=0"
-  IFS="
-"
-  for ini in $(locate "$USE_XP" "php.ini" 0) ; do
-    while read line ; do
-      case "$line" in
-        *=*)
+      *=*)
+        if [ runtime = $section ] ; then
           key=${line%=*}
-          if [ "executor" = "$key" ]; then
-            executor="${line#*=}"
-          else
-            args="$args${ifs}-d$key=\"${line#*=}\""
-          fi
-        ;;
-      esac
-    done < $ini
-  done
+          XP_RT="${line#*=}"
+        else
+          echo "*** Unknown configuration $line in section $section" >&2
+        fi
+    esac
+  done < "$base"/xp.ini
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
 
-  IFS=" "
-  echo ${executor}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${runner}".php" 1)
-}
+args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$include\"${ifs}-dmagic_quotes_gpc=0"
+IFS="
+"
+for ini in $(locate "$USE_XP" "php.ini" 0) ; do
+  while read line ; do
+    case "$line" in
+      *=*)
+        key=${line%=*}
+        if [ "executor" = "$key" ]; then
+          XP_RT="${line#*=}"
+        else
+          args="$args${ifs}-d$key=\"${line#*=}\""
+        fi
+      ;;
+    esac
+  done < $ini
+done
 
-cmd=$(execute "$DIRNAME" "class" "."); IFS="|"; $cmd xp.unittest.Runner "$@";
---2625:doclet:--
+export XP_RT
+IFS="|"
+${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
+--2495:doclet:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -606,64 +586,59 @@ locate() {
   echo ""
 }
 
-execute() {
-  base="$1"
-  runner="$2"
-  include="$3"
-  xppath="$1"
-  ifs="|"
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.doclet.Runner IFS="|";
 
-  executor=${XP_RT-php}
-  if [ "" = "$USE_XP" ] ; then
-    section=default
-    while read line ; do
-      case "$line" in
-        use=*)
-          USE_XP=$(translate_paths "$base" "${line#*=}")
-        ;;
 
-        \[*\])
-          section=${line#[}
-          section=${section%]}
-        ;;
+XP_RT=${XP_RT-php}
+ifs="|"
+if [ "" = "$USE_XP" ] ; then
+  section=default
+  while read line ; do
+    case "$line" in
+      use=*)
+        USE_XP=$(translate_paths "$base" "${line#*=}")
+      ;;
 
-        *=*)
-          if [ runtime = $section ] ; then
-            key=${line%=*}
-            executor="${line#*=}"
-          else
-            echo "*** Unknown configuration $line in section $section" >&2
-          fi
-      esac
-    done < "$base"/xp.ini
-  else
-    USE_XP=$(translate_paths "." "$USE_XP")
-  fi
+      \[*\])
+        section=${line#[}
+        section=${section%]}
+      ;;
 
-  args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$include\"${ifs}-dmagic_quotes_gpc=0"
-  IFS="
-"
-  for ini in $(locate "$USE_XP" "php.ini" 0) ; do
-    while read line ; do
-      case "$line" in
-        *=*)
+      *=*)
+        if [ runtime = $section ] ; then
           key=${line%=*}
-          if [ "executor" = "$key" ]; then
-            executor="${line#*=}"
-          else
-            args="$args${ifs}-d$key=\"${line#*=}\""
-          fi
-        ;;
-      esac
-    done < $ini
-  done
+          XP_RT="${line#*=}"
+        else
+          echo "*** Unknown configuration $line in section $section" >&2
+        fi
+    esac
+  done < "$base"/xp.ini
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
 
-  IFS=" "
-  echo ${executor}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${runner}".php" 1)
-}
+args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$include\"${ifs}-dmagic_quotes_gpc=0"
+IFS="
+"
+for ini in $(locate "$USE_XP" "php.ini" 0) ; do
+  while read line ; do
+    case "$line" in
+      *=*)
+        key=${line%=*}
+        if [ "executor" = "$key" ]; then
+          XP_RT="${line#*=}"
+        else
+          args="$args${ifs}-d$key=\"${line#*=}\""
+        fi
+      ;;
+    esac
+  done < $ini
+done
 
-cmd=$(execute "$DIRNAME" "class" "."); IFS="|"; $cmd xp.doclet.Runner "$@";
---2626:cgen:--
+export XP_RT
+IFS="|"
+${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
+--2496:cgen:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -731,60 +706,55 @@ locate() {
   echo ""
 }
 
-execute() {
-  base="$1"
-  runner="$2"
-  include="$3"
-  xppath="$1"
-  ifs="|"
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.codegen.Runner IFS="|";
 
-  executor=${XP_RT-php}
-  if [ "" = "$USE_XP" ] ; then
-    section=default
-    while read line ; do
-      case "$line" in
-        use=*)
-          USE_XP=$(translate_paths "$base" "${line#*=}")
-        ;;
 
-        \[*\])
-          section=${line#[}
-          section=${section%]}
-        ;;
+XP_RT=${XP_RT-php}
+ifs="|"
+if [ "" = "$USE_XP" ] ; then
+  section=default
+  while read line ; do
+    case "$line" in
+      use=*)
+        USE_XP=$(translate_paths "$base" "${line#*=}")
+      ;;
 
-        *=*)
-          if [ runtime = $section ] ; then
-            key=${line%=*}
-            executor="${line#*=}"
-          else
-            echo "*** Unknown configuration $line in section $section" >&2
-          fi
-      esac
-    done < "$base"/xp.ini
-  else
-    USE_XP=$(translate_paths "." "$USE_XP")
-  fi
+      \[*\])
+        section=${line#[}
+        section=${section%]}
+      ;;
 
-  args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$include\"${ifs}-dmagic_quotes_gpc=0"
-  IFS="
-"
-  for ini in $(locate "$USE_XP" "php.ini" 0) ; do
-    while read line ; do
-      case "$line" in
-        *=*)
+      *=*)
+        if [ runtime = $section ] ; then
           key=${line%=*}
-          if [ "executor" = "$key" ]; then
-            executor="${line#*=}"
-          else
-            args="$args${ifs}-d$key=\"${line#*=}\""
-          fi
-        ;;
-      esac
-    done < $ini
-  done
+          XP_RT="${line#*=}"
+        else
+          echo "*** Unknown configuration $line in section $section" >&2
+        fi
+    esac
+  done < "$base"/xp.ini
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
 
-  IFS=" "
-  echo ${executor}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${runner}".php" 1)
-}
+args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$include\"${ifs}-dmagic_quotes_gpc=0"
+IFS="
+"
+for ini in $(locate "$USE_XP" "php.ini" 0) ; do
+  while read line ; do
+    case "$line" in
+      *=*)
+        key=${line%=*}
+        if [ "executor" = "$key" ]; then
+          XP_RT="${line#*=}"
+        else
+          args="$args${ifs}-d$key=\"${line#*=}\""
+        fi
+      ;;
+    esac
+  done < $ini
+done
 
-cmd=$(execute "$DIRNAME" "class" "."); IFS="|"; $cmd xp.codegen.Runner "$@";
+export XP_RT
+IFS="|"
+${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
