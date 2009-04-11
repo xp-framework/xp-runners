@@ -1,0 +1,2 @@
+CMD=unittest HelloTest
+ERR.EXPECT=No classloader provides class "HelloTest"

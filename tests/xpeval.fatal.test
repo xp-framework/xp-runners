@@ -1,0 +1,2 @@
+CMD=xp -e "fatal();"
+OUT.EXPECT=Fatal error: Call to undefined function fatal

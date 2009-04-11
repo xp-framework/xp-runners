@@ -1,0 +1,2 @@
+CMD=xp non.existant.Class
+ERR.EXPECT=Uncaught exception: Exception lang.ClassNotFoundException

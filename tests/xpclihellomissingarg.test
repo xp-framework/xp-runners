@@ -1,0 +1,2 @@
+CMD=xpcli -cp src HelloCommand
+ERR.EXPECT=Argument #1 does not exist

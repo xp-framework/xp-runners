@@ -1,0 +1,3 @@
+CMD=doclet
+ERR.EXPECT=No doclet classname given
+!!! This should really show the usage

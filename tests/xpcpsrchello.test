@@ -1,0 +1,2 @@
+CMD=xp -cp src Hello World
+OUT.EXPECT=Hello World

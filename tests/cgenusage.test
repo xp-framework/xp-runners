@@ -1,0 +1,3 @@
+CMD=cgen
+ERR.EXPECT=Code generation tool
+ERR.EXPECT=Usage

@@ -1,0 +1,96 @@
+Release<Version<5.7.2> r12947 @ 2009-03-27 00:00:00+0100> {
+  
+  Heads up!
+  ~~~~~~~~~
+  - Removed xp-net.xp_framework-{VERSION}.xar from boot classpath. It is
+    no longer required for runners, that`s all in xp-tools-${VERSION}.xar
+    To run unittests on a released version, use the following:
+    unittest -cp {VERSION}/lib/xp-net.xp_framework-{VERSION}.xar [tests]
+    (friebe)
+  
+  RFCs
+  ~~~~
+  - Implemented RFC #0087 - Move class details information to ClassLoader
+    (friebe)
+  - Implemented RFC #0174 - io.collections interface additions / io.streams
+    integration
+    (friebe)
+  
+  Features
+  ~~~~~~~~
+  - Added lang.Primitive::wrapperClass() method
+    (friebe)
+  - Included type information in unittest.AssertionFailedError's message
+    (friebe)
+  - Included prerequisites in unittest.PrerequisitesNotMetError's message
+    (friebe)
+  - Added lang.reflect.Package::getSimpleName() which complements
+    lang.XPClass::getSimpleName()
+    (friebe)
+  - Added util.log.StreamAppender to use streams as log appender
+    (hinckel)
+  - Added io.streams.ChannelInputStream and io.streams.ChannelOutputStream
+    classes that read from / write to stdin, stdout and stderr
+    (friebe)
+  - Made peer.ftp.FtpConnection constructor accept not only strings but also
+    peer.URL objects - same as in peer.http.HttpConnection
+    (friebe)
+  - Implemented feature suggested in bug #31 - Allow Numbers in Scriptlet
+    States
+    (friebe)
+  - Added io.collections.ArchiveCollection class to work with XARs
+    (friebe)
+  - Added support for enums to the Remote API (EASC)
+    See http://news.xp-framework.net/article/287/2009/01/28/
+    (hinckel, friebe)
+  - Made lang.XPClass::isSubclassOf() accept not only a string with the
+    classname but also XPClass objects
+    (friebe)
+  
+  Bugfixes
+  ~~~~~~~~
+  - Fixed xp::stringOf() to not incorrectly detect recursion with objects
+    returning hashcodes which are very large numbers
+    (friebe)
+  - Fixed dataset generator to use prefixed XML file names when accessing
+    referenced tables for foreign keys
+    (gellweiler, hinckel)
+  - Fixed WSDL code generator: replace "." with "_" and upper case first
+    letter in generated class names
+    (wagner, hinckel)
+  - Fixed org.fpdf.FPDF::writeCells() when writing justified cells
+    (friebe, Tobias Roth, Thomas Geiger)
+  - Use "etc" directory as default configuration path for xpcli command
+    (hinckel)
+  - Fixed rdbms.mysql.MySQLDBAdapter did not handle '"' quotes (bug#34)
+    (wagner)
+  - Fixed util.Date::hashCode() returns timestamp now instead of object id.
+    (wagner)
+  - Made /proc lookup inside lang.Process::getProcessById() work on
+    FreeBSD 7 - the link is /proc/$PID/file instead of /proc/$PID/exe
+    (friebe, wagner)
+  - Fixed bug #33 - Parse error for comments having a line ending with "]"
+    (friebe)
+  - Fixed io.File::write() and io.File::writeLine() to throw an IOException
+    if the underlying file handle has been closed
+    (friebe)
+  - Fixed io.streams.FileInputStream and io.streams.FileOutputStream not
+    to close underlying file when they get garbage-collected.
+    (friebe)
+  - Fixed remote interface mapping when creating the remote interface in the
+    remote API
+    (hinckel)
+  - Fixed util.Locale::setDefault() fatalling when the given locale does
+    not exist (and while trying to throw an exception).
+    (friebe)
+  - Fixed scriptlet.xml.XMLScriptletRequest not handling URLs handled
+    by rewrite rules such as RewriteRule ^/category/([0-9]+)/.*$ /index.php
+    [E=PRODUCT:news,E=LANGUAGE:en_US,E=STATE:bycategory,E=CATID:$1,PT]
+    (friebe)
+  - Fixed lang.Process thinking it would be able to execute directories
+    which would simply fail later on.
+    (friebe)
+  - Fixed leftover of refactoring of peer.mail.MessagingAddress
+    interface in peer.mail.transport.SmtpTransport
+    (gellweiler, reuter, kiesel)
+}

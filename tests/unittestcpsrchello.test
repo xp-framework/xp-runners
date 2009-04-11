@@ -1,0 +1,2 @@
+CMD=unittest -cp src HelloTest
+OUT.EXPECT=[0-9]+/[0-9]+ run \\([0-9]+ skipped\\), [0-9]+ succeeded, [0-9]+ failed

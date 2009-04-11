@@ -1,0 +1,3 @@
+CMD=unittest
+ERR.EXPECT=Unittest command
+ERR.EXPECT=Usage

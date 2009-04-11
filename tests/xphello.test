@@ -1,0 +1,2 @@
+CMD=xp Hello World
+ERR.EXPECT=Uncaught exception: Exception lang.ClassNotFoundException

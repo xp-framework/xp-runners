@@ -1,0 +1,2 @@
+CMD=xp -e "echo 'Hello';"
+OUT.EXPECT=Hello

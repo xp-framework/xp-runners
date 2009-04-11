@@ -1,0 +1,3 @@
+CMD=xpcli -cp src HelloCommand -?
+ERR.EXPECT=Usage
+ERR.EXPECT=xpcli HelloCommand <name>
