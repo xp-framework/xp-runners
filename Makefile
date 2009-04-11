@@ -19,3 +19,9 @@ release:
 clean:
 	cd unix && $(MAKE) clean
 	cd windows && $(MAKE) clean
+
+test.windows: windows
+	cd tests && $(MAKE) testrun TYPE=windows
+
+test.unix: unix
+	cd tests && $(MAKE) testrun TYPE=unix
