@@ -1,0 +1,2 @@
+CMD=xp -invalid
+ERR.EXPECT=Invalid argument -invalid
