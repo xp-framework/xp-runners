@@ -1,0 +1,2 @@
+CMD=xp -xar lib/hello.xar World
+OUT.EXPECT=Hello World

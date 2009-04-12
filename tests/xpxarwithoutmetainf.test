@@ -1,0 +1,2 @@
+CMD=xp -xar lib/hello-class.xar Hello
+ERR.EXPECT=Could not load resource META-INF/manifest.ini
