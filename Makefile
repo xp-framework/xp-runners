@@ -5,12 +5,16 @@
 
 .PHONY: unix windows
 
-unix: unix/src/*
+unix: unix/src/* unix.ar
 	cd unix && $(MAKE)
+
+unix.ar: unix/xp unix/xar unix/xpcli unix/unittest unix/doclet unix/cgen
 	sh ar.sh unix.ar unix/xp unix/xar unix/xpcli unix/unittest unix/doclet unix/cgen
 
-windows: windows/src/*
+windows: windows/src/* windows.ar
 	cd windows && $(MAKE)
+
+windows.ar: windows/*.exe
 	sh ar.sh windows.ar windows/*.exe
 
 release:
