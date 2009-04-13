@@ -10,6 +10,7 @@ all:
 	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	@echo "$(MAKE) clean        - Cleanup"
 	@echo "$(MAKE) release      - Release runners @ xp-framework.net"
+	@echo "$(MAKE) ar           - Create archives for release"
 	@echo
 	@echo "$(MAKE) unix         - Creates Un*x runners (/bin/sh)"
 	@echo "$(MAKE) windows      - Creates Windows runners (C#)"
@@ -29,7 +30,9 @@ windows: windows/src/*
 windows.ar: windows/*.exe
 	sh ar.sh windows.ar windows/*.exe
 
-release: *.ar
+ar: windows.ar unix.ar
+	
+release: ar
 	scp setup *.ar xpdoku@php3.de:/home/httpd/xp.php3.de/doc_root/downloads/releases/bin/
 
 clean:
