@@ -17,8 +17,6 @@ if [ "" = "$USE_XP" ] ; then
         if [ runtime = $section ] ; then
           key=${line%=*}
           XP_RT="${line#*=}"
-        else
-          echo "*** Unknown configuration $line in section $section" >&2
         fi
     esac
   done < "$base"/xp.ini
