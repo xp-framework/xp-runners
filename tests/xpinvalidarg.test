@@ -1,2 +1,3 @@
 CMD=xp -invalid
 ERR.EXPECT=Invalid argument -invalid
+EXIT.EXPECT=255
