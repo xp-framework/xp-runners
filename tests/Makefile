@@ -9,6 +9,7 @@ testrun:
 	      CMD=*)                                                                     \
 	        echo "<$$ENV $(TYPE)/$${line#*=}>: " ;                                   \
 	        eval $$ENV ../$(TYPE)/$${line#*=} 2>err 1>out ;                          \
+	        EXITCODE=$$? ;                                                           \
 	      ;;                                                                         \
 	                                                                                 \
 	      OUT.EXPECT=*)                                                              \
@@ -26,6 +27,14 @@ testrun:
 	          echo "--> OK, $$line" ;                                                \
 	        else                                                                     \
 	          echo "*** STDERR: Expecting <$${line#*=}>, have:" ; cat err ; echo ;   \
+            fi                                                                       \
+          ;;                                                                         \
+	                                                                                 \
+	      EXIT.EXPECT=*)                                                             \
+	        if [ "$${line#*=}" = "$$EXITCODE" ] ; then                               \
+	          echo "--> OK, exitcode $$EXITCODE" ;                                   \
+	        else                                                                     \
+	          echo "*** EXITCODE: Expecting <$${line#*=}>, have: $$EXITCODE";        \
             fi                                                                       \
           ;;                                                                         \
 	                                                                                 \
