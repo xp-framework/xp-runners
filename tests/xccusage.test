@@ -1,0 +1,3 @@
+CMD=xcc
+ERR.EXPECT=XP Compiler
+ERR.EXPECT=Usage
