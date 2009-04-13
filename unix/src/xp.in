@@ -29,7 +29,7 @@ for arg in "$@" ; do
       OPTIND=$(expr $OPTIND + 1)
       ;;
     -*)               # Any other arg
-      echo "*** Invalid argument $arg"
+      echo "*** Invalid argument $arg" >&2
       echo ${USAGE}
       exit
       ;;
