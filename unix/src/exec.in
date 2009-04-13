@@ -1,31 +1,37 @@
-XP_RT=${XP_RT-php}
 ifs="|"
+
 if [ "" = "$USE_XP" ] ; then
-  section=default
-  while read line ; do
-    case "$line" in
-      use=*)
-        USE_XP=$(translate_paths "$base" "${line#*=}")
-      ;;
-
-      \[*\])
-        section=${line#\[}
-        section=${section%]}
-      ;;
-
-      *=*)
-        if [ runtime = $section ] ; then
-          key=${line%=*}
-          XP_RT="${line#*=}"
-        fi
-    esac
-  done < "$base"/xp.ini
+  unset USE_XP
 else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
+for i in "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    while read line ; do
+      case "$line" in
+        use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+        ;;
+
+        \[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+
+        *=*)
+          if [ runtime = $section ] && [ default = ${line%=*} ] ; then
+            XP_RT=${XP_RT-"${line#*=}"}
+          fi
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+
+XP_RT=${XP_RT-php}
 if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting" >&2
-  exit
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
 fi
 
 args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0"
