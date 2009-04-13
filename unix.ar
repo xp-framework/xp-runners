@@ -1,4 +1,4 @@
---3312:xp:--
+--3474:xp:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -96,8 +96,7 @@ for arg in "$@" ; do
       ;;
     -*) # Any other arg
       echo "*** Invalid argument $arg" >&2
-      echo ${USAGE}
-      exit
+      exit 255
       ;;
     *) # First arg we find that does not begin with a "-"
       break
@@ -109,34 +108,40 @@ shift $OPTIND
 base="$DIRNAME" RUNNER=$RUNNER INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
 
 
-XP_RT=${XP_RT-php}
 ifs="|"
+
 if [ "" = "$USE_XP" ] ; then
-  section=default
-  while read line ; do
-    case "$line" in
-      use=*)
-        USE_XP=$(translate_paths "$base" "${line#*=}")
-      ;;
-
-      \[*\])
-        section=${line#\[}
-        section=${section%]}
-      ;;
-
-      *=*)
-        if [ runtime = $section ] ; then
-          key=${line%=*}
-          XP_RT="${line#*=}"
-        fi
-    esac
-  done < "$base"/xp.ini
+  unset USE_XP
 else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
+for i in "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    while read line ; do
+      case "$line" in
+        use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+        ;;
+
+        \[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+
+        *=*)
+          if [ runtime = $section ] && [ default = ${line%=*} ] ; then
+            XP_RT=${XP_RT-"${line#*=}"}
+          fi
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+
+XP_RT=${XP_RT-php}
 if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting" >&2
-  exit
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
 fi
 
 args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0"
@@ -160,7 +165,7 @@ done
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2495:xar:--
+--2673:xar:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -231,34 +236,40 @@ locate() {
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.xar.Runner IFS="|";
 
 
-XP_RT=${XP_RT-php}
 ifs="|"
+
 if [ "" = "$USE_XP" ] ; then
-  section=default
-  while read line ; do
-    case "$line" in
-      use=*)
-        USE_XP=$(translate_paths "$base" "${line#*=}")
-      ;;
-
-      \[*\])
-        section=${line#\[}
-        section=${section%]}
-      ;;
-
-      *=*)
-        if [ runtime = $section ] ; then
-          key=${line%=*}
-          XP_RT="${line#*=}"
-        fi
-    esac
-  done < "$base"/xp.ini
+  unset USE_XP
 else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
+for i in "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    while read line ; do
+      case "$line" in
+        use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+        ;;
+
+        \[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+
+        *=*)
+          if [ runtime = $section ] && [ default = ${line%=*} ] ; then
+            XP_RT=${XP_RT-"${line#*=}"}
+          fi
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+
+XP_RT=${XP_RT-php}
 if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting" >&2
-  exit
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
 fi
 
 args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0"
@@ -282,7 +293,7 @@ done
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2499:xpcli:--
+--2677:xpcli:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -353,34 +364,40 @@ locate() {
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.command.Runner IFS="|";
 
 
-XP_RT=${XP_RT-php}
 ifs="|"
+
 if [ "" = "$USE_XP" ] ; then
-  section=default
-  while read line ; do
-    case "$line" in
-      use=*)
-        USE_XP=$(translate_paths "$base" "${line#*=}")
-      ;;
-
-      \[*\])
-        section=${line#\[}
-        section=${section%]}
-      ;;
-
-      *=*)
-        if [ runtime = $section ] ; then
-          key=${line%=*}
-          XP_RT="${line#*=}"
-        fi
-    esac
-  done < "$base"/xp.ini
+  unset USE_XP
 else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
+for i in "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    while read line ; do
+      case "$line" in
+        use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+        ;;
+
+        \[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+
+        *=*)
+          if [ runtime = $section ] && [ default = ${line%=*} ] ; then
+            XP_RT=${XP_RT-"${line#*=}"}
+          fi
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+
+XP_RT=${XP_RT-php}
 if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting" >&2
-  exit
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
 fi
 
 args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0"
@@ -404,7 +421,7 @@ done
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2500:unittest:--
+--2678:unittest:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -475,34 +492,40 @@ locate() {
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.unittest.Runner IFS="|";
 
 
-XP_RT=${XP_RT-php}
 ifs="|"
+
 if [ "" = "$USE_XP" ] ; then
-  section=default
-  while read line ; do
-    case "$line" in
-      use=*)
-        USE_XP=$(translate_paths "$base" "${line#*=}")
-      ;;
-
-      \[*\])
-        section=${line#\[}
-        section=${section%]}
-      ;;
-
-      *=*)
-        if [ runtime = $section ] ; then
-          key=${line%=*}
-          XP_RT="${line#*=}"
-        fi
-    esac
-  done < "$base"/xp.ini
+  unset USE_XP
 else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
+for i in "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    while read line ; do
+      case "$line" in
+        use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+        ;;
+
+        \[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+
+        *=*)
+          if [ runtime = $section ] && [ default = ${line%=*} ] ; then
+            XP_RT=${XP_RT-"${line#*=}"}
+          fi
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+
+XP_RT=${XP_RT-php}
 if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting" >&2
-  exit
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
 fi
 
 args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0"
@@ -526,7 +549,7 @@ done
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2498:doclet:--
+--2676:doclet:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -597,34 +620,40 @@ locate() {
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.doclet.Runner IFS="|";
 
 
-XP_RT=${XP_RT-php}
 ifs="|"
+
 if [ "" = "$USE_XP" ] ; then
-  section=default
-  while read line ; do
-    case "$line" in
-      use=*)
-        USE_XP=$(translate_paths "$base" "${line#*=}")
-      ;;
-
-      \[*\])
-        section=${line#\[}
-        section=${section%]}
-      ;;
-
-      *=*)
-        if [ runtime = $section ] ; then
-          key=${line%=*}
-          XP_RT="${line#*=}"
-        fi
-    esac
-  done < "$base"/xp.ini
+  unset USE_XP
 else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
+for i in "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    while read line ; do
+      case "$line" in
+        use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+        ;;
+
+        \[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+
+        *=*)
+          if [ runtime = $section ] && [ default = ${line%=*} ] ; then
+            XP_RT=${XP_RT-"${line#*=}"}
+          fi
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+
+XP_RT=${XP_RT-php}
 if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting" >&2
-  exit
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
 fi
 
 args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0"
@@ -648,7 +677,7 @@ done
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2499:cgen:--
+--2677:cgen:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -719,34 +748,40 @@ locate() {
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.codegen.Runner IFS="|";
 
 
-XP_RT=${XP_RT-php}
 ifs="|"
+
 if [ "" = "$USE_XP" ] ; then
-  section=default
-  while read line ; do
-    case "$line" in
-      use=*)
-        USE_XP=$(translate_paths "$base" "${line#*=}")
-      ;;
-
-      \[*\])
-        section=${line#\[}
-        section=${section%]}
-      ;;
-
-      *=*)
-        if [ runtime = $section ] ; then
-          key=${line%=*}
-          XP_RT="${line#*=}"
-        fi
-    esac
-  done < "$base"/xp.ini
+  unset USE_XP
 else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
+for i in "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    while read line ; do
+      case "$line" in
+        use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+        ;;
+
+        \[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+
+        *=*)
+          if [ runtime = $section ] && [ default = ${line%=*} ] ; then
+            XP_RT=${XP_RT-"${line#*=}"}
+          fi
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+
+XP_RT=${XP_RT-php}
 if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting" >&2
-  exit
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
 fi
 
 args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0"
@@ -770,7 +805,7 @@ done
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2500:xcc:--
+--2678:xcc:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -841,34 +876,40 @@ locate() {
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.compiler.Runner IFS="|";
 
 
-XP_RT=${XP_RT-php}
 ifs="|"
+
 if [ "" = "$USE_XP" ] ; then
-  section=default
-  while read line ; do
-    case "$line" in
-      use=*)
-        USE_XP=$(translate_paths "$base" "${line#*=}")
-      ;;
-
-      \[*\])
-        section=${line#\[}
-        section=${section%]}
-      ;;
-
-      *=*)
-        if [ runtime = $section ] ; then
-          key=${line%=*}
-          XP_RT="${line#*=}"
-        fi
-    esac
-  done < "$base"/xp.ini
+  unset USE_XP
 else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
+for i in "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    while read line ; do
+      case "$line" in
+        use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+        ;;
+
+        \[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+
+        *=*)
+          if [ runtime = $section ] && [ default = ${line%=*} ] ; then
+            XP_RT=${XP_RT-"${line#*=}"}
+          fi
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+
+XP_RT=${XP_RT-php}
 if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting" >&2
-  exit
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
 fi
 
 args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0"
