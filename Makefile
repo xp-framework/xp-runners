@@ -5,6 +5,18 @@
 
 .PHONY: unix windows
 
+all:
+	@echo "Makefile for XP runners"
+	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	@echo "$(MAKE) clean        - Cleanup"
+	@echo "$(MAKE) release      - Release runners @ xp-framework.net"
+	@echo
+	@echo "$(MAKE) unix         - Creates Un*x runners (/bin/sh)"
+	@echo "$(MAKE) windows      - Creates Windows runners (C#)"
+	@echo
+	@echo "$(MAKE) test.unix    - Tests Un*x runners"
+	@echo "$(MAKE) test.windows - Test Windows runners"
+
 unix: unix/src/* unix.ar
 	cd unix && $(MAKE)
 
