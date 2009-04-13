@@ -30,8 +30,7 @@ for arg in "$@" ; do
       ;;
     -*)               # Any other arg
       echo "*** Invalid argument $arg" >&2
-      echo ${USAGE}
-      exit
+      exit 255
       ;;
     *)                # First arg we find that does not begin with a "-"
       break
