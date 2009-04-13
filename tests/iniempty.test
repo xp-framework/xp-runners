@@ -1,0 +1,4 @@
+INI=empty
+ENV.USE_XP=
+CMD=xp -v
+ERR.EXPECT=Cannot determine use_xp setting

@@ -1,0 +1,4 @@
+INI=unknownsection
+ENV.USE_XP=
+CMD=xp -v
+ERR.EXPECT=Unknown configuration
