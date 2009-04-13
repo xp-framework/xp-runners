@@ -20,8 +20,8 @@ all:
 unix: unix/src/*
 	cd unix && $(MAKE)
 
-unix.ar: unix/xp unix/xar unix/xpcli unix/unittest unix/doclet unix/cgen
-	sh ar.sh unix.ar unix/xp unix/xar unix/xpcli unix/unittest unix/doclet unix/cgen
+unix.ar: unix/xp unix/xar unix/xpcli unix/unittest unix/doclet unix/cgen unix/xcc
+	sh ar.sh unix.ar unix/xp unix/xar unix/xpcli unix/unittest unix/doclet unix/cgen unix/xcc
 
 windows: windows/src/*
 	cd windows && $(MAKE)
