@@ -1,7 +1,7 @@
 CSC?=csc
 CLASSES=src\\Executor.cs src\\Paths.cs src\\BaseRunner.cs src\\XpConfigSource.cs src\\EnvironmentConfigSource.cs src\\IniConfigSource.cs src\\CompositeConfigSource.cs src\\Ini.cs
 
-all: xp.exe xpcli.exe xar.exe unittest.exe cgen.exe doclet.exe
+all: xp.exe xpcli.exe xar.exe unittest.exe cgen.exe doclet.exe xcc.exe
 
 xp.exe: src\\Xp.cs $(CLASSES)
 	$(CSC) /nologo /target:exe /out:$@ src\\Xp.cs $(CLASSES)
@@ -21,6 +21,9 @@ cgen.exe: src\\Cgen.cs $(CLASSES)
 doclet.exe: src\\Doclet.cs $(CLASSES)
 	$(CSC) /nologo /target:exe /out:$@ src\\Doclet.cs $(CLASSES)
 
+xcc.exe: src\\Xcc.cs $(CLASSES)
+	$(CSC) /nologo /target:exe /out:$@ src\\Xcc.cs $(CLASSES)
+
 clean:
-	-rm xp.exe xpcli.exe xar.exe unittest.exe cgen.exe doclet.exe
+	-rm xp.exe xpcli.exe xar.exe unittest.exe cgen.exe doclet.exe xcc.exe
 
