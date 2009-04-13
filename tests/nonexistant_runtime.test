@@ -1,0 +1,4 @@
+ENV.XP_RT=php-exe
+CMD=xp -v
+ERR.EXPECT=php-exe
+!!! This should yield a nice and unified message
