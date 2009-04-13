@@ -9,7 +9,7 @@ if [ "" = "$USE_XP" ] ; then
       ;;
 
       \[*\])
-        section=${line#[}
+        section=${line#\[}
         section=${section%]}
       ;;
 
@@ -24,6 +24,10 @@ if [ "" = "$USE_XP" ] ; then
   done < "$base"/xp.ini
 else
   USE_XP=$(translate_paths "." "$USE_XP")
+fi
+if [ "" = "$USE_XP" ] ; then
+  echo "*** Cannot determine use_xp setting" >&2
+  exit
 fi
 
 args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0"
