@@ -1,5 +1,4 @@
 INI=unknownsection
 ENV.USE_XP=
 CMD=xp -e 'var_dump(TRUE);'
-ERR.EXPECT=Unknown configuration
 OUT.EXPECT=bool\\(true\\)
