@@ -2,11 +2,12 @@ testrun:
 	@echo "~~ Running testsuite ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	@-for i in `ls *.test` ; do                                                      \
 	  echo -n "==> $$i " ;                                                           \
+	  ENV="USE_XP=5.7.2" ;                                                           \
 	  while read line ; do                                                           \
 	    case "$$line" in                                                             \
 	      CMD=*)                                                                     \
-	        echo "<USE_XP=5.7.2 $(TYPE)/$${line#*=}>: " ;                            \
-	        USE_XP=5.7.2 ../$(TYPE)/$${line#*=} 2>err 1>out ;                        \
+	        echo "<$$ENV $(TYPE)/$${line#*=}>: " ;                                   \
+	        eval $$ENV ../$(TYPE)/$${line#*=} 2>err 1>out ;                          \
 	      ;;                                                                         \
 	                                                                                 \
 	      OUT.EXPECT=*)                                                              \
@@ -25,6 +26,11 @@ testrun:
 	        else                                                                     \
 	          echo "*** STDERR: Expecting <$${line#*=}>, have:" ; cat err ; echo ;   \
             fi                                                                       \
+          ;;                                                                         \
+	                                                                                 \
+	      ENV.*=*)                                                                   \
+	        var=$${line%=*} ;                                                        \
+	        ENV="$$ENV $${var#*.}=$${line#*=}"                                       \
           ;;                                                                         \
 	                                                                                 \
 	      *)                                                                         \
