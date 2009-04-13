@@ -1,4 +1,4 @@
 ENV.USE_XP=xp-install
 CMD=xp -v
-ERR.EXPECT=Cannot find tools.+class
+ERR.EXPECT=tools.+class
 !!! This should yield a nice and unified message
