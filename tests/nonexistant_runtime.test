@@ -1,4 +1,4 @@
-ENV.XP_RT=php-exe
+ENV.XP_RT=/non/existant/php-exe
 CMD=xp -v
-ERR.EXPECT=php-exe
+ERR.EXPECT=/non/existant/php-exe
 !!! This should yield a nice and unified message
