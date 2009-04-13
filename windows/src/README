@@ -13,7 +13,7 @@ Compiler) in your path, you may tell make where to find it as follows:
 
 This step will produce the following binaries:
 <pre>
-  xp.exe xpcli.exe xar.exe unittest.exe cgen.exe doclet.exe
+  xp.exe xpcli.exe xar.exe unittest.exe cgen.exe doclet.exe xcc.exe
 </pre>
 
 Howto: Install
