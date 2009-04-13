@@ -3,6 +3,7 @@ testrun:
 	@-for i in `ls *.test` ; do                                                      \
 	  echo -n "==> $$i " ;                                                           \
 	  ENV="USE_XP=5.7.2" ;                                                           \
+	  if [ -e ../$(TYPE)/xp.ini ] ; then rm ../$(TYPE)/xp.ini ; fi ;                 \
 	  while read line ; do                                                           \
 	    case "$$line" in                                                             \
 	      CMD=*)                                                                     \
@@ -26,6 +27,10 @@ testrun:
 	        else                                                                     \
 	          echo "*** STDERR: Expecting <$${line#*=}>, have:" ; cat err ; echo ;   \
             fi                                                                       \
+          ;;                                                                         \
+	                                                                                 \
+	      INI=*)                                                                     \
+	        cp ini/$${line#*=}.ini ../$(TYPE)/xp.ini ;                               \
           ;;                                                                         \
 	                                                                                 \
 	      ENV.*=*)                                                                   \
