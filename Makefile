@@ -17,19 +17,19 @@ all:
 	@echo "$(MAKE) test.unix    - Tests Un*x runners"
 	@echo "$(MAKE) test.windows - Test Windows runners"
 
-unix: unix/src/* unix.ar
+unix: unix/src/*
 	cd unix && $(MAKE)
 
 unix.ar: unix/xp unix/xar unix/xpcli unix/unittest unix/doclet unix/cgen
 	sh ar.sh unix.ar unix/xp unix/xar unix/xpcli unix/unittest unix/doclet unix/cgen
 
-windows: windows/src/* windows.ar
+windows: windows/src/*
 	cd windows && $(MAKE)
 
 windows.ar: windows/*.exe
 	sh ar.sh windows.ar windows/*.exe
 
-release:
+release: *.ar
 	scp setup *.ar xpdoku@php3.de:/home/httpd/xp.php3.de/doc_root/downloads/releases/bin/
 
 clean:
