@@ -3,7 +3,6 @@ testrun:
 	@-for i in `ls *.test` ; do                                                      \
 	  echo -n "==> $$i " ;                                                           \
 	  ENV="USE_XP=5.7.2" ;                                                           \
-	  if [ -e ../$(TYPE)/xp.ini ] ; then rm ../$(TYPE)/xp.ini ; fi ;                 \
 	  while read line ; do                                                           \
 	    case "$$line" in                                                             \
 	      CMD=*)                                                                     \
@@ -52,7 +51,8 @@ testrun:
           ;;                                                                         \
 	    esac                                                                         \
 	  done < $$i ;                                                                   \
+	  if [ -e ../$(TYPE)/xp.ini ] ; then rm ../$(TYPE)/xp.ini ; fi ;                 \
 	  echo ;                                                                         \
 	done
 	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	-rm out err ../$(TYPE)/xp.ini 
+	-rm out err
