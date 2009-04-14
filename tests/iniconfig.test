@@ -1,0 +1,4 @@
+INI=config
+ENV.USE_XP=
+CMD=xp -e "var_dump(ini_get('default_charset'));"
+OUT.EXPECT=string\\([0-9]+\\) "US-ASCII"
