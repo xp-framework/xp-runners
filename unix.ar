@@ -1,4 +1,4 @@
---3474:xp:--
+--3292:xp:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -115,22 +115,27 @@ if [ "" = "$USE_XP" ] ; then
 else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
-for i in "$HOME/.xp" "$base" ; do
+RT_ARG=""
+for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
+    section=default
     while read line ; do
-      case "$line" in
-        use=*)
+      case "$section.$line" in
+        default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
 
-        \[*\])
+        *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
 
-        *=*)
-          if [ runtime = $section ] && [ default = ${line%=*} ] ; then
+        runtime.*=*)
+          key=${line%=*}
+          if [ default = $key ] ; then
             XP_RT=${XP_RT-"${line#*=}"}
+          else
+            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
           fi
         ;;
       esac
@@ -144,28 +149,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0"
-IFS="
-"
-for ini in $(locate "$USE_XP" "php.ini" 0) ; do
-  while read line ; do
-    case "$line" in
-      *=*)
-        key=${line%=*}
-        if [ "executor" = "$key" ]; then
-          XP_RT="${line#*=}"
-        else
-          args="$args${ifs}-d$key=\"${line#*=}\""
-        fi
-      ;;
-    esac
-  done < $ini
-done
+args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2673:xar:--
+--2491:xar:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -243,22 +232,27 @@ if [ "" = "$USE_XP" ] ; then
 else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
-for i in "$HOME/.xp" "$base" ; do
+RT_ARG=""
+for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
+    section=default
     while read line ; do
-      case "$line" in
-        use=*)
+      case "$section.$line" in
+        default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
 
-        \[*\])
+        *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
 
-        *=*)
-          if [ runtime = $section ] && [ default = ${line%=*} ] ; then
+        runtime.*=*)
+          key=${line%=*}
+          if [ default = $key ] ; then
             XP_RT=${XP_RT-"${line#*=}"}
+          else
+            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
           fi
         ;;
       esac
@@ -272,28 +266,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0"
-IFS="
-"
-for ini in $(locate "$USE_XP" "php.ini" 0) ; do
-  while read line ; do
-    case "$line" in
-      *=*)
-        key=${line%=*}
-        if [ "executor" = "$key" ]; then
-          XP_RT="${line#*=}"
-        else
-          args="$args${ifs}-d$key=\"${line#*=}\""
-        fi
-      ;;
-    esac
-  done < $ini
-done
+args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2677:xpcli:--
+--2495:xpcli:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -371,22 +349,27 @@ if [ "" = "$USE_XP" ] ; then
 else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
-for i in "$HOME/.xp" "$base" ; do
+RT_ARG=""
+for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
+    section=default
     while read line ; do
-      case "$line" in
-        use=*)
+      case "$section.$line" in
+        default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
 
-        \[*\])
+        *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
 
-        *=*)
-          if [ runtime = $section ] && [ default = ${line%=*} ] ; then
+        runtime.*=*)
+          key=${line%=*}
+          if [ default = $key ] ; then
             XP_RT=${XP_RT-"${line#*=}"}
+          else
+            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
           fi
         ;;
       esac
@@ -400,28 +383,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0"
-IFS="
-"
-for ini in $(locate "$USE_XP" "php.ini" 0) ; do
-  while read line ; do
-    case "$line" in
-      *=*)
-        key=${line%=*}
-        if [ "executor" = "$key" ]; then
-          XP_RT="${line#*=}"
-        else
-          args="$args${ifs}-d$key=\"${line#*=}\""
-        fi
-      ;;
-    esac
-  done < $ini
-done
+args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2678:unittest:--
+--2496:unittest:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -499,22 +466,27 @@ if [ "" = "$USE_XP" ] ; then
 else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
-for i in "$HOME/.xp" "$base" ; do
+RT_ARG=""
+for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
+    section=default
     while read line ; do
-      case "$line" in
-        use=*)
+      case "$section.$line" in
+        default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
 
-        \[*\])
+        *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
 
-        *=*)
-          if [ runtime = $section ] && [ default = ${line%=*} ] ; then
+        runtime.*=*)
+          key=${line%=*}
+          if [ default = $key ] ; then
             XP_RT=${XP_RT-"${line#*=}"}
+          else
+            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
           fi
         ;;
       esac
@@ -528,28 +500,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0"
-IFS="
-"
-for ini in $(locate "$USE_XP" "php.ini" 0) ; do
-  while read line ; do
-    case "$line" in
-      *=*)
-        key=${line%=*}
-        if [ "executor" = "$key" ]; then
-          XP_RT="${line#*=}"
-        else
-          args="$args${ifs}-d$key=\"${line#*=}\""
-        fi
-      ;;
-    esac
-  done < $ini
-done
+args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2676:doclet:--
+--2494:doclet:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -627,22 +583,27 @@ if [ "" = "$USE_XP" ] ; then
 else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
-for i in "$HOME/.xp" "$base" ; do
+RT_ARG=""
+for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
+    section=default
     while read line ; do
-      case "$line" in
-        use=*)
+      case "$section.$line" in
+        default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
 
-        \[*\])
+        *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
 
-        *=*)
-          if [ runtime = $section ] && [ default = ${line%=*} ] ; then
+        runtime.*=*)
+          key=${line%=*}
+          if [ default = $key ] ; then
             XP_RT=${XP_RT-"${line#*=}"}
+          else
+            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
           fi
         ;;
       esac
@@ -656,28 +617,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0"
-IFS="
-"
-for ini in $(locate "$USE_XP" "php.ini" 0) ; do
-  while read line ; do
-    case "$line" in
-      *=*)
-        key=${line%=*}
-        if [ "executor" = "$key" ]; then
-          XP_RT="${line#*=}"
-        else
-          args="$args${ifs}-d$key=\"${line#*=}\""
-        fi
-      ;;
-    esac
-  done < $ini
-done
+args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2677:cgen:--
+--2495:cgen:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -755,22 +700,27 @@ if [ "" = "$USE_XP" ] ; then
 else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
-for i in "$HOME/.xp" "$base" ; do
+RT_ARG=""
+for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
+    section=default
     while read line ; do
-      case "$line" in
-        use=*)
+      case "$section.$line" in
+        default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
 
-        \[*\])
+        *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
 
-        *=*)
-          if [ runtime = $section ] && [ default = ${line%=*} ] ; then
+        runtime.*=*)
+          key=${line%=*}
+          if [ default = $key ] ; then
             XP_RT=${XP_RT-"${line#*=}"}
+          else
+            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
           fi
         ;;
       esac
@@ -784,28 +734,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0"
-IFS="
-"
-for ini in $(locate "$USE_XP" "php.ini" 0) ; do
-  while read line ; do
-    case "$line" in
-      *=*)
-        key=${line%=*}
-        if [ "executor" = "$key" ]; then
-          XP_RT="${line#*=}"
-        else
-          args="$args${ifs}-d$key=\"${line#*=}\""
-        fi
-      ;;
-    esac
-  done < $ini
-done
+args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2678:xcc:--
+--2496:xcc:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -883,22 +817,27 @@ if [ "" = "$USE_XP" ] ; then
 else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
-for i in "$HOME/.xp" "$base" ; do
+RT_ARG=""
+for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
+    section=default
     while read line ; do
-      case "$line" in
-        use=*)
+      case "$section.$line" in
+        default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
 
-        \[*\])
+        *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
 
-        *=*)
-          if [ runtime = $section ] && [ default = ${line%=*} ] ; then
+        runtime.*=*)
+          key=${line%=*}
+          if [ default = $key ] ; then
             XP_RT=${XP_RT-"${line#*=}"}
+          else
+            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
           fi
         ;;
       esac
@@ -912,23 +851,7 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0"
-IFS="
-"
-for ini in $(locate "$USE_XP" "php.ini" 0) ; do
-  while read line ; do
-    case "$line" in
-      *=*)
-        key=${line%=*}
-        if [ "executor" = "$key" ]; then
-          XP_RT="${line#*=}"
-        else
-          args="$args${ifs}-d$key=\"${line#*=}\""
-        fi
-      ;;
-    esac
-  done < $ini
-done
+args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
