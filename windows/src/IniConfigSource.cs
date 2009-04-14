@@ -45,8 +45,12 @@ namespace Net.XpFramework.Runner
         {
             Dictionary<string, IEnumerable<string>> args= new Dictionary<string, IEnumerable<string>>();
             List<string> empty= new List<string>();
-            foreach (string key in this.ini.Keys("runtime", empty)) {
-                args[key]= this.ini.GetAll("runtime", key, empty);
+            foreach (string key in this.ini.Keys("runtime", empty)) 
+            {
+                if (!"default".Equals(key)) 
+                {
+                    args[key]= this.ini.GetAll("runtime", key, empty);
+                }
             }
             return args;
         }
