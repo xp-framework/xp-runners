@@ -25,6 +25,7 @@ namespace Net.XpFramework.Runner
             // Read configuration
             XpConfigSource configs = new CompositeConfigSource(
                 new EnvironmentConfigSource(),
+                new IniConfigSource(new Ini(Paths.Compose(".", "xp.ini"))),
                 null != home ? new IniConfigSource(new Ini(Paths.Compose(home, ".xp", "xp.ini"))) : null,
                 new IniConfigSource(new Ini(Paths.Compose(Environment.SpecialFolder.LocalApplicationData, "xp.ini"))),
                 new IniConfigSource(new Ini(Paths.Compose(base_dir, "xp.ini")))
@@ -53,17 +54,11 @@ namespace Net.XpFramework.Runner
             );
             
             // Look for PHP configuration
-            foreach (string file in Paths.Locate(use_xp, "php.ini", false))
+            foreach (KeyValuePair<string, IEnumerable<string>> kv in configs.GetArgs())
             {
-                var ini= new Ini(file);
-                executor = ini.Get("default", "executor", executor);
-                
-                foreach (string key in ini.Keys("config", EMPTY_LIST))
+                foreach (string value in kv.Value)
                 {
-                    foreach (string value in ini.GetAll("config", key, EMPTY_LIST))
-                    {
-                        argv += " -d" + key + "=\"" + value + "\"";
-                    }
+                    argv += " -d" + kv.Key + "=\"" + value + "\"";
                 }
             }
 
@@ -85,7 +80,7 @@ namespace Net.XpFramework.Runner
             }
             catch (SystemException e) {
                 throw new ExecutionEngineException(executor + ": " + e.Message, e);
-            }
+            } 
             finally
             {
                 proc.Close();

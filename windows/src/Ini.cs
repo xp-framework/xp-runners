@@ -88,7 +88,7 @@ namespace Net.XpFramework.Runner
         public IEnumerable<string> Keys(string section, IEnumerable<string> defaultValue) {
             this.Parse(false);
             if (!this.sections.ContainsKey(section)) return defaultValue;
-            return this.sections.Keys;
+            return this.sections[section].Keys;
         }
 
         public IEnumerable<string> Keys(string section) {

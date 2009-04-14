@@ -37,6 +37,19 @@ namespace Net.XpFramework.Runner
         {
             return this.ini.Get("runtime", "default");
         }
+
+        /// <summary>
+        /// Returns the PHP runtime arguments to be used from this config source
+        /// </summary>
+        public Dictionary<string, IEnumerable<string>> GetArgs()
+        {
+            Dictionary<string, IEnumerable<string>> args= new Dictionary<string, IEnumerable<string>>();
+            List<string> empty= new List<string>();
+            foreach (string key in this.ini.Keys("runtime", empty)) {
+                args[key]= this.ini.GetAll("runtime", key, empty);
+            }
+            return args;
+        }
         
         /// <summary>
         /// Returns a string representation of this config source

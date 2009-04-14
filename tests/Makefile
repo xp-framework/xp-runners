@@ -38,7 +38,7 @@ testrun:
           ;;                                                                         \
 	                                                                                 \
 	      INI=*)                                                                     \
-	        cp ini/$${line#*=}.ini ../$(TYPE)/xp.ini ;                               \
+	        cp ini/$${line#*=}.ini xp.ini ;                                          \
           ;;                                                                         \
 	                                                                                 \
 	      ENV.*=*)                                                                   \
@@ -51,7 +51,7 @@ testrun:
           ;;                                                                         \
 	    esac                                                                         \
 	  done < $$i ;                                                                   \
-	  if [ -e ../$(TYPE)/xp.ini ] ; then rm ../$(TYPE)/xp.ini ; fi ;                 \
+	  if [ -e xp.ini ] ; then rm xp.ini ; fi ;                                       \
 	  echo ;                                                                         \
 	done
 	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"

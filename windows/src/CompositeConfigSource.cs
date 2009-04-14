@@ -40,6 +40,23 @@ namespace Net.XpFramework.Runner
             }
             return null;
         }
+
+        /// <summary>
+        /// Returns the PHP runtime arguments to be used from this config source
+        /// </summary>
+        public Dictionary<string, IEnumerable<string>> GetArgs()
+        {
+            Dictionary<string, IEnumerable<string>> merged= new Dictionary<string, IEnumerable<string>>();
+            foreach (XpConfigSource source in this.sources) 
+            {
+                Dictionary<string, IEnumerable<string>> args = source.GetArgs();
+                if (args == null) continue;
+                foreach (KeyValuePair<string, IEnumerable<string>> kv in args) {
+                    merged.Add(kv.Key, kv.Value);
+                }
+            }
+            return merged;
+        }
         
         /// <summary>
         /// Returns a string representation of this config source

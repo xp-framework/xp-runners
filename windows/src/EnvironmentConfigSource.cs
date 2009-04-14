@@ -28,6 +28,14 @@ namespace Net.XpFramework.Runner
         }
 
         /// <summary>
+        /// Returns the PHP runtime arguments to be used from this config source
+        /// </summary>
+        public Dictionary<string, IEnumerable<string>> GetArgs()
+        {
+            return null;
+        }
+
+        /// <summary>
         /// Returns a string representation of this config source
         /// </summary>
         public override string ToString() 
