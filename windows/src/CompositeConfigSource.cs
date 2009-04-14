@@ -51,8 +51,13 @@ namespace Net.XpFramework.Runner
             {
                 Dictionary<string, IEnumerable<string>> args = source.GetArgs();
                 if (args == null) continue;
-                foreach (KeyValuePair<string, IEnumerable<string>> kv in args) {
-                    merged.Add(kv.Key, kv.Value);
+
+                foreach (KeyValuePair<string, IEnumerable<string>> kv in args) 
+                {
+                    if (!merged.ContainsKey(kv.Key)) 
+                    {
+                        merged[kv.Key] = kv.Value;
+                    }
                 }
             }
             return merged;
