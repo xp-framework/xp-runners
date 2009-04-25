@@ -39,7 +39,7 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
