@@ -1,4 +1,4 @@
---3292:xp:--
+--3440:xp:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -71,39 +71,43 @@ INCLUDE_PATH="."
 TOOL=
 RUNNER="class"
 
-for arg in "$@" ; do
-  if [ ! -z "$INCLUDE_ARG" ] ; then
-    INCLUDE_PATH="$arg$INCLUDE_ARG$INCLUDE_PATH" ; INCLUDE_ARG=""
-    OPTIND=`expr $OPTIND + 2`
-    continue
-  fi
+if [ 0 = $# ] ; then
+  TOOL="xp.runtime.ShowResource|usage.txt|255"
+else
+  for arg in "$@" ; do
+    if [ ! -z "$INCLUDE_ARG" ] ; then
+      INCLUDE_PATH="$arg$INCLUDE_ARG$INCLUDE_PATH" ; INCLUDE_ARG=""
+      OPTIND=`expr $OPTIND + 2`
+      continue
+    fi
 
-  case $arg in
-    -v) # Display version
-      TOOL="xp.runtime.Version"
-      OPTIND=$(expr $OPTIND + 1)
-      ;;
-    -e) # Run source passed via command line
-      TOOL="xp.runtime.Evaluate"
-      OPTIND=$(expr $OPTIND + 1)
-      ;;
-    -cp) # Add class path
-      INCLUDE_ARG=${PATHSEP}
-      ;;
-    -xar) # Run a xar
-      RUNNER="xar"
-      OPTIND=$(expr $OPTIND + 1)
-      ;;
-    -*) # Any other arg
-      echo "*** Invalid argument $arg" >&2
-      exit 255
-      ;;
-    *) # First arg we find that does not begin with a "-"
-      break
-      ;;
-  esac
-done
-shift $OPTIND
+    case $arg in
+      -v) # Display version
+        TOOL="xp.runtime.Version"
+        OPTIND=$(expr $OPTIND + 1)
+        ;;
+      -e) # Run source passed via command line
+        TOOL="xp.runtime.Evaluate"
+        OPTIND=$(expr $OPTIND + 1)
+        ;;
+      -cp) # Add class path
+        INCLUDE_ARG=${PATHSEP}
+        ;;
+      -xar) # Run a xar
+        RUNNER="xar"
+        OPTIND=$(expr $OPTIND + 1)
+        ;;
+      -*) # Any other arg
+        echo "*** Invalid argument $arg" >&2
+        exit 255
+        ;;
+      *) # First arg we find that does not begin with a "-"
+        break
+        ;;
+    esac
+  done
+  shift $OPTIND
+fi
 
 base="$DIRNAME" RUNNER=$RUNNER INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
 
@@ -149,12 +153,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2491:xar:--
+--2499:xar:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -266,12 +270,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2495:xpcli:--
+--2503:xpcli:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -383,12 +387,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2496:unittest:--
+--2504:unittest:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -500,12 +504,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2494:doclet:--
+--2502:doclet:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -617,12 +621,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2495:cgen:--
+--2503:cgen:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -734,12 +738,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2496:xcc:--
+--2504:xcc:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -851,7 +855,7 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
