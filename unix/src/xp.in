@@ -5,39 +5,43 @@ INCLUDE_PATH="."
 TOOL=
 RUNNER="class"
 
-for arg in "$@" ; do
-  if [ ! -z "$INCLUDE_ARG" ] ; then
-    INCLUDE_PATH="$arg$INCLUDE_ARG$INCLUDE_PATH" ; INCLUDE_ARG=""
-    OPTIND=`expr $OPTIND + 2`
-    continue
-  fi
+if [ 0 = $# ] ; then 
+  TOOL="xp.runtime.ShowResource|usage.txt|255"
+else
+  for arg in "$@" ; do
+    if [ ! -z "$INCLUDE_ARG" ] ; then
+      INCLUDE_PATH="$arg$INCLUDE_ARG$INCLUDE_PATH" ; INCLUDE_ARG=""
+      OPTIND=`expr $OPTIND + 2`
+      continue
+    fi
 
-  case $arg in
-    -v)               # Display version
-      TOOL="xp.runtime.Version"
-      OPTIND=$(expr $OPTIND + 1)
-      ;;
-    -e)               # Run source passed via command line
-      TOOL="xp.runtime.Evaluate"
-      OPTIND=$(expr $OPTIND + 1)
-      ;;
-    -cp)              # Add class path
-      INCLUDE_ARG=${PATHSEP}
-      ;;
-    -xar)             # Run a xar
-      RUNNER="xar"
-      OPTIND=$(expr $OPTIND + 1)
-      ;;
-    -*)               # Any other arg
-      echo "*** Invalid argument $arg" >&2
-      exit 255
-      ;;
-    *)                # First arg we find that does not begin with a "-"
-      break
-      ;;
-  esac
-done
-shift $OPTIND
+    case $arg in
+      -v)               # Display version
+        TOOL="xp.runtime.Version"
+        OPTIND=$(expr $OPTIND + 1)
+        ;;
+      -e)               # Run source passed via command line
+        TOOL="xp.runtime.Evaluate"
+        OPTIND=$(expr $OPTIND + 1)
+        ;;
+      -cp)              # Add class path
+        INCLUDE_ARG=${PATHSEP}
+        ;;
+      -xar)             # Run a xar
+        RUNNER="xar"
+        OPTIND=$(expr $OPTIND + 1)
+        ;;
+      -*)               # Any other arg
+        echo "*** Invalid argument $arg" >&2
+        exit 255
+        ;;
+      *)                # First arg we find that does not begin with a "-"
+        break
+        ;;
+    esac
+  done
+  shift $OPTIND
+fi
 
 EXEC($RUNNER, $INCLUDE_PATH, $TOOL)
 

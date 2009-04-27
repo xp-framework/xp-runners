@@ -8,52 +8,61 @@ namespace Net.XpFramework.Runner
 
         static void Main(string[] args)
         {
+            string[] argv;
             string tool = "";
             string runner = "class";
             int shift = 0;
             var includes = new List<string>();
             includes.Add(".");
+            
+            if (0 == args.Length) 
+            {
+                tool = "xp.runtime.ShowResource";
+                argv = new string[2] { "usage.txt", "255" };
+            } 
+            else 
+            {
+                for (var i = 0; i < args.Length ; i++) {
+                    switch (args[i])
+                    {
+                        case "-v": 
+                            tool = "xp.runtime.Version"; 
+                            shift++;  
+                            break;
 
-            for (var i = 0; i < args.Length ; i++) {
-                switch (args[i])
-                {
-                    case "-v": 
-                        tool = "xp.runtime.Version"; 
-                        shift++;  
-                        break;
+                        case "-e": 
+                            tool = "xp.runtime.Evaluate"; 
+                            shift++; 
+                            break;
 
-                    case "-e": 
-                        tool = "xp.runtime.Evaluate"; 
-                        shift++; 
-                        break;
+                        case "-xar": 
+                            runner = "xar"; 
+                            shift++; 
+                            break;
 
-                    case "-xar": 
-                        runner = "xar"; 
-                        shift++; 
-                        break;
+                        case "-cp":
+                            includes.Add(args[++i]);
+                            shift += 2;
+                            break;
 
-                    case "-cp":
-                        includes.Add(args[++i]);
-                        shift += 2;
-                        break;
-
-                    default:
-                        if (args[i].StartsWith("-"))
-                        {
-                            Console.Error.WriteLine("*** Invalid argument {0}", args[i]);
-                            Environment.Exit(0xFF);
-                        } 
-                        else 
-                        {
-                            i = args.Length;
-                        }
-                        break;
+                        default:
+                            if (args[i].StartsWith("-"))
+                            {
+                                Console.Error.WriteLine("*** Invalid argument {0}", args[i]);
+                                Environment.Exit(0xFF);
+                            } 
+                            else 
+                            {
+                                i = args.Length;
+                            }
+                            break;
+                    }
                 }
-            }
 
-            // Shift
-            var argv = new string[args.Length - shift];
-            Array.Copy(args, shift, argv, 0, args.Length - shift);
+                // Shift
+                argv = new string[args.Length - shift];
+                Array.Copy(args, shift, argv, 0, args.Length - shift);
+            }
 
             // Execute
             Execute(runner, tool, includes.ToArray(), argv);
