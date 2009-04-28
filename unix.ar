@@ -1,4 +1,4 @@
---3440:xp:--
+--3448:xp:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -153,12 +153,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2499:xar:--
+--2507:xar:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -270,12 +270,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2503:xpcli:--
+--2511:xpcli:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -387,12 +387,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2504:unittest:--
+--2512:unittest:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -504,12 +504,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2502:doclet:--
+--2510:doclet:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -621,12 +621,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2503:cgen:--
+--2511:cgen:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -738,12 +738,12 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2504:xcc:--
+--2512:xcc:--
 #!/bin/sh
 if [ "$OS" = "Windows_NT" ]; then
   PATHSEP=';'
@@ -855,7 +855,7 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 
 export XP_RT
 IFS="|"
