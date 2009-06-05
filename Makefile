@@ -40,7 +40,7 @@ clean:
 	cd windows && $(MAKE) clean
 
 test.windows: windows
-	cd tests && $(MAKE) testrun TYPE=windows
+	cd tests && $(MAKE) testrun on=windows
 
 test.unix: unix
-	cd tests && $(MAKE) testrun TYPE=unix
+	cd tests && $(MAKE) testrun on=unix
