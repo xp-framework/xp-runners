@@ -6,7 +6,7 @@ on=$2
 SELF=`dirname $0`
 cd `realpath "$SELF"`
 
-ENV="USE_XP=5.7.2"
+ENV="USE_XP=5.7.3"
 
 # Read commands in test file, executing them one after each other
 echo -n "==> ${file} "

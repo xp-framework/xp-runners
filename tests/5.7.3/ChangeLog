@@ -1,0 +1,107 @@
+Release<Version<5.7.3> r13125 @ 2009-06-08 00:00:00+0200> {
+  
+  Heads up!
+  ~~~~~~~~~
+  - Changed text.doclet.Doclet::start() to be abstract
+    (friebe)
+  - Removed webservices.soap.transport.SOAPHTTPSTransport - the transport
+    class SOAPHTTPTransport can handle this already
+    (hinckel)
+  - Replaced all base RPC webservice transport classes with newly created
+    scriptlet.rpc.transport.AbstractRpcTransport class
+    (hinckel)
+  - Rewrote FTP API to no longer depend on ext/ftp
+    http://news.xp-framework.net/article/298/2009/05/17/
+    (friebe)
+  - Made scriptlet.xml.workflow.checkers.ParamChecker and
+    scriptlet.xml.workflow.casters.ParamCaster abstract.
+    (kiesel)
+  - Deprecated global constants in scriptlet.xml.XMLScriptletResponse
+    in favor of class constants
+    (kiesel)
+  - Deprecated HTTP_* constants, use peer.http.HttpConstants class
+    constants instead.
+    (kiesel)
+  - Removed net.xp_framework.website from ports (now resides in xpadmin
+    repository, web/src)
+    (friebe)
+  - Modified package mapping to also work from client to server in
+    remote.protocol.Serializer
+    (gelli)
+  
+  Bugfixes
+  ~~~~~~~~
+  - Fixed JSONDecoder unserialization for objects having __wakeup() method
+    declared (e.g. util.Date)
+    (hinckel)
+  - Made JSONClient work again by using JsonRequestMessage::create() instead
+    of JsonMessage::createCall() function when invoking RPC
+    (hinckel)
+  - Fixed GenericHttpTransport (which is not JsonRpcHttpTransport) to work
+    with "new" HttpConnection and HttpRequest object (see RFC #0162)
+    (hinckel)
+  - Fixed image tags parsing in text.doclet.markup API for multiple
+    adjacent images
+    (friebe)
+  - Fixed lang.reflect.Constructor::newInstance() check on instantiating
+    an abstract class
+    (kiesel, friebe)
+  - Fixed webservices.soap.xp.XPSoapNode class to not fatal when
+    serializing stdClass objects.
+    (kiesel)
+  - Fixed com.microsoft.com.COMObject class to work with PHP5 COM
+    (friebe)
+  - Fixed lang.XPClass::getSimpleName() cutting off first character when
+    class name is unqualified
+    (friebe)
+  - Fixed class names for soap generator
+    (wagner)
+  - Fixed endless recursion in text.util.RandomCodeGenerator class
+    (kiesel, Tom Geiger)
+  - Fixed text.util.RandomCodeGenerator not being able to generate codes
+    longer than 44 characters
+    (friebe)
+  - Added fix to catch submission of malicious request data in
+    scriptlet.xml.XMLScriptletResponse.
+    (kiesel)
+  - Fixed typo in security.crypto.PrivateKey class
+    (Thomas Geiger, Tobias Roth, kiesel)
+  
+  Features
+  ~~~~~~~~
+  - Extended doclet command to be able to work with .xar files
+    http://news.xp-framework.net/article/300/2009/06/07/
+    (friebe)
+  - Added usage to the doclet command.
+    (friebe)
+  - Added support for package names as arguments to doclets, where lang.*
+    will expand to all classes inside the lang package, and lang.** to all
+    classes inside lang and all subpackages
+    (friebe)
+  - Changed text.doclet.TagletManager to process test tags via specialized
+    taglet
+    (friebe)
+  - Added support for attributes to custom markup processors in
+    text.doclet.markup API
+    (friebe)
+  - Added text.spelling package and SpellChecker class based on ext/pspell
+    http://news.xp-framework.net/article/297/2009/05/17/
+    (friebe)
+  - Changed io.Folder constructor signature to (string|Folder [, string*])
+    (friebe)
+  - Added a new soap type caster webservices.soap.types.SOAPDecimal
+    (wagner)
+  - Added a new Caster that removes illegal control characters from input
+    strings scriptlet.workflow.casters.ToValidXMLString
+    (toennishoff)
+  - made lang.XPClass support reflection for class constants
+    (kiesel)
+  - org.bugzilla.gateway.BugMessage class now inhertits methods from
+    peer.mail.MimeMessage class instead of peer.mail.Message class to
+    support file attachments
+    (toennishoff)
+  - Added a setBody() method to peer.mail.MimeMessage class to add more
+    compatibility to peer.mail.Message and to support older bedavior of
+    org.bugzilla.gateway.BugMessage class
+    (toennishoff)
+}
