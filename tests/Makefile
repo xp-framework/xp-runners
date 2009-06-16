@@ -1,4 +1,4 @@
 testrun:
 	@echo "~~ Running testsuite ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	@-for i in `ls *.test` ; do echo -n "==> $$i " ; sh run.sh $$i $(on); done 
+	@-for i in `ls *.test` ; do sh run.sh $$i $(on); done 
 	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
