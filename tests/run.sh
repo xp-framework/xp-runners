@@ -4,7 +4,7 @@ on=$2
 
 # Change to this script's directory
 SELF=`dirname $0`
-cd `realpath "$SELF"`
+cd "`realpath "$SELF"`"
 
 ENV="USE_XP=5.7.3"
 
