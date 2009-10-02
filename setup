@@ -155,6 +155,20 @@
 
     case TRUE == preg_match('/^Windows/i', $uname):
       $runners= 'windows';
+
+      // Verify .NET version
+      $d= dir(getenv('SYSTEMROOT').'/Microsoft.NET/Framework');
+      $versions= array();
+      while ($entry= $d->read()) {
+        if (sscanf($entry, 'v%d.%d.%s', $major, $minor, $patch) > 1) {
+          $versions[]= substr($entry, 1);
+        }
+      }
+      $d->close();
+      if (!version_compare(max($versions), '2.0', 'gt')) {
+        println('*** .NET Framework 2.0 or greater required, found [', implode(', ', $versions), ']');
+        exit(1);
+      }
       break;
     
     default:
