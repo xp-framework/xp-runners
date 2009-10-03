@@ -68,7 +68,9 @@ namespace Net.XpFramework.Runner
             proc.StartInfo.Arguments = argv + " \"" + new List<string>(Paths.Locate(use_xp, "tools\\" + runner + ".php", true))[0] + "\" " + tool;
             if (args.Length > 0)
             {
-                proc.StartInfo.Arguments +=  " \"" + String.Join("\" \"", args) + "\"";
+                foreach (string arg in args) {
+                    proc.StartInfo.Arguments +=  " \"" + arg.Replace("\"", "\"\"\"") + "\"";
+                }
             }
             
             proc.StartInfo.UseShellExecute = false;
