@@ -13,12 +13,27 @@
   }
   // }}}  
 
-  // {{{ ardl(string url, string targetdir)
-  function ardl($url, $targetdir, $permissions= -1) {
+  // {{{ ardl(string proxy, string url, string targetdir)
+  function ardl($proxy, $url, $targetdir, $permissions= -1) {
     static $pw= 10;
 
-    println('---> ', $url);
-    $u= parse_url($url);    
+    if ($proxy) {
+      println('---> ', $url, ' via ', $proxy);
+      $u= parse_url($proxy);
+      $request= sprintf(
+        "GET %s HTTP/1.0\r\nHost: %s\r\n\r\n",
+        $url.'.ar',
+        $u['host']
+      );
+    } else {
+      println('---> ', $url);
+      $u= parse_url($url);
+      $request= sprintf(
+        "GET %s HTTP/1.0\r\nHost: %s\r\n\r\n",
+        $u['path'].'.ar',
+        $u['host']
+      );
+    }
     $fd= fsockopen($u['host'], isset($u['port']) ? $u['port'] : 80, $errno, $errstr);
     if (!$fd) {
       println('*** Failed (#', $errno, ': ', $errstr, ' ***');
@@ -26,11 +41,7 @@
     }
 
     // Send HTTP request
-    fputs($fd, sprintf(
-      "GET %s HTTP/1.0\r\nHost: %s\r\n\r\n",
-      $u['path'].'.ar',
-      $u['host']
-    ));
+    fputs($fd, $request);
     
     // Read HTTP response
     $status= fgets($fd, 1024);
@@ -187,7 +198,7 @@
   }
   
   // Download runners
-  ardl(BASE_URL.'bin/'.$runners, $bin, 0700) || exit(3);
+  ardl($proxy, BASE_URL.'bin/'.$runners, $bin, 0700) || exit(3);
   
   // Check for xp.ini
   $config= $bin.DIRECTORY_SEPARATOR.'xp.ini';
