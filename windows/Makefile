@@ -1,5 +1,6 @@
 ifeq ($(OS),Windows_NT)
-	CSC?=$(WINDIR)/Microsoft.NET/Framework/v3.5/csc
+	BASE=$(shell cygpath "$(WINDIR)")
+	CSC?=$(BASE)/Microsoft.NET/Framework/v3.5/csc
 else
 	CSC?=csc
 endif
