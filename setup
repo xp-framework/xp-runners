@@ -163,6 +163,10 @@
   switch (TRUE) {
     case NULL !== $runners:
       break;
+    
+    case TRUE == preg_mach('/^BSD/i', $uname):
+      $runners= 'bsd';
+      break;
 
     case TRUE == preg_match('/^Windows/i', $uname):
       $runners= 'windows';
