@@ -164,7 +164,7 @@
     case NULL !== $runners:
       break;
     
-    case TRUE == preg_mach('/^BSD/i', $uname):
+    case TRUE == preg_match('/^([A-Z]+)BSD/i', $uname):
       $runners= 'bsd';
       break;
 
