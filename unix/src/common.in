@@ -1,10 +1,10 @@
-if [ "$OS" = "Windows_NT" ]; then
-  PATHSEP=';'
-  DIRSEP='\'
-else
-  PATHSEP=':'
-  DIRSEP='/'
-fi
+#ifdef __CYGWIN
+PATHSEP=';'
+DIRSEP='\'
+#else
+PATHSEP=':'
+DIRSEP='/'
+#endif
 
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
@@ -27,12 +27,12 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;;    # ~/lib
     *) path=$base$DIRSEP$path ;;           # lib, ../lib, ./classes
   esac
-  
-  if [ "$OS" = "Windows_NT" ]; then
-    echo $(cygpath -m "$path")
-  else
-    echo $path
-  fi
+
+#ifdef __CYGWIN  
+  echo $(cygpath -m "$path")
+#else
+  echo $path
+#endif
 }
 
 translate_paths() {
