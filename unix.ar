@@ -1,12 +1,8 @@
---3448:xp:--
+--2378:cgen:--
 #!/bin/sh
-if [ "$OS" = "Windows_NT" ]; then
-  PATHSEP=';'
-  DIRSEP='\'
-else
-  PATHSEP=':'
-  DIRSEP='/'
-fi
+PATHSEP=':'
+DIRSEP='/'
+
 
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
@@ -30,11 +26,606 @@ translate_path() {
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
 
-  if [ "$OS" = "Windows_NT" ]; then
-    echo $(cygpath -m "$path")
-  else
-    echo $path
+
+
+
+  echo $path
+
+}
+
+translate_paths() {
+  base="$1"
+  path="$2"
+
+  translated=""
+  IFS="$PATHSEP"
+  for i in $path ; do
+    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
+  done
+  echo "${translated#$PATHSEP}"
+}
+
+locate() {
+  path="$1"
+  file="$2"
+  expect=$3
+
+  IFS="$PATHSEP"
+  for i in $path ; do
+    qualified="$i/$file"
+    if [ -e "$qualified" ] ; then
+      echo "$qualified"
+      if [ $expect = 1 ] ; then return ; fi
+    fi
+  done
+  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.codegen.Runner IFS="|";
+
+
+ifs="|"
+
+if [ "" = "$USE_XP" ] ; then
+  unset USE_XP
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
+RT_ARG=""
+for i in "." "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    section=default
+    while read line ; do
+      case "$section.$line" in
+        default.use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+        ;;
+
+        *.\[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+
+        runtime.*=*)
+          key=${line%=*}
+          if [ default = $key ] ; then
+            XP_RT=${XP_RT-"${line#*=}"}
+          else
+            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
+          fi
+        ;;
+      esac
+    done < "$i/xp.ini"
   fi
+done
+
+XP_RT=${XP_RT-php}
+if [ "" = "$USE_XP" ] ; then
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
+fi
+
+args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+
+
+
+
+
+
+export XP_RT
+IFS="|"
+${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--2377:doclet:--
+#!/bin/sh
+PATHSEP=':'
+DIRSEP='/'
+
+
+if [ -L "$0" ] ; then
+  link="$(readlink "$0")"
+  case "$link" in
+    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
+  esac
+else
+  DIRNAME=$(dirname "$0")
+fi
+
+translate_path() {
+  base="$1"
+  path="$2"
+  
+  case "$path" in
+    ?:*) ;;                                # C:\xp
+    \\*) ;;                                # \\filesrv\shares
+    /*) ;;                                 # /usr/local/lib */
+    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
+    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
+  esac
+
+
+
+
+  echo $path
+
+}
+
+translate_paths() {
+  base="$1"
+  path="$2"
+
+  translated=""
+  IFS="$PATHSEP"
+  for i in $path ; do
+    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
+  done
+  echo "${translated#$PATHSEP}"
+}
+
+locate() {
+  path="$1"
+  file="$2"
+  expect=$3
+
+  IFS="$PATHSEP"
+  for i in $path ; do
+    qualified="$i/$file"
+    if [ -e "$qualified" ] ; then
+      echo "$qualified"
+      if [ $expect = 1 ] ; then return ; fi
+    fi
+  done
+  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.doclet.Runner IFS="|";
+
+
+ifs="|"
+
+if [ "" = "$USE_XP" ] ; then
+  unset USE_XP
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
+RT_ARG=""
+for i in "." "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    section=default
+    while read line ; do
+      case "$section.$line" in
+        default.use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+        ;;
+
+        *.\[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+
+        runtime.*=*)
+          key=${line%=*}
+          if [ default = $key ] ; then
+            XP_RT=${XP_RT-"${line#*=}"}
+          else
+            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
+          fi
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+
+XP_RT=${XP_RT-php}
+if [ "" = "$USE_XP" ] ; then
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
+fi
+
+args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+
+
+
+
+
+
+export XP_RT
+IFS="|"
+${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--2379:unittest:--
+#!/bin/sh
+PATHSEP=':'
+DIRSEP='/'
+
+
+if [ -L "$0" ] ; then
+  link="$(readlink "$0")"
+  case "$link" in
+    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
+  esac
+else
+  DIRNAME=$(dirname "$0")
+fi
+
+translate_path() {
+  base="$1"
+  path="$2"
+  
+  case "$path" in
+    ?:*) ;;                                # C:\xp
+    \\*) ;;                                # \\filesrv\shares
+    /*) ;;                                 # /usr/local/lib */
+    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
+    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
+  esac
+
+
+
+
+  echo $path
+
+}
+
+translate_paths() {
+  base="$1"
+  path="$2"
+
+  translated=""
+  IFS="$PATHSEP"
+  for i in $path ; do
+    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
+  done
+  echo "${translated#$PATHSEP}"
+}
+
+locate() {
+  path="$1"
+  file="$2"
+  expect=$3
+
+  IFS="$PATHSEP"
+  for i in $path ; do
+    qualified="$i/$file"
+    if [ -e "$qualified" ] ; then
+      echo "$qualified"
+      if [ $expect = 1 ] ; then return ; fi
+    fi
+  done
+  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.unittest.Runner IFS="|";
+
+
+ifs="|"
+
+if [ "" = "$USE_XP" ] ; then
+  unset USE_XP
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
+RT_ARG=""
+for i in "." "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    section=default
+    while read line ; do
+      case "$section.$line" in
+        default.use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+        ;;
+
+        *.\[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+
+        runtime.*=*)
+          key=${line%=*}
+          if [ default = $key ] ; then
+            XP_RT=${XP_RT-"${line#*=}"}
+          else
+            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
+          fi
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+
+XP_RT=${XP_RT-php}
+if [ "" = "$USE_XP" ] ; then
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
+fi
+
+args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+
+
+
+
+
+
+export XP_RT
+IFS="|"
+${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--2374:xar:--
+#!/bin/sh
+PATHSEP=':'
+DIRSEP='/'
+
+
+if [ -L "$0" ] ; then
+  link="$(readlink "$0")"
+  case "$link" in
+    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
+  esac
+else
+  DIRNAME=$(dirname "$0")
+fi
+
+translate_path() {
+  base="$1"
+  path="$2"
+  
+  case "$path" in
+    ?:*) ;;                                # C:\xp
+    \\*) ;;                                # \\filesrv\shares
+    /*) ;;                                 # /usr/local/lib */
+    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
+    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
+  esac
+
+
+
+
+  echo $path
+
+}
+
+translate_paths() {
+  base="$1"
+  path="$2"
+
+  translated=""
+  IFS="$PATHSEP"
+  for i in $path ; do
+    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
+  done
+  echo "${translated#$PATHSEP}"
+}
+
+locate() {
+  path="$1"
+  file="$2"
+  expect=$3
+
+  IFS="$PATHSEP"
+  for i in $path ; do
+    qualified="$i/$file"
+    if [ -e "$qualified" ] ; then
+      echo "$qualified"
+      if [ $expect = 1 ] ; then return ; fi
+    fi
+  done
+  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.xar.Runner IFS="|";
+
+
+ifs="|"
+
+if [ "" = "$USE_XP" ] ; then
+  unset USE_XP
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
+RT_ARG=""
+for i in "." "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    section=default
+    while read line ; do
+      case "$section.$line" in
+        default.use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+        ;;
+
+        *.\[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+
+        runtime.*=*)
+          key=${line%=*}
+          if [ default = $key ] ; then
+            XP_RT=${XP_RT-"${line#*=}"}
+          else
+            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
+          fi
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+
+XP_RT=${XP_RT-php}
+if [ "" = "$USE_XP" ] ; then
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
+fi
+
+args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+
+
+
+
+
+
+export XP_RT
+IFS="|"
+${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--2379:xcc:--
+#!/bin/sh
+PATHSEP=':'
+DIRSEP='/'
+
+
+if [ -L "$0" ] ; then
+  link="$(readlink "$0")"
+  case "$link" in
+    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
+  esac
+else
+  DIRNAME=$(dirname "$0")
+fi
+
+translate_path() {
+  base="$1"
+  path="$2"
+  
+  case "$path" in
+    ?:*) ;;                                # C:\xp
+    \\*) ;;                                # \\filesrv\shares
+    /*) ;;                                 # /usr/local/lib */
+    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
+    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
+  esac
+
+
+
+
+  echo $path
+
+}
+
+translate_paths() {
+  base="$1"
+  path="$2"
+
+  translated=""
+  IFS="$PATHSEP"
+  for i in $path ; do
+    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
+  done
+  echo "${translated#$PATHSEP}"
+}
+
+locate() {
+  path="$1"
+  file="$2"
+  expect=$3
+
+  IFS="$PATHSEP"
+  for i in $path ; do
+    qualified="$i/$file"
+    if [ -e "$qualified" ] ; then
+      echo "$qualified"
+      if [ $expect = 1 ] ; then return ; fi
+    fi
+  done
+  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.compiler.Runner IFS="|";
+
+
+ifs="|"
+
+if [ "" = "$USE_XP" ] ; then
+  unset USE_XP
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
+RT_ARG=""
+for i in "." "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    section=default
+    while read line ; do
+      case "$section.$line" in
+        default.use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+        ;;
+
+        *.\[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+
+        runtime.*=*)
+          key=${line%=*}
+          if [ default = $key ] ; then
+            XP_RT=${XP_RT-"${line#*=}"}
+          else
+            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
+          fi
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+
+XP_RT=${XP_RT-php}
+if [ "" = "$USE_XP" ] ; then
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
+fi
+
+args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+
+
+
+
+
+
+export XP_RT
+IFS="|"
+${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--3315:xp:--
+#!/bin/sh
+PATHSEP=':'
+DIRSEP='/'
+
+
+if [ -L "$0" ] ; then
+  link="$(readlink "$0")"
+  case "$link" in
+    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
+  esac
+else
+  DIRNAME=$(dirname "$0")
+fi
+
+translate_path() {
+  base="$1"
+  path="$2"
+  
+  case "$path" in
+    ?:*) ;;                                # C:\xp
+    \\*) ;;                                # \\filesrv\shares
+    /*) ;;                                 # /usr/local/lib */
+    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
+    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
+  esac
+
+
+
+
+  echo $path
+
 }
 
 translate_paths() {
@@ -154,19 +745,21 @@ if [ "" = "$USE_XP" ] ; then
 fi
 
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+
+
+
+
+
 
 export XP_RT
 IFS="|"
-${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2507:xar:--
+${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--2378:xpcli:--
 #!/bin/sh
-if [ "$OS" = "Windows_NT" ]; then
-  PATHSEP=';'
-  DIRSEP='\'
-else
-  PATHSEP=':'
-  DIRSEP='/'
-fi
+PATHSEP=':'
+DIRSEP='/'
+
 
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
@@ -190,128 +783,11 @@ translate_path() {
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
 
-  if [ "$OS" = "Windows_NT" ]; then
-    echo $(cygpath -m "$path")
-  else
-    echo $path
-  fi
-}
-
-translate_paths() {
-  base="$1"
-  path="$2"
-
-  translated=""
-  IFS="$PATHSEP"
-  for i in $path ; do
-    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
-  done
-  echo "${translated#$PATHSEP}"
-}
-
-locate() {
-  path="$1"
-  file="$2"
-  expect=$3
-
-  IFS="$PATHSEP"
-  for i in $path ; do
-    qualified="$i/$file"
-    if [ -e "$qualified" ] ; then
-      echo "$qualified"
-      if [ $expect = 1 ] ; then return ; fi
-    fi
-  done
-  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
-  echo ""
-}
-
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.xar.Runner IFS="|";
 
 
-ifs="|"
 
-if [ "" = "$USE_XP" ] ; then
-  unset USE_XP
-else
-  USE_XP=$(translate_paths "." "$USE_XP")
-fi
-RT_ARG=""
-for i in "." "$HOME/.xp" "$base" ; do
-  if [ -e "$i/xp.ini" ] ; then
-    section=default
-    while read line ; do
-      case "$section.$line" in
-        default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
-        ;;
+  echo $path
 
-        *.\[*\])
-          section=${line#\[}
-          section=${section%]}
-        ;;
-
-        runtime.*=*)
-          key=${line%=*}
-          if [ default = $key ] ; then
-            XP_RT=${XP_RT-"${line#*=}"}
-          else
-            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
-          fi
-        ;;
-      esac
-    done < "$i/xp.ini"
-  fi
-done
-
-XP_RT=${XP_RT-php}
-if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
-  exit 255
-fi
-
-args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-
-export XP_RT
-IFS="|"
-${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2511:xpcli:--
-#!/bin/sh
-if [ "$OS" = "Windows_NT" ]; then
-  PATHSEP=';'
-  DIRSEP='\'
-else
-  PATHSEP=':'
-  DIRSEP='/'
-fi
-
-if [ -L "$0" ] ; then
-  link="$(readlink "$0")"
-  case "$link" in
-    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
-  esac
-else
-  DIRNAME=$(dirname "$0")
-fi
-
-translate_path() {
-  base="$1"
-  path="$2"
-  
-  case "$path" in
-    ?:*) ;;                                # C:\xp
-    \\*) ;;                                # \\filesrv\shares
-    /*) ;;                                 # /usr/local/lib */
-    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
-    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
-  esac
-
-  if [ "$OS" = "Windows_NT" ]; then
-    echo $(cygpath -m "$path")
-  else
-    echo $path
-  fi
 }
 
 translate_paths() {
@@ -388,19 +864,21 @@ if [ "" = "$USE_XP" ] ; then
 fi
 
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+
+
+
+
+
 
 export XP_RT
 IFS="|"
-${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2512:unittest:--
+${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--2378:xpi:--
 #!/bin/sh
-if [ "$OS" = "Windows_NT" ]; then
-  PATHSEP=';'
-  DIRSEP='\'
-else
-  PATHSEP=':'
-  DIRSEP='/'
-fi
+PATHSEP=':'
+DIRSEP='/'
+
 
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
@@ -424,11 +902,11 @@ translate_path() {
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
 
-  if [ "$OS" = "Windows_NT" ]; then
-    echo $(cygpath -m "$path")
-  else
-    echo $path
-  fi
+
+
+
+  echo $path
+
 }
 
 translate_paths() {
@@ -460,7 +938,7 @@ locate() {
   echo ""
 }
 
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.unittest.Runner IFS="|";
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.install.Runner IFS="|";
 
 
 ifs="|"
@@ -505,358 +983,13 @@ if [ "" = "$USE_XP" ] ; then
 fi
 
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+
+
+
+
+
 
 export XP_RT
 IFS="|"
-${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2510:doclet:--
-#!/bin/sh
-if [ "$OS" = "Windows_NT" ]; then
-  PATHSEP=';'
-  DIRSEP='\'
-else
-  PATHSEP=':'
-  DIRSEP='/'
-fi
-
-if [ -L "$0" ] ; then
-  link="$(readlink "$0")"
-  case "$link" in
-    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
-  esac
-else
-  DIRNAME=$(dirname "$0")
-fi
-
-translate_path() {
-  base="$1"
-  path="$2"
-  
-  case "$path" in
-    ?:*) ;;                                # C:\xp
-    \\*) ;;                                # \\filesrv\shares
-    /*) ;;                                 # /usr/local/lib */
-    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
-    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
-  esac
-
-  if [ "$OS" = "Windows_NT" ]; then
-    echo $(cygpath -m "$path")
-  else
-    echo $path
-  fi
-}
-
-translate_paths() {
-  base="$1"
-  path="$2"
-
-  translated=""
-  IFS="$PATHSEP"
-  for i in $path ; do
-    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
-  done
-  echo "${translated#$PATHSEP}"
-}
-
-locate() {
-  path="$1"
-  file="$2"
-  expect=$3
-
-  IFS="$PATHSEP"
-  for i in $path ; do
-    qualified="$i/$file"
-    if [ -e "$qualified" ] ; then
-      echo "$qualified"
-      if [ $expect = 1 ] ; then return ; fi
-    fi
-  done
-  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
-  echo ""
-}
-
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.doclet.Runner IFS="|";
-
-
-ifs="|"
-
-if [ "" = "$USE_XP" ] ; then
-  unset USE_XP
-else
-  USE_XP=$(translate_paths "." "$USE_XP")
-fi
-RT_ARG=""
-for i in "." "$HOME/.xp" "$base" ; do
-  if [ -e "$i/xp.ini" ] ; then
-    section=default
-    while read line ; do
-      case "$section.$line" in
-        default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
-        ;;
-
-        *.\[*\])
-          section=${line#\[}
-          section=${section%]}
-        ;;
-
-        runtime.*=*)
-          key=${line%=*}
-          if [ default = $key ] ; then
-            XP_RT=${XP_RT-"${line#*=}"}
-          else
-            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
-          fi
-        ;;
-      esac
-    done < "$i/xp.ini"
-  fi
-done
-
-XP_RT=${XP_RT-php}
-if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
-  exit 255
-fi
-
-args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-
-export XP_RT
-IFS="|"
-${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2511:cgen:--
-#!/bin/sh
-if [ "$OS" = "Windows_NT" ]; then
-  PATHSEP=';'
-  DIRSEP='\'
-else
-  PATHSEP=':'
-  DIRSEP='/'
-fi
-
-if [ -L "$0" ] ; then
-  link="$(readlink "$0")"
-  case "$link" in
-    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
-  esac
-else
-  DIRNAME=$(dirname "$0")
-fi
-
-translate_path() {
-  base="$1"
-  path="$2"
-  
-  case "$path" in
-    ?:*) ;;                                # C:\xp
-    \\*) ;;                                # \\filesrv\shares
-    /*) ;;                                 # /usr/local/lib */
-    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
-    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
-  esac
-
-  if [ "$OS" = "Windows_NT" ]; then
-    echo $(cygpath -m "$path")
-  else
-    echo $path
-  fi
-}
-
-translate_paths() {
-  base="$1"
-  path="$2"
-
-  translated=""
-  IFS="$PATHSEP"
-  for i in $path ; do
-    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
-  done
-  echo "${translated#$PATHSEP}"
-}
-
-locate() {
-  path="$1"
-  file="$2"
-  expect=$3
-
-  IFS="$PATHSEP"
-  for i in $path ; do
-    qualified="$i/$file"
-    if [ -e "$qualified" ] ; then
-      echo "$qualified"
-      if [ $expect = 1 ] ; then return ; fi
-    fi
-  done
-  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
-  echo ""
-}
-
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.codegen.Runner IFS="|";
-
-
-ifs="|"
-
-if [ "" = "$USE_XP" ] ; then
-  unset USE_XP
-else
-  USE_XP=$(translate_paths "." "$USE_XP")
-fi
-RT_ARG=""
-for i in "." "$HOME/.xp" "$base" ; do
-  if [ -e "$i/xp.ini" ] ; then
-    section=default
-    while read line ; do
-      case "$section.$line" in
-        default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
-        ;;
-
-        *.\[*\])
-          section=${line#\[}
-          section=${section%]}
-        ;;
-
-        runtime.*=*)
-          key=${line%=*}
-          if [ default = $key ] ; then
-            XP_RT=${XP_RT-"${line#*=}"}
-          else
-            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
-          fi
-        ;;
-      esac
-    done < "$i/xp.ini"
-  fi
-done
-
-XP_RT=${XP_RT-php}
-if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
-  exit 255
-fi
-
-args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-
-export XP_RT
-IFS="|"
-${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
---2512:xcc:--
-#!/bin/sh
-if [ "$OS" = "Windows_NT" ]; then
-  PATHSEP=';'
-  DIRSEP='\'
-else
-  PATHSEP=':'
-  DIRSEP='/'
-fi
-
-if [ -L "$0" ] ; then
-  link="$(readlink "$0")"
-  case "$link" in
-    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
-  esac
-else
-  DIRNAME=$(dirname "$0")
-fi
-
-translate_path() {
-  base="$1"
-  path="$2"
-  
-  case "$path" in
-    ?:*) ;;                                # C:\xp
-    \\*) ;;                                # \\filesrv\shares
-    /*) ;;                                 # /usr/local/lib */
-    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
-    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
-  esac
-
-  if [ "$OS" = "Windows_NT" ]; then
-    echo $(cygpath -m "$path")
-  else
-    echo $path
-  fi
-}
-
-translate_paths() {
-  base="$1"
-  path="$2"
-
-  translated=""
-  IFS="$PATHSEP"
-  for i in $path ; do
-    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
-  done
-  echo "${translated#$PATHSEP}"
-}
-
-locate() {
-  path="$1"
-  file="$2"
-  expect=$3
-
-  IFS="$PATHSEP"
-  for i in $path ; do
-    qualified="$i/$file"
-    if [ -e "$qualified" ] ; then
-      echo "$qualified"
-      if [ $expect = 1 ] ; then return ; fi
-    fi
-  done
-  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
-  echo ""
-}
-
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.compiler.Runner IFS="|";
-
-
-ifs="|"
-
-if [ "" = "$USE_XP" ] ; then
-  unset USE_XP
-else
-  USE_XP=$(translate_paths "." "$USE_XP")
-fi
-RT_ARG=""
-for i in "." "$HOME/.xp" "$base" ; do
-  if [ -e "$i/xp.ini" ] ; then
-    section=default
-    while read line ; do
-      case "$section.$line" in
-        default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
-        ;;
-
-        *.\[*\])
-          section=${line#\[}
-          section=${section%]}
-        ;;
-
-        runtime.*=*)
-          key=${line%=*}
-          if [ default = $key ] ; then
-            XP_RT=${XP_RT-"${line#*=}"}
-          else
-            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
-          fi
-        ;;
-      esac
-    done < "$i/xp.ini"
-  fi
-done
-
-XP_RT=${XP_RT-php}
-if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
-  exit 255
-fi
-
-args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-
-export XP_RT
-IFS="|"
-${XP_RT}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${RUNNER}".php" 1) ${ARGS} "$@"
+${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
