@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 
 namespace Net.XpFramework.Runner
 {
@@ -61,9 +62,10 @@ namespace Net.XpFramework.Runner
                     argv += " -d" + kv.Key + "=\"" + value + "\"";
                 }
             }
+            
 
             // Spawn runtime
-            var proc = new System.Diagnostics.Process();
+            var proc = new Process();
             proc.StartInfo.FileName = executor;
             proc.StartInfo.Arguments = argv + " \"" + new List<string>(Paths.Locate(use_xp, "tools\\" + runner + ".php", true))[0] + "\" " + tool;
             if (args.Length > 0)
@@ -73,19 +75,53 @@ namespace Net.XpFramework.Runner
                 }
             }
             
+            // Catch Ctrl+C (only works in "real" consoles, not in a cygwin 
+            // shell, for example) and kill the spawned process, see also:
+            // http://www.cygwin.com/ml/cygwin/2006-12/msg00151.html
+            // http://www.mail-archive.com/cygwin@cygwin.com/msg74638.html
+            // If we are not inside a real shell, accessing WindowHeight
+            // will raise an exception. In this case, setup a monitoring 
+            // process that detects when this process is killed and will 
+            // then ensure the child process is torn down.
+            Process monitor = null;
+            try {
+                var test= Console.WindowHeight;
+                Console.CancelKeyPress += delegate {
+                    proc.Kill();
+                    proc.WaitForExit();
+                };
+            } 
+            catch 
+            {
+                monitor = new Process();
+                monitor.StartInfo.FileName = base_dir + "\\xpmon.exe";
+                monitor.StartInfo.Arguments = Process.GetCurrentProcess().Id + " ";
+                monitor.StartInfo.UseShellExecute = false;
+            }
+            
             proc.StartInfo.UseShellExecute = false;
             try
             {
                 proc.Start();
+                if (monitor != null) 
+                {
+                    monitor.StartInfo.Arguments += proc.Id;
+                    monitor.Start();
+                }
                 proc.WaitForExit();
                 return proc.ExitCode;
             }
-            catch (SystemException e) {
+            catch (SystemException e) 
+            {
                 throw new ExecutionEngineException(executor + ": " + e.Message, e);
             } 
             finally
             {
                 proc.Close();
+                if (monitor != null) 
+                {
+                    monitor.Kill();
+                }
             }
         }
     }
