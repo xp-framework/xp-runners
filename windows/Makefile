@@ -6,7 +6,7 @@ else
 endif
 CLASSES=src\\Executor.cs src\\Paths.cs src\\BaseRunner.cs src\\XpConfigSource.cs src\\EnvironmentConfigSource.cs src\\IniConfigSource.cs src\\CompositeConfigSource.cs src\\Ini.cs
 
-all: xp.exe xpcli.exe xar.exe unittest.exe cgen.exe doclet.exe xcc.exe xpi.exe xpmon.exe
+all: xp.exe xpcli.exe xar.exe unittest.exe cgen.exe doclet.exe xcc.exe xpi.exe
 
 xp.exe: src\\Xp.cs $(CLASSES)
 	$(CSC) /nologo /target:exe /out:$@ src\\Xp.cs $(CLASSES)
@@ -32,9 +32,6 @@ xcc.exe: src\\Xcc.cs $(CLASSES)
 xpi.exe: src\\Xpi.cs $(CLASSES)
 	$(CSC) /nologo /target:exe /out:$@ src\\Xpi.cs $(CLASSES)
 
-xpmon.exe: src\\Monitor.cs
-	$(CSC) /nologo /target:exe /out:$@ src\\Monitor.cs
-
 clean:
-	-rm xp.exe xpcli.exe xar.exe unittest.exe cgen.exe doclet.exe xcc.exe xpi.exe xpmon.exe
+	-rm xp.exe xpcli.exe xar.exe unittest.exe cgen.exe doclet.exe xcc.exe xpi.exe
 

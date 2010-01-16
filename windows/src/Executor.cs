@@ -79,35 +79,15 @@ namespace Net.XpFramework.Runner
             // shell, for example) and kill the spawned process, see also:
             // http://www.cygwin.com/ml/cygwin/2006-12/msg00151.html
             // http://www.mail-archive.com/cygwin@cygwin.com/msg74638.html
-            // If we are not inside a real shell, accessing WindowHeight
-            // will raise an exception. In this case, setup a monitoring 
-            // process that detects when this process is killed and will 
-            // then ensure the child process is torn down.
-            Process monitor = null;
-            try {
-                var test= Console.WindowHeight;
-                Console.CancelKeyPress += delegate {
-                    proc.Kill();
-                    proc.WaitForExit();
-                };
-            } 
-            catch 
-            {
-                monitor = new Process();
-                monitor.StartInfo.FileName = base_dir + "\\xpmon.exe";
-                monitor.StartInfo.Arguments = Process.GetCurrentProcess().Id + " ";
-                monitor.StartInfo.UseShellExecute = false;
-            }
+            Console.CancelKeyPress += delegate {
+                proc.Kill();
+                proc.WaitForExit();
+            };
             
             proc.StartInfo.UseShellExecute = false;
             try
             {
                 proc.Start();
-                if (monitor != null) 
-                {
-                    monitor.StartInfo.Arguments += proc.Id;
-                    monitor.Start();
-                }
                 proc.WaitForExit();
                 return proc.ExitCode;
             }
@@ -118,10 +98,6 @@ namespace Net.XpFramework.Runner
             finally
             {
                 proc.Close();
-                if (monitor != null) 
-                {
-                    monitor.Kill();
-                }
             }
         }
     }
