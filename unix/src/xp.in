@@ -24,6 +24,10 @@ else
         TOOL="xp.runtime.Evaluate"
         OPTIND=$(expr $OPTIND + 1)
         ;;
+      -r)               # Reflect given class
+        TOOL="xp.runtime.Reflect"
+        OPTIND=$(expr $OPTIND + 1)
+        ;;
       -cp)              # Add class path
         INCLUDE_ARG=${PATHSEP}
         ;;

@@ -35,6 +35,11 @@ namespace Net.XpFramework.Runner
                             shift++; 
                             break;
 
+                        case "-r": 
+                            tool = "xp.runtime.Reflect"; 
+                            shift++; 
+                            break;
+
                         case "-xar": 
                             runner = "xar"; 
                             shift++; 
