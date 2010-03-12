@@ -26,19 +26,22 @@ unix: unix/src/*
 	cd unix && $(MAKE) TARGET=default
 
 unix.ar: unix unix/default/*
-	sh ar.sh unix.ar unix/default/*
+	cat unix/src/update.sh.in | sed -e 's/@TYPE@/unix/g' > unix/update.sh
+	sh ar.sh unix.ar unix/default/* unix/update.sh
 
 bsd: unix/src/*
 	cd unix && $(MAKE) TARGET=bsd
 
 bsd.ar: bsd unix/bsd/*
-	sh ar.sh bsd.ar unix/bsd/*
+	cat unix/src/update.sh.in | sed -e 's/@TYPE@/bsd/g' > unix/update.sh
+	sh ar.sh bsd.ar unix/bsd/* unix/update.sh
 
 cygwin: unix/src/*
 	cd unix && $(MAKE) TARGET=cygwin
 
-cygwin.ar: cygwin unix/cygwin/*
-	sh ar.sh cygwin.ar unix/cygwin/*
+cygwin.ar: cygwin unix/cygwin/* 
+	cat unix/src/update.sh.in | sed -e 's/@TYPE@/cygwin/g' > unix/update.sh
+	sh ar.sh cygwin.ar unix/cygwin/* unix/update.sh
 
 windows: windows/src/*
 	cd windows && $(MAKE)
