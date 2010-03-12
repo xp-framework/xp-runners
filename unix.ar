@@ -997,3 +997,29 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--422:update.sh:--
+#!/bin/sh
+
+if [ -z $TEMP ] ; then
+  TARGET=/tmp/.xp
+else
+  TARGET=$TEMP/.xp
+fi
+
+echo "===> Downloading unix runners to $TARGET"
+xpi download bin/unix $TARGET
+if [ $? != 0 ] ; then
+  exit
+fi
+
+echo "===> Extracting"
+i=0
+for e in `ls -1 $TARGET/*` ; do
+  (head -1 $e | grep '^#!/bin/sh' >/dev/null) && chmod +x $e
+  mv $e .
+  i=$[$i+1]
+done
+echo "$i file(s) copied"
+
+rmdir $TARGET
+echo "===> Done, runners have been updated"

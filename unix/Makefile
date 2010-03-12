@@ -9,7 +9,7 @@ all: $(TARGET)/xp $(TARGET)/xar $(TARGET)/xpcli $(TARGET)/unittest $(TARGET)/doc
 	@echo -n "===> " ; cat $(TARGET)/.target
 
 clean: 
-	-rm $(TARGET)/*
+	-rm $(TARGET)/* update.sh
 
 default/%: src/%.in src/common.in src/exec.in src/macros.h
 	(echo "#!/bin/sh" ; $(CC) -E -I. -I./src -x c -C -P -imacros src/macros.h $< ) > $@

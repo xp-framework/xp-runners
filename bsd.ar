@@ -997,3 +997,29 @@ fi
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--420:update.sh:--
+#!/bin/sh
+
+if [ -z $TEMP ] ; then
+  TARGET=/tmp/.xp
+else
+  TARGET=$TEMP/.xp
+fi
+
+echo "===> Downloading bsd runners to $TARGET"
+xpi download bin/bsd $TARGET
+if [ $? != 0 ] ; then
+  exit
+fi
+
+echo "===> Extracting"
+i=0
+for e in `ls -1 $TARGET/*` ; do
+  (head -1 $e | grep '^#!/bin/sh' >/dev/null) && chmod +x $e
+  mv $e .
+  i=$[$i+1]
+done
+echo "$i file(s) copied"
+
+rmdir $TARGET
+echo "===> Done, runners have been updated"
