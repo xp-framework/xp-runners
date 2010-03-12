@@ -43,8 +43,8 @@ cygwin.ar: cygwin unix/cygwin/*
 windows: windows/src/*
 	cd windows && $(MAKE)
 
-windows.ar: windows windows/*.exe
-	sh ar.sh windows.ar windows/*.exe
+windows.ar: windows windows/*.exe windows/src/update.bat
+	sh ar.sh windows.ar windows/*.exe windows/src/update.bat
 
 test.windows: windows
 	cd tests && $(MAKE) testrun on=windows

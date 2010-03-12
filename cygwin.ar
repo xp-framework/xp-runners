@@ -608,11 +608,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3432:xp:--
+--3446:xp:--
 #!/bin/sh
-
-
-
 PATHSEP=';'
 DIRSEP='\'
 
@@ -677,10 +674,12 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
+
 OPTIND=0
 INCLUDE_PATH="."
 TOOL=
 RUNNER="class"
+
 if [ 0 = $# ] ; then
   TOOL="xp.runtime.ShowResource|usage.txt|255"
 else
@@ -690,6 +689,7 @@ else
       OPTIND=`expr $OPTIND + 2`
       continue
     fi
+
     case $arg in
       -v) # Display version
         TOOL="xp.runtime.Version"
@@ -721,8 +721,12 @@ else
   done
   shift $OPTIND
 fi
+
 base="$DIRNAME" RUNNER=$RUNNER INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
+
+
 ifs="|"
+
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
 else
@@ -737,10 +741,12 @@ for i in "." "$HOME/.xp" "$base" ; do
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
+
         *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
+
         runtime.*=*)
           key=${line%=*}
           if [ default = $key ] ; then
@@ -753,13 +759,21 @@ for i in "." "$HOME/.xp" "$base" ; do
     done < "$i/xp.ini"
   fi
 done
+
 XP_RT=${XP_RT-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
+
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+
+
+
+
+
+
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
