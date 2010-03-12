@@ -997,7 +997,7 @@ fi
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---420:update.sh:--
+--420:xprt-update.sh:--
 #!/bin/sh
 
 if [ -z $TEMP ] ; then

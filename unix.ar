@@ -997,7 +997,7 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---422:update.sh:--
+--422:xprt-update.sh:--
 #!/bin/sh
 
 if [ -z $TEMP ] ; then

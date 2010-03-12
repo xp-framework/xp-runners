@@ -26,28 +26,28 @@ unix: unix/src/*
 	cd unix && $(MAKE) TARGET=default
 
 unix.ar: unix unix/default/*
-	cat unix/src/update.sh.in | sed -e 's/@TYPE@/unix/g' > unix/update.sh
-	sh ar.sh unix.ar unix/default/* unix/update.sh
+	cat unix/src/xprt-update.sh.in | sed -e 's/@TYPE@/unix/g' > unix/xprt-update.sh
+	sh ar.sh unix.ar unix/default/* unix/xprt-update.sh
 
 bsd: unix/src/*
 	cd unix && $(MAKE) TARGET=bsd
 
 bsd.ar: bsd unix/bsd/*
-	cat unix/src/update.sh.in | sed -e 's/@TYPE@/bsd/g' > unix/update.sh
-	sh ar.sh bsd.ar unix/bsd/* unix/update.sh
+	cat unix/src/xprt-update.sh.in | sed -e 's/@TYPE@/bsd/g' > unix/xprt-update.sh
+	sh ar.sh bsd.ar unix/bsd/* unix/xprt-update.sh
 
 cygwin: unix/src/*
 	cd unix && $(MAKE) TARGET=cygwin
 
 cygwin.ar: cygwin unix/cygwin/* 
-	cat unix/src/update.sh.in | sed -e 's/@TYPE@/cygwin/g' > unix/update.sh
-	sh ar.sh cygwin.ar unix/cygwin/* unix/update.sh
+	cat unix/src/xprt-update.sh.in | sed -e 's/@TYPE@/cygwin/g' > unix/xprt-update.sh
+	sh ar.sh cygwin.ar unix/cygwin/* unix/xprt-update.sh
 
 windows: windows/src/*
 	cd windows && $(MAKE)
 
-windows.ar: windows windows/*.exe windows/src/update.bat
-	sh ar.sh windows.ar windows/*.exe windows/src/update.bat
+windows.ar: windows windows/*.exe windows/src/xprt-update.bat
+	sh ar.sh windows.ar windows/*.exe windows/src/xprt-update.bat
 
 test.windows: windows
 	cd tests && $(MAKE) testrun on=windows
