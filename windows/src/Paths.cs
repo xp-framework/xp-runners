@@ -269,7 +269,7 @@ namespace Net.XpFramework.Runner
         /// <summary>
         /// Composes a path name of two or more components - varargs
         /// </summary>
-        /// <param name="components"></param>
+        /// <param name="components">...</param>
         /// <returns></returns>
         public static string Compose(params string[] components) 
         {
@@ -284,12 +284,15 @@ namespace Net.XpFramework.Runner
         /// <summary>
         /// Composes a path name of a special folder and a string component
         /// </summary>
-        /// <param name="kind"></param>
-        /// <param name="file"></param>
+        /// <param name="special">Special Folder from Environment.SpecialFolder enum</param>
+        /// <param name="components">...</param>
         /// <returns></returns>
-        public static string Compose(Environment.SpecialFolder special, string component) 
+        public static string Compose(Environment.SpecialFolder special, params string[] components) 
         {
-            return Compose(Environment.GetFolderPath(special), component);
+            var args = new string[1 + components.Length];
+            args[0] = Environment.GetFolderPath(special);
+            Array.Copy(components, 0, args, 1, components.Length);
+            return Compose(args);
         }
 
         /// <summary>
