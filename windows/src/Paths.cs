@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using WshShell = IWshRuntimeLibrary.WshShell;
+using IWshShortcut = IWshRuntimeLibrary.IWshShortcut;
 
 namespace Net.XpFramework.Runner
 {
     class Paths
     {
+        private static WshShell shell = null;
+
         /// <summary>
         /// Returns the directory name of a given file name
         /// </summary>
@@ -30,18 +34,39 @@ namespace Net.XpFramework.Runner
             bool found = false;
             foreach (string path in bases)
             {
-
-                string qualified = path + Path.DirectorySeparatorChar + file;
+                string qualified = path.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar + file;
+                
                 if (File.Exists(qualified))
                 {
                     found = true;
                     yield return qualified;
                 }
+
             }
             if (expect && !found)
             {
                 throw new FileNotFoundException("Cannot find " + file + " in [" + String.Join(", ", new List<string>(bases).ToArray()) + "]");
             }
+        }
+        
+        /// <summary>
+        /// Resolve a path. If the path is actually a shell link (.lnk file), this link's target path
+        /// is used.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string Resolve(string path)
+        {
+            if (!File.Exists(path)) 
+            {
+                string link = path.TrimEnd(Path.DirectorySeparatorChar) + ".lnk";
+                if (File.Exists(link)) 
+                {
+                    shell = shell ?? new WshShell();   // Lazy initialization
+                    return (shell.CreateShortcut(link) as IWshShortcut).TargetPath;
+                }
+            }
+            return path;
         }
         
         /// <summary>
@@ -62,17 +87,17 @@ namespace Net.XpFramework.Runner
                 if (normalized.StartsWith("~"))
                 {
                     // Path in home directory
-                    yield return Compose(HOME, normalized.Substring(1));
+                    yield return Resolve(Compose(HOME, normalized.Substring(1)));
                 } 
                 else if (normalized.Substring(1).StartsWith(":\\") || normalized.StartsWith("\\\\")) 
                 {
                     // Fully qualified path
-                    yield return normalized;
+                    yield return Resolve(normalized);
                 }
                 else
                 {
                     // Relative path, prepend root
-                    yield return Compose(root, normalized);
+                    yield return Resolve(Compose(root, normalized));
                 }
             }
         }
