@@ -4,7 +4,7 @@ ifeq ($(OS),Windows_NT)
 else
 	CSC?=csc
 endif
-CLASSES=src\\Executor.cs src\\Paths.cs src\\BaseRunner.cs src\\XpConfigSource.cs src\\EnvironmentConfigSource.cs src\\IniConfigSource.cs src\\CompositeConfigSource.cs src\\Ini.cs
+CLASSES=src\\AssemblyInfo.cs src\\Executor.cs src\\Paths.cs src\\BaseRunner.cs src\\XpConfigSource.cs src\\EnvironmentConfigSource.cs src\\IniConfigSource.cs src\\CompositeConfigSource.cs src\\Ini.cs
 CSC_OPT=/nologo /target:exe
 all: xp.exe xpcli.exe xar.exe unittest.exe cgen.exe doclet.exe xcc.exe xpi.exe
 
