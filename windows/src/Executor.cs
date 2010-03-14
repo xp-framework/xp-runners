@@ -28,7 +28,7 @@ namespace Net.XpFramework.Runner
                 new EnvironmentConfigSource(),
                 new IniConfigSource(new Ini(Paths.Compose(".", "xp.ini"))),
                 null != home ? new IniConfigSource(new Ini(Paths.Compose(home, ".xp", "xp.ini"))) : null,
-                new IniConfigSource(new Ini(Paths.Compose(Environment.SpecialFolder.LocalApplicationData, "xp.ini"))),
+                new IniConfigSource(new Ini(Paths.Compose(Environment.SpecialFolder.LocalApplicationData, "Xp", "xp.ini"))),
                 new IniConfigSource(new Ini(Paths.Compose(base_dir, "xp.ini")))
             );
             IEnumerable<string> use_xp = configs.GetUse();
