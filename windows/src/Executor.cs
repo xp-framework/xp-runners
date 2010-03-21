@@ -54,6 +54,21 @@ namespace Net.XpFramework.Runner
                 String.Join(PATH_SEPARATOR, includes)
             );
             
+            // If input or output encoding are not equal to default, also pass their
+            // names inside an LC_CONSOLE environment variable. Only do this inside
+            // real Windows console windows!
+            //
+            // See http://msdn.microsoft.com/en-us/library/system.text.encoding.headername.aspx
+            // and http://msdn.microsoft.com/en-us/library/system.text.encoding.aspx
+            if (null == Environment.GetEnvironmentVariable("TERM")) 
+            {
+                Encoding defaultEncoding = Encoding.Default;
+                if (!defaultEncoding.Equals(Console.InputEncoding) || !defaultEncoding.Equals(Console.OutputEncoding)) 
+                {
+                    Environment.SetEnvironmentVariable("LC_CONSOLE", Console.InputEncoding.HeaderName + "," + Console.OutputEncoding.HeaderName);
+                }
+            }
+            
             // Look for PHP configuration
             foreach (KeyValuePair<string, IEnumerable<string>> kv in configs.GetArgs())
             {
