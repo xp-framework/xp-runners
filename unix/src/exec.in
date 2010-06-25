@@ -15,6 +15,9 @@ for i in "." "$HOME/.xp" "$base" ; do
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
 
+        *.\;*)
+          ;;
+
         *.\[*\])
           section=${line#\[}
           section=${section%]}
