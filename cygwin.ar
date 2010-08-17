@@ -1,4 +1,4 @@
---2397:cgen:--
+--2426:cgen:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP='\'
@@ -85,6 +85,9 @@ for i in "." "$HOME/.xp" "$base" ; do
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
 
+        *.\;*)
+          ;;
+
         *.\[*\])
           section=${line#\[}
           section=${section%]}
@@ -120,7 +123,7 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2396:doclet:--
+--2425:doclet:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP='\'
@@ -207,6 +210,9 @@ for i in "." "$HOME/.xp" "$base" ; do
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
 
+        *.\;*)
+          ;;
+
         *.\[*\])
           section=${line#\[}
           section=${section%]}
@@ -242,7 +248,7 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2398:unittest:--
+--2427:unittest:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP='\'
@@ -329,6 +335,9 @@ for i in "." "$HOME/.xp" "$base" ; do
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
 
+        *.\;*)
+          ;;
+
         *.\[*\])
           section=${line#\[}
           section=${section%]}
@@ -364,7 +373,7 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2393:xar:--
+--2422:xar:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP='\'
@@ -451,6 +460,9 @@ for i in "." "$HOME/.xp" "$base" ; do
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
 
+        *.\;*)
+          ;;
+
         *.\[*\])
           section=${line#\[}
           section=${section%]}
@@ -486,7 +498,7 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2398:xcc:--
+--2427:xcc:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP='\'
@@ -573,6 +585,9 @@ for i in "." "$HOME/.xp" "$base" ; do
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
 
+        *.\;*)
+          ;;
+
         *.\[*\])
           section=${line#\[}
           section=${section%]}
@@ -608,7 +623,7 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3446:xp:--
+--3469:xp:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP='\'
@@ -678,7 +693,6 @@ locate() {
 OPTIND=0
 INCLUDE_PATH="."
 TOOL=
-RUNNER="class"
 
 if [ 0 = $# ] ; then
   TOOL="xp.runtime.ShowResource|usage.txt|255"
@@ -707,7 +721,7 @@ else
         INCLUDE_ARG=${PATHSEP}
         ;;
       -xar) # Run a xar
-        RUNNER="xar"
+        TOOL="xp.runtime.Xar"
         OPTIND=$(expr $OPTIND + 1)
         ;;
       -*) # Any other arg
@@ -722,7 +736,7 @@ else
   shift $OPTIND
 fi
 
-base="$DIRNAME" RUNNER=$RUNNER INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
+base="$DIRNAME" RUNNER="class" INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
 
 
 ifs="|"
@@ -741,6 +755,9 @@ for i in "." "$HOME/.xp" "$base" ; do
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
+
+        *.\;*)
+          ;;
 
         *.\[*\])
           section=${line#\[}
@@ -777,7 +794,7 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2397:xpcli:--
+--2426:xpcli:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP='\'
@@ -864,6 +881,9 @@ for i in "." "$HOME/.xp" "$base" ; do
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
 
+        *.\;*)
+          ;;
+
         *.\[*\])
           section=${line#\[}
           section=${section%]}
@@ -899,7 +919,7 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2397:xpi:--
+--2426:xpi:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP='\'
@@ -985,6 +1005,9 @@ for i in "." "$HOME/.xp" "$base" ; do
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
+
+        *.\;*)
+          ;;
 
         *.\[*\])
           section=${line#\[}
