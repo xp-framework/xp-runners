@@ -3,7 +3,6 @@
 OPTIND=0
 INCLUDE_PATH="."
 TOOL=
-RUNNER="class"
 
 if [ 0 = $# ] ; then 
   TOOL="xp.runtime.ShowResource|usage.txt|255"
@@ -32,7 +31,7 @@ else
         INCLUDE_ARG=${PATHSEP}
         ;;
       -xar)             # Run a xar
-        RUNNER="xar"
+        TOOL="xp.runtime.Xar"
         OPTIND=$(expr $OPTIND + 1)
         ;;
       -*)               # Any other arg
@@ -47,6 +46,6 @@ else
   shift $OPTIND
 fi
 
-EXEC($RUNNER, $INCLUDE_PATH, $TOOL)
+EXEC("class", $INCLUDE_PATH, $TOOL)
 
 #include <exec.in> 
