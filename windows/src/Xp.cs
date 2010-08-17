@@ -10,7 +10,6 @@ namespace Net.XpFramework.Runner
         {
             string[] argv;
             string tool = "";
-            string runner = "class";
             int shift = 0;
             var includes = new List<string>();
             includes.Add(".");
@@ -22,7 +21,8 @@ namespace Net.XpFramework.Runner
             } 
             else 
             {
-                for (var i = 0; i < args.Length ; i++) {
+                for (var i = 0; i < args.Length ; i++) 
+                {
                     switch (args[i])
                     {
                         case "-v": 
@@ -41,7 +41,7 @@ namespace Net.XpFramework.Runner
                             break;
 
                         case "-xar": 
-                            runner = "xar"; 
+                            tool = "xp.runtime.Xar";
                             shift++; 
                             break;
 
@@ -70,7 +70,7 @@ namespace Net.XpFramework.Runner
             }
 
             // Execute
-            Execute(runner, tool, includes.ToArray(), argv);
+            Execute("class", tool, includes.ToArray(), argv);
         }
     }
 }
