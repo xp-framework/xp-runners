@@ -23,6 +23,9 @@ else
         TOOL="xp.runtime.Evaluate"
         OPTIND=$(expr $OPTIND + 1)
         ;;
+      -w|-d)             # Evaluate source and dump result
+        TOOL="xp.runtime.Dump"
+        ;;
       -r)               # Reflect given class
         TOOL="xp.runtime.Reflect"
         OPTIND=$(expr $OPTIND + 1)
