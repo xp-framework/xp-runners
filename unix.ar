@@ -932,8 +932,11 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---422:xprt-update.sh:--
+--485:xprt-update.sh:--
 #!/bin/sh
+
+DIR=$(dirname "$0")
+BIN=$(realpath "$DIR")
 
 if [ -z $TEMP ] ; then
   TARGET=/tmp/.xp
@@ -947,12 +950,12 @@ if [ $? != 0 ] ; then
   exit
 fi
 
-echo "===> Extracting"
+echo "===> Extracting into $BIN"
 i=0
 for e in `ls -1 $TARGET/*` ; do
   (head -1 $e | grep '^#!/bin/sh' >/dev/null) && chmod +x $e
-  mv $e .
-  i=$[$i+1]
+  mv $e $BIN
+  i=`expr $i + 1`
 done
 echo "$i file(s) copied"
 
