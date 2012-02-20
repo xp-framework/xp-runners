@@ -47,7 +47,7 @@ windows: windows/src/*
 	cd windows && $(MAKE)
 
 windows.ar: windows windows/*.exe windows/src/xprt-update.bat
-	sh ar.sh windows.ar windows/*.exe windows/src/xprt-update.bat
+	sh ar.sh windows.ar windows/*.exe windows/src/xprt-update.bat windows/src/xpwin.bat
 
 test.windows: windows
 	cd tests && $(MAKE) testrun on=windows
