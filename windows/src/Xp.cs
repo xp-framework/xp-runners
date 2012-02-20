@@ -35,6 +35,11 @@ namespace Net.XpFramework.Runner
                             shift++; 
                             break;
 
+                        case "-w": 
+                        case "-d": 
+                            tool = "xp.runtime.Dump"; 
+                            break;
+
                         case "-r": 
                             tool = "xp.runtime.Reflect"; 
                             shift++; 
