@@ -1,6 +1,6 @@
 #ifdef __CYGWIN
 PATHSEP=';'
-DIRSEP='\'
+DIRSEP='\\'
 #else
 PATHSEP=':'
 DIRSEP='/'
