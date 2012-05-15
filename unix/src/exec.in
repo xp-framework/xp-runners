@@ -42,7 +42,7 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0${ifs}-ddisplay_errors=stderr$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 #ifdef __BSD
 if [ ! -d /proc/1 ] ; then
