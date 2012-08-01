@@ -1,4 +1,4 @@
---2491:cgen:--
+--2509:cgen:--
 #!/bin/sh
 
 
@@ -76,7 +76,7 @@ RT_ARG=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -113,7 +113,7 @@ fi
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2490:doclet:--
+--2508:doclet:--
 #!/bin/sh
 
 
@@ -191,7 +191,7 @@ RT_ARG=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -228,7 +228,7 @@ fi
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2492:unittest:--
+--2510:unittest:--
 #!/bin/sh
 
 
@@ -306,7 +306,7 @@ RT_ARG=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -343,7 +343,7 @@ fi
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2487:xar:--
+--2505:xar:--
 #!/bin/sh
 
 
@@ -421,7 +421,7 @@ RT_ARG=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -458,7 +458,7 @@ fi
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2492:xcc:--
+--2510:xcc:--
 #!/bin/sh
 
 
@@ -536,7 +536,7 @@ RT_ARG=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -573,7 +573,7 @@ fi
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3620:xp:--
+--3638:xp:--
 #!/bin/sh
 
 
@@ -697,7 +697,7 @@ RT_ARG=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -734,7 +734,7 @@ fi
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2491:xpcli:--
+--2509:xpcli:--
 #!/bin/sh
 
 
@@ -812,7 +812,7 @@ RT_ARG=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -849,7 +849,7 @@ fi
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2491:xpi:--
+--2509:xpi:--
 #!/bin/sh
 
 
@@ -927,7 +927,7 @@ RT_ARG=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
