@@ -43,12 +43,13 @@ namespace Net.XpFramework.Runner
 
         /// <summary>
         /// Returns the PHP executable to be used from this config source
+        /// based on the given runtime version.
         /// </summary>
-        public string GetExecutable()
+        public string GetExecutable(string runtime)
         {
             foreach (XpConfigSource source in this.sources) 
             {
-                string executable = source.GetExecutable();
+                string executable = source.GetExecutable(runtime);
                 if (executable != null) return executable;
             }
             return null;
@@ -56,13 +57,14 @@ namespace Net.XpFramework.Runner
 
         /// <summary>
         /// Returns the PHP runtime arguments to be used from this config source
+        /// based on the given runtime version.
         /// </summary>
-        public Dictionary<string, IEnumerable<string>> GetArgs()
+        public Dictionary<string, IEnumerable<string>> GetArgs(string runtime)
         {
             Dictionary<string, IEnumerable<string>> merged= new Dictionary<string, IEnumerable<string>>();
             foreach (XpConfigSource source in this.sources) 
             {
-                Dictionary<string, IEnumerable<string>> args = source.GetArgs();
+                Dictionary<string, IEnumerable<string>> args = source.GetArgs(runtime);
                 if (args == null) continue;
 
                 foreach (KeyValuePair<string, IEnumerable<string>> kv in args) 
