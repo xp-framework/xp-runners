@@ -48,26 +48,34 @@ namespace Net.XpFramework.Runner
         }
 
         /// <summary>
+        /// Returns all keys in a given section as key/value pair
+        /// </summary>
+        protected IEnumerable<KeyValuePair<string, IEnumerable<string>>> ArgsInSection(string section)
+        {
+            List<string> empty= new List<string>();
+            foreach (string key in this.ini.Keys(section, empty))
+            {
+                if (!"default".Equals(key))
+                {
+                    yield return new KeyValuePair<string, IEnumerable<string>>(key, this.ini.GetAll(section, key, empty));
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns the PHP runtime arguments to be used from this config source
         /// based on the given runtime version.
         /// </summary>
         public Dictionary<string, IEnumerable<string>> GetArgs(string runtime)
         {
             Dictionary<string, IEnumerable<string>> args= new Dictionary<string, IEnumerable<string>>();
-            List<string> empty= new List<string>();
-            foreach (string key in this.ini.Keys("runtime", empty))
+            foreach (var pair in ArgsInSection("runtime"))
             {
-                if (!"default".Equals(key))
-                {
-                    args[key]= this.ini.GetAll("runtime", key, empty);
-                }
+                args[pair.Key]= pair.Value;
             }
-            foreach (string key in this.ini.Keys("runtime@" + runtime, empty))
+            foreach (var pair in ArgsInSection("runtime@" + runtime))
             {
-                if (!"default".Equals(key))
-                {
-                    args[key]= this.ini.GetAll("runtime@" + runtime, key, empty);
-                }
+                args[pair.Key]= pair.Value;
             }
             return args;
         }
