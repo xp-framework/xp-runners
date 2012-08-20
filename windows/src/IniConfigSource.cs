@@ -44,7 +44,7 @@ namespace Net.XpFramework.Runner
         /// </summary>
         public string GetExecutable(string runtime) 
         {
-            return this.ini.Get("runtime", "default");
+            return this.ini.Get("runtime@" + runtime, "default") ?? this.ini.Get("runtime", "default");
         }
 
         /// <summary>
@@ -55,11 +55,18 @@ namespace Net.XpFramework.Runner
         {
             Dictionary<string, IEnumerable<string>> args= new Dictionary<string, IEnumerable<string>>();
             List<string> empty= new List<string>();
-            foreach (string key in this.ini.Keys("runtime", empty)) 
+            foreach (string key in this.ini.Keys("runtime", empty))
             {
-                if (!"default".Equals(key)) 
+                if (!"default".Equals(key))
                 {
                     args[key]= this.ini.GetAll("runtime", key, empty);
+                }
+            }
+            foreach (string key in this.ini.Keys("runtime@" + runtime, empty))
+            {
+                if (!"default".Equals(key))
+                {
+                    args[key]= this.ini.GetAll("runtime@" + runtime, key, empty);
                 }
             }
             return args;
