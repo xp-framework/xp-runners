@@ -3,14 +3,43 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+
 
 namespace Net.XpFramework.Runner
 {
+    delegate string ArgProcessor(string arg);
+    
     class Executor
     {
         private static string PATH_SEPARATOR = new string(new char[] { Path.PathSeparator});
         private static List<string> EMPTY_LIST = new List<string>();
 
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)] 
+        internal static extern IntPtr GetStdHandle(int nStdHandle); 
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern bool GetConsoleMode(IntPtr hConsoleHandle, out int mode);
+        
+        internal enum StandardHandles 
+        {
+            IN  = -10,
+            OUT = -11,
+            ERR = -12
+        }
+        
+        public static bool IsRedirect(StandardHandles id)
+        {
+            int mode;
+            
+            if (!GetConsoleMode(GetStdHandle((int)id), out mode))
+            {
+                throw new IOException("GetConsoleMode(" + id + ") failed");
+            }
+
+            return 0 == mode;
+        }
+        
         /// <summary>
         /// 
         /// </summary>
@@ -33,6 +62,7 @@ namespace Net.XpFramework.Runner
             );
             IEnumerable<string> use_xp = configs.GetUse();
             string executor = configs.GetRuntime() ?? "php";
+            bool wmain = configs.GetWMain() ?? false;
             
             if (null == use_xp) {
                 throw new EntryPointNotFoundException("Cannot determine use_xp setting from " + configs);
@@ -54,19 +84,33 @@ namespace Net.XpFramework.Runner
                 String.Join(PATH_SEPARATOR, includes)
             );
             
-            // If input or output encoding are not equal to default, also pass their
-            // names inside an LC_CONSOLE environment variable. Only do this inside
-            // real Windows console windows!
+            // Pass input,output,default encodings and whether stdin,out and err are redirects
+            // or not via LC_CONSOLE. Only do this inside real Windows console windows, for
+            // Cygwin, this works quite differently!
             //
             // See http://msdn.microsoft.com/en-us/library/system.text.encoding.headername.aspx
             // and http://msdn.microsoft.com/en-us/library/system.text.encoding.aspx
             if (null == Environment.GetEnvironmentVariable("TERM")) 
             {
                 Encoding defaultEncoding = Encoding.Default;
-                if (!defaultEncoding.Equals(Console.InputEncoding) || !defaultEncoding.Equals(Console.OutputEncoding)) 
-                {
-                    Environment.SetEnvironmentVariable("LC_CONSOLE", Console.InputEncoding.HeaderName + "," + Console.OutputEncoding.HeaderName);
-                }
+                Environment.SetEnvironmentVariable("LC_CONSOLE", String.Format(
+                    "{0} {1} {2} {3}{4}{5}",
+                    Console.InputEncoding.HeaderName,
+                    Console.OutputEncoding.HeaderName,
+                    wmain ? "utf-16" : "utf-8",
+                    IsRedirect(StandardHandles.IN) ? 1 : 0,
+                    IsRedirect(StandardHandles.OUT) ? 1 : 0,
+                    IsRedirect(StandardHandles.ERR) ? 1 : 0
+                ));
+            }
+            else
+            {
+                string lang = Environment.GetEnvironmentVariable("LANG");
+                Environment.SetEnvironmentVariable("LC_CONSOLE", String.Format(
+                    "{0} {0} {1} 000",
+                    null == lang ? Encoding.Default.HeaderName : lang.Split('.')[1],
+                    wmain ? "utf-16" : "utf-8"
+                ));
             }
             
             // Look for PHP configuration
@@ -77,7 +121,6 @@ namespace Net.XpFramework.Runner
                     argv += " -d" + kv.Key + "=\"" + value + "\"";
                 }
             }
-            
 
             // Spawn runtime
             var proc = new Process();
@@ -85,8 +128,35 @@ namespace Net.XpFramework.Runner
             proc.StartInfo.Arguments = argv + " \"" + new List<string>(Paths.Locate(use_xp, "tools\\" + runner + ".php", true))[0] + "\" " + tool;
             if (args.Length > 0)
             {
-                foreach (string arg in args) {
-                    proc.StartInfo.Arguments +=  " \"" + arg.Replace("\"", "\"\"\"") + "\"";
+                ArgProcessor process;
+
+                // Workaround problem that php itself doesn't have a wmain() method, so the OS
+                // converts the strings passed as argument to OS default encoding (CP1252, on
+                // a German Windows installation). Works fine until someone enters Japanese 
+                // characters). Convert to single byte character set before passing. 
+                //
+                // This workaround can be disabled by setting runtime.wmain to true once PHP
+                // declares that. See http://msdn.microsoft.com/en-us/library/88w63h9k.aspx
+                if (wmain) 
+                {
+                    process = delegate(string arg) 
+                    { 
+                        return arg; 
+                    };
+                }
+                else
+                {
+                    process = delegate(string arg) 
+                    { 
+                        var mb = Encoding.UTF8;
+                        var sb = Encoding.GetEncoding(1252); 
+                    
+                        return sb.GetString(mb.GetBytes(arg)); 
+                    };
+                }
+                foreach (string arg in args) 
+                {
+                    proc.StartInfo.Arguments +=  " \"" + process(arg.Replace("\"", "\"\"\"")) + "\"";
                 }
             }
             

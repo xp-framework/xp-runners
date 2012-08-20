@@ -39,6 +39,22 @@ namespace Net.XpFramework.Runner
         }
 
         /// <summary>
+        /// Returns whether the PHP runtime supports wmain()
+        /// </summary>
+        public bool? GetWMain() 
+        {
+            var wmain = this.ini.Get("runtime", "wmain");
+
+            if (null == wmain) 
+            {
+                return null;
+            }
+
+            wmain = wmain.ToLower();
+            return wmain.Equals("yes") || wmain.Equals("true") || wmain.Equals("1") || wmain.Equals("on");
+        }
+
+        /// <summary>
         /// Returns the PHP runtime arguments to be used from this config source
         /// </summary>
         public Dictionary<string, IEnumerable<string>> GetArgs()
@@ -47,7 +63,7 @@ namespace Net.XpFramework.Runner
             List<string> empty= new List<string>();
             foreach (string key in this.ini.Keys("runtime", empty)) 
             {
-                if (!"default".Equals(key)) 
+                if (!"default".Equals(key) && !"wmain".Equals(key)) 
                 {
                     args[key]= this.ini.GetAll("runtime", key, empty);
                 }

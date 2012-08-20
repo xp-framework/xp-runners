@@ -28,6 +28,14 @@ namespace Net.XpFramework.Runner
         }
 
         /// <summary>
+        /// Returns whether the PHP runtime supports wmain()
+        /// </summary>
+        public bool? GetWMain() 
+        {
+            return null;
+        }
+
+        /// <summary>
         /// Returns the PHP runtime arguments to be used from this config source
         /// </summary>
         public Dictionary<string, IEnumerable<string>> GetArgs()

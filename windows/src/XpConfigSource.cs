@@ -19,6 +19,12 @@ namespace Net.XpFramework.Runner
         string GetRuntime();
 
         /// <summary>
+        /// Returns whether the PHP runtime supports wmain()
+        /// See http://stackoverflow.com/questions/2627891/does-process-startinfo-arguments-support-a-utf-8-string
+        /// </summary>
+        bool? GetWMain();
+
+        /// <summary>
         /// Returns the PHP runtime arguments to be used from this config source
         /// </summary>
         Dictionary<string, IEnumerable<string>> GetArgs();

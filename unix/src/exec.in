@@ -50,6 +50,12 @@ if [ ! -d /proc/1 ] ; then
   export XP_CMDLINE
 fi
 #endif
+LC_CONSOLE=${LANG#*\.}
+LC_CONSOLE="${LC_CONSOLE} ${LC_CONSOLE} ${LC_CONSOLE} "
+if [ -t 0 ] ; then LC_CONSOLE=${LC_CONSOLE}0 ; else LC_CONSOLE=${LC_CONSOLE}1; fi
+if [ -t 1 ] ; then LC_CONSOLE=${LC_CONSOLE}0 ; else LC_CONSOLE=${LC_CONSOLE}1; fi
+if [ -t 2 ] ; then LC_CONSOLE=${LC_CONSOLE}0 ; else LC_CONSOLE=${LC_CONSOLE}1; fi
 export XP_RT
+export LC_CONSOLE
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
