@@ -1,5 +1,9 @@
---2407:cgen:--
+--2414:cgen:--
 #!/bin/sh
+
+
+
+
 PATHSEP=':'
 DIRSEP='/'
 
@@ -61,12 +65,8 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.codegen.Runner IFS="|";
-
-
 ifs="|"
-
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
 else
@@ -76,20 +76,17 @@ RT_ARG=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
-
         *.\;*)
           ;;
-
         *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
-
         runtime.*=*)
           key=${line%=*}
           if [ default = $key ] ; then
@@ -102,26 +99,22 @@ for i in "." "$HOME/.xp" "$base" ; do
     done < "$i/xp.ini"
   fi
 done
-
 XP_RT=${XP_RT-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
-
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
-
-
-
-
-
-
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2406:doclet:--
+--2413:doclet:--
 #!/bin/sh
+
+
+
+
 PATHSEP=':'
 DIRSEP='/'
 
@@ -183,12 +176,8 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.doclet.Runner IFS="|";
-
-
 ifs="|"
-
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
 else
@@ -198,20 +187,17 @@ RT_ARG=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
-
         *.\;*)
           ;;
-
         *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
-
         runtime.*=*)
           key=${line%=*}
           if [ default = $key ] ; then
@@ -224,26 +210,22 @@ for i in "." "$HOME/.xp" "$base" ; do
     done < "$i/xp.ini"
   fi
 done
-
 XP_RT=${XP_RT-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
-
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
-
-
-
-
-
-
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2408:unittest:--
+--2415:unittest:--
 #!/bin/sh
+
+
+
+
 PATHSEP=':'
 DIRSEP='/'
 
@@ -305,12 +287,8 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.unittest.Runner IFS="|";
-
-
 ifs="|"
-
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
 else
@@ -320,20 +298,17 @@ RT_ARG=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
-
         *.\;*)
           ;;
-
         *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
-
         runtime.*=*)
           key=${line%=*}
           if [ default = $key ] ; then
@@ -346,26 +321,22 @@ for i in "." "$HOME/.xp" "$base" ; do
     done < "$i/xp.ini"
   fi
 done
-
 XP_RT=${XP_RT-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
-
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
-
-
-
-
-
-
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2403:xar:--
+--2410:xar:--
 #!/bin/sh
+
+
+
+
 PATHSEP=':'
 DIRSEP='/'
 
@@ -427,12 +398,8 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.xar.Runner IFS="|";
-
-
 ifs="|"
-
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
 else
@@ -442,20 +409,17 @@ RT_ARG=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
-
         *.\;*)
           ;;
-
         *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
-
         runtime.*=*)
           key=${line%=*}
           if [ default = $key ] ; then
@@ -468,26 +432,22 @@ for i in "." "$HOME/.xp" "$base" ; do
     done < "$i/xp.ini"
   fi
 done
-
 XP_RT=${XP_RT-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
-
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
-
-
-
-
-
-
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2408:xcc:--
+--2415:xcc:--
 #!/bin/sh
+
+
+
+
 PATHSEP=':'
 DIRSEP='/'
 
@@ -549,12 +509,8 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.compiler.Runner IFS="|";
-
-
 ifs="|"
-
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
 else
@@ -564,20 +520,17 @@ RT_ARG=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
-
         *.\;*)
           ;;
-
         *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
-
         runtime.*=*)
           key=${line%=*}
           if [ default = $key ] ; then
@@ -590,26 +543,22 @@ for i in "." "$HOME/.xp" "$base" ; do
     done < "$i/xp.ini"
   fi
 done
-
 XP_RT=${XP_RT-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
-
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
-
-
-
-
-
-
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3450:xp:--
+--3543:xp:--
 #!/bin/sh
+
+
+
+
 PATHSEP=':'
 DIRSEP='/'
 
@@ -671,11 +620,9 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-
 OPTIND=0
 INCLUDE_PATH="."
 TOOL=
-
 if [ 0 = $# ] ; then
   TOOL="xp.runtime.ShowResource|usage.txt|255"
 else
@@ -685,7 +632,6 @@ else
       OPTIND=`expr $OPTIND + 2`
       continue
     fi
-
     case $arg in
       -v) # Display version
         TOOL="xp.runtime.Version"
@@ -694,6 +640,9 @@ else
       -e) # Run source passed via command line
         TOOL="xp.runtime.Evaluate"
         OPTIND=$(expr $OPTIND + 1)
+        ;;
+      -w|-d) # Evaluate source and dump result
+        TOOL="xp.runtime.Dump"
         ;;
       -r) # Reflect given class
         TOOL="xp.runtime.Reflect"
@@ -717,12 +666,8 @@ else
   done
   shift $OPTIND
 fi
-
 base="$DIRNAME" RUNNER="class" INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
-
-
 ifs="|"
-
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
 else
@@ -732,20 +677,17 @@ RT_ARG=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
-
         *.\;*)
           ;;
-
         *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
-
         runtime.*=*)
           key=${line%=*}
           if [ default = $key ] ; then
@@ -758,26 +700,22 @@ for i in "." "$HOME/.xp" "$base" ; do
     done < "$i/xp.ini"
   fi
 done
-
 XP_RT=${XP_RT-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
-
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
-
-
-
-
-
-
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2407:xpcli:--
+--2414:xpcli:--
 #!/bin/sh
+
+
+
+
 PATHSEP=':'
 DIRSEP='/'
 
@@ -839,12 +777,8 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.command.Runner IFS="|";
-
-
 ifs="|"
-
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
 else
@@ -854,20 +788,17 @@ RT_ARG=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
-
         *.\;*)
           ;;
-
         *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
-
         runtime.*=*)
           key=${line%=*}
           if [ default = $key ] ; then
@@ -880,26 +811,22 @@ for i in "." "$HOME/.xp" "$base" ; do
     done < "$i/xp.ini"
   fi
 done
-
 XP_RT=${XP_RT-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
-
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
-
-
-
-
-
-
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2407:xpi:--
+--2414:xpi:--
 #!/bin/sh
+
+
+
+
 PATHSEP=':'
 DIRSEP='/'
 
@@ -961,12 +888,8 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.install.Runner IFS="|";
-
-
 ifs="|"
-
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
 else
@@ -976,20 +899,17 @@ RT_ARG=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
-
         *.\;*)
           ;;
-
         *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
-
         runtime.*=*)
           key=${line%=*}
           if [ default = $key ] ; then
@@ -1002,26 +922,21 @@ for i in "." "$HOME/.xp" "$base" ; do
     done < "$i/xp.ini"
   fi
 done
-
 XP_RT=${XP_RT-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
-
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
-
-
-
-
-
-
 export XP_RT
 IFS="|"
 ${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---422:xprt-update.sh:--
+--485:xprt-update.sh:--
 #!/bin/sh
+
+DIR=$(dirname "$0")
+BIN=$(realpath "$DIR")
 
 if [ -z $TEMP ] ; then
   TARGET=/tmp/.xp
@@ -1035,12 +950,12 @@ if [ $? != 0 ] ; then
   exit
 fi
 
-echo "===> Extracting"
+echo "===> Extracting into $BIN"
 i=0
 for e in `ls -1 $TARGET/*` ; do
   (head -1 $e | grep '^#!/bin/sh' >/dev/null) && chmod +x $e
-  mv $e .
-  i=$[$i+1]
+  mv $e $BIN
+  i=`expr $i + 1`
 done
 echo "$i file(s) copied"
 

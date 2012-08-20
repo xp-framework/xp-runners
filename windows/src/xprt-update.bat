@@ -6,8 +6,8 @@ echo ===^> Downloading Windows runners to %TARGET%
 xpi download bin/windows %TARGET%
 if ERRORLEVEL 1 goto end
 
-echo ===^> Extracting
-xcopy /y /q %TARGET%\* .
+echo ===^> Extracting into %~p0
+xcopy /y /q %TARGET%\* "%~p0"
 
 rmdir /s /q %TARGET%
 echo ===^> Done, runners have been updated

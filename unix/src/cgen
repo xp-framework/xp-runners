@@ -73,7 +73,7 @@ execute() {
   ifs="|"
 
   if [ "" = "$USE_XP" ] ; then
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$line" in
         use=*)
           USE_XP=$(translate_paths "$base" "${line#*=}")
@@ -89,7 +89,7 @@ execute() {
   IFS="
 "
   for ini in $(locate "$USE_XP" "php.ini" 0) ; do
-    while read line ; do
+    while read line || [ -n "$line" ] ; do
       case "$line" in
         *=*)
           key=${line%=*}
