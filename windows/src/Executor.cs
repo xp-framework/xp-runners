@@ -32,7 +32,7 @@ namespace Net.XpFramework.Runner
                 new IniConfigSource(new Ini(Paths.Compose(base_dir, "xp.ini")))
             );
             IEnumerable<string> use_xp = configs.GetUse();
-            string executor = configs.GetRuntime() ?? "php";
+            string executor = configs.GetExecutable() ?? "php";
             
             if (null == use_xp) {
                 throw new EntryPointNotFoundException("Cannot determine use_xp setting from " + configs);

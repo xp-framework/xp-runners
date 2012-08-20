@@ -27,16 +27,29 @@ namespace Net.XpFramework.Runner
             }
             return null;
         }
-        
+
         /// <summary>
-        /// Returns the PHP runtime to be used from this config source
+        /// Returns the runtime to be used from this config source
         /// </summary>
-        public string GetRuntime() 
+        public string GetRuntime()
         {
             foreach (XpConfigSource source in this.sources) 
             {
                 string runtime = source.GetRuntime();
                 if (runtime != null) return runtime;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the PHP executable to be used from this config source
+        /// </summary>
+        public string GetExecutable()
+        {
+            foreach (XpConfigSource source in this.sources) 
+            {
+                string executable = source.GetExecutable();
+                if (executable != null) return executable;
             }
             return null;
         }

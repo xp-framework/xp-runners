@@ -20,11 +20,19 @@ namespace Net.XpFramework.Runner
         }
         
         /// <summary>
-        /// Returns the PHP runtime to be used from this config source
+        /// Returns the runtime to be used from this config source
         /// </summary>
         public string GetRuntime() 
         {
             return Environment.GetEnvironmentVariable("XP_RT");
+        }
+
+        /// <summary>
+        /// Returns the PHP executable to be used from this config source
+        /// </summary>
+        public string GetExecutable() 
+        {
+            return null;
         }
 
         /// <summary>

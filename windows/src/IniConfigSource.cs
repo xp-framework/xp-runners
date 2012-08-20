@@ -29,11 +29,19 @@ namespace Net.XpFramework.Runner
                 value.Split(new char[] { Path.PathSeparator })
             );
         }
-        
+
         /// <summary>
-        /// Returns the PHP runtime to be used from this config source
+        /// Returns the runtime to be used from this config source
         /// </summary>
-        public string GetRuntime() 
+        public string GetRuntime()
+        {
+            return this.ini.Get("default", "rt");
+        }
+
+        /// <summary>
+        /// Returns the PHP executable to be used from this config source
+        /// </summary>
+        public string GetExecutable() 
         {
             return this.ini.Get("runtime", "default");
         }
