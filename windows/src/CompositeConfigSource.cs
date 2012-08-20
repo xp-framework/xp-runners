@@ -14,18 +14,23 @@ namespace Net.XpFramework.Runner
             this.sources = new List<XpConfigSource>(sources);
             this.sources.RemoveAll(delegate(XpConfigSource o) { return o == null; });
         }
+
+        protected T AskEach<T>(Func<XpConfigSource, T> closure)
+        {
+            foreach (XpConfigSource source in this.sources) 
+            {
+                T value = closure(source);
+                if (value != null) return value;
+            }
+            return default(T); 
+        }
     
         /// <summary>
         /// Returns the use_xp setting derived from this config source
         /// </summary>
         public IEnumerable<string> GetUse() 
         {
-            foreach (XpConfigSource source in this.sources) 
-            {
-                IEnumerable<string> use= source.GetUse();
-                if (use != null) return use;
-            }
-            return null;
+            return AskEach<IEnumerable<string>>((s) => s.GetUse());
         }
 
         /// <summary>
@@ -33,12 +38,7 @@ namespace Net.XpFramework.Runner
         /// </summary>
         public string GetRuntime()
         {
-            foreach (XpConfigSource source in this.sources) 
-            {
-                string runtime = source.GetRuntime();
-                if (runtime != null) return runtime;
-            }
-            return null;
+            return AskEach<string>((s) => s.GetRuntime());
         }
 
         /// <summary>
@@ -47,12 +47,7 @@ namespace Net.XpFramework.Runner
         /// </summary>
         public string GetExecutable(string runtime)
         {
-            foreach (XpConfigSource source in this.sources) 
-            {
-                string executable = source.GetExecutable(runtime);
-                if (executable != null) return executable;
-            }
-            return null;
+            return AskEach<string>((s) => s.GetExecutable(runtime));
         }
 
         /// <summary>
