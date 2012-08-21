@@ -15,6 +15,10 @@ for i in "." "$HOME/.xp" "$base" ; do
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
 
+        default.rt=*)
+          XP_RT=${XP_RT-${line#*=}}
+        ;;
+
         *.\;*)
           ;;
 
@@ -23,10 +27,10 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
 
-        runtime.*=*)
+        runtime.*=*|runtime@$XP_RT.*=*)
           key=${line%=*}
           if [ default = $key ] ; then
-            XP_RT=${XP_RT-"${line#*=}"}
+            XP_EXE=${XP_EXE-"${line#*=}"}
           else
             RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
           fi
@@ -36,7 +40,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   fi
 done
 
-XP_RT=${XP_RT-php}
+XP_EXE=${XP_EXE-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
@@ -50,6 +54,6 @@ if [ ! -d /proc/1 ] ; then
   export XP_CMDLINE
 fi
 #endif
-export XP_RT
+export XP_EXE
 IFS="|"
-${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
