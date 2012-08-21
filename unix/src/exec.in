@@ -6,6 +6,8 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+dkeys=""
+vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
@@ -27,16 +29,41 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
 
-        runtime.*=*|runtime@$XP_RT.*=*)
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+        ;;
+
+        runtime.*=*)
           key=${line%=*}
-          if [ default = $key ] ; then
-            XP_EXE=${XP_EXE-"${line#*=}"}
-          else
-            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
-          fi
+          key=${key//./__}
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=${line#*=}
+        ;;
+
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=${key//./__}
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=${line#*=}
         ;;
       esac
     done < "$i/xp.ini"
+  fi
+done
+
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+    fi
   fi
 done
 
