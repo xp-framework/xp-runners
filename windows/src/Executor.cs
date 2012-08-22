@@ -31,8 +31,10 @@ namespace Net.XpFramework.Runner
                 new IniConfigSource(new Ini(Paths.Compose(Environment.SpecialFolder.LocalApplicationData, "Xp", "xp.ini"))),
                 new IniConfigSource(new Ini(Paths.Compose(base_dir, "xp.ini")))
             );
+
             IEnumerable<string> use_xp = configs.GetUse();
-            string executor = configs.GetRuntime() ?? "php";
+            string runtime = configs.GetRuntime();
+            string executor = configs.GetExecutable(runtime) ?? "php";
             
             if (null == use_xp) {
                 throw new EntryPointNotFoundException("Cannot determine use_xp setting from " + configs);
@@ -70,7 +72,7 @@ namespace Net.XpFramework.Runner
             }
             
             // Look for PHP configuration
-            foreach (KeyValuePair<string, IEnumerable<string>> kv in configs.GetArgs())
+            foreach (KeyValuePair<string, IEnumerable<string>> kv in configs.GetArgs(runtime))
             {
                 foreach (string value in kv.Value)
                 {
