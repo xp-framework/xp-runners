@@ -14,42 +14,52 @@ namespace Net.XpFramework.Runner
             this.sources = new List<XpConfigSource>(sources);
             this.sources.RemoveAll(delegate(XpConfigSource o) { return o == null; });
         }
+
+        protected T AskEach<T>(Func<XpConfigSource, T> closure)
+        {
+            foreach (XpConfigSource source in this.sources) 
+            {
+                T value = closure(source);
+                if (value != null) return value;
+            }
+            return default(T); 
+        }
     
         /// <summary>
         /// Returns the use_xp setting derived from this config source
         /// </summary>
         public IEnumerable<string> GetUse() 
         {
-            foreach (XpConfigSource source in this.sources) 
-            {
-                IEnumerable<string> use= source.GetUse();
-                if (use != null) return use;
-            }
-            return null;
+            return AskEach<IEnumerable<string>>((s) => s.GetUse());
         }
-        
+
         /// <summary>
-        /// Returns the PHP runtime to be used from this config source
+        /// Returns the runtime to be used from this config source
         /// </summary>
-        public string GetRuntime() 
+        public string GetRuntime()
         {
-            foreach (XpConfigSource source in this.sources) 
-            {
-                string runtime = source.GetRuntime();
-                if (runtime != null) return runtime;
-            }
-            return null;
+            return AskEach<string>((s) => s.GetRuntime());
+        }
+
+        /// <summary>
+        /// Returns the PHP executable to be used from this config source
+        /// based on the given runtime version.
+        /// </summary>
+        public string GetExecutable(string runtime)
+        {
+            return AskEach<string>((s) => s.GetExecutable(runtime));
         }
 
         /// <summary>
         /// Returns the PHP runtime arguments to be used from this config source
+        /// based on the given runtime version.
         /// </summary>
-        public Dictionary<string, IEnumerable<string>> GetArgs()
+        public Dictionary<string, IEnumerable<string>> GetArgs(string runtime)
         {
             Dictionary<string, IEnumerable<string>> merged= new Dictionary<string, IEnumerable<string>>();
             foreach (XpConfigSource source in this.sources) 
             {
-                Dictionary<string, IEnumerable<string>> args = source.GetArgs();
+                Dictionary<string, IEnumerable<string>> args = source.GetArgs(runtime);
                 if (args == null) continue;
 
                 foreach (KeyValuePair<string, IEnumerable<string>> kv in args) 

@@ -20,7 +20,7 @@ namespace Net.XpFramework.Runner
         }
         
         /// <summary>
-        /// Returns the PHP runtime to be used from this config source
+        /// Returns the runtime to be used from this config source
         /// </summary>
         public string GetRuntime() 
         {
@@ -28,9 +28,19 @@ namespace Net.XpFramework.Runner
         }
 
         /// <summary>
-        /// Returns the PHP runtime arguments to be used from this config source
+        /// Returns the PHP executable to be used from this config source
+        /// based on the given runtime version.
         /// </summary>
-        public Dictionary<string, IEnumerable<string>> GetArgs()
+        public string GetExecutable(string runtime) 
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the PHP runtime arguments to be used from this config source
+        /// based on the given runtime version.
+        /// </summary>
+        public Dictionary<string, IEnumerable<string>> GetArgs(string runtime)
         {
             return null;
         }

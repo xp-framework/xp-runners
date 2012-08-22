@@ -14,14 +14,21 @@ namespace Net.XpFramework.Runner
         IEnumerable<string> GetUse();
 
         /// <summary>
-        /// Returns the PHP runtime to be used from this config source
+        /// Returns the runtime to be used from this config source
         /// </summary>
         string GetRuntime();
 
         /// <summary>
-        /// Returns the PHP runtime arguments to be used from this config source
+        /// Returns the PHP executable to be used from this config source
+        /// based on the given runtime version.
         /// </summary>
-        Dictionary<string, IEnumerable<string>> GetArgs();
+        string GetExecutable(string runtime);
+
+        /// <summary>
+        /// Returns the PHP runtime arguments to be used from this config source
+        /// based on the given runtime version.
+        /// </summary>
+        Dictionary<string, IEnumerable<string>> GetArgs(string runtime);
         
     }
 }
