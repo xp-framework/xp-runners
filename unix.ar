@@ -1,4 +1,4 @@
---2414:cgen:--
+--2980:cgen:--
 #!/bin/sh
 
 
@@ -73,6 +73,8 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+dkeys=""
+vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
@@ -81,35 +83,59 @@ for i in "." "$HOME/.xp" "$base" ; do
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
+        default.rt=*)
+          XP_RT=${XP_RT-${line#*=}}
+        ;;
         *.\;*)
           ;;
         *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+        ;;
         runtime.*=*)
           key=${line%=*}
-          if [ default = $key ] ; then
-            XP_RT=${XP_RT-"${line#*=}"}
-          else
-            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
-          fi
+          key=${key//./__}
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=${line#*=}
+        ;;
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=${key//./__}
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=${line#*=}
         ;;
       esac
     done < "$i/xp.ini"
   fi
 done
-XP_RT=${XP_RT-php}
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+    fi
+  fi
+done
+XP_EXE=${XP_EXE-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
-export XP_RT
+export XP_EXE
 IFS="|"
-${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2413:doclet:--
+${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--2979:doclet:--
 #!/bin/sh
 
 
@@ -184,6 +210,8 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+dkeys=""
+vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
@@ -192,35 +220,59 @@ for i in "." "$HOME/.xp" "$base" ; do
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
+        default.rt=*)
+          XP_RT=${XP_RT-${line#*=}}
+        ;;
         *.\;*)
           ;;
         *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+        ;;
         runtime.*=*)
           key=${line%=*}
-          if [ default = $key ] ; then
-            XP_RT=${XP_RT-"${line#*=}"}
-          else
-            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
-          fi
+          key=${key//./__}
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=${line#*=}
+        ;;
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=${key//./__}
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=${line#*=}
         ;;
       esac
     done < "$i/xp.ini"
   fi
 done
-XP_RT=${XP_RT-php}
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+    fi
+  fi
+done
+XP_EXE=${XP_EXE-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
-export XP_RT
+export XP_EXE
 IFS="|"
-${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2415:unittest:--
+${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--2981:unittest:--
 #!/bin/sh
 
 
@@ -295,6 +347,8 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+dkeys=""
+vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
@@ -303,35 +357,59 @@ for i in "." "$HOME/.xp" "$base" ; do
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
+        default.rt=*)
+          XP_RT=${XP_RT-${line#*=}}
+        ;;
         *.\;*)
           ;;
         *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+        ;;
         runtime.*=*)
           key=${line%=*}
-          if [ default = $key ] ; then
-            XP_RT=${XP_RT-"${line#*=}"}
-          else
-            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
-          fi
+          key=${key//./__}
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=${line#*=}
+        ;;
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=${key//./__}
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=${line#*=}
         ;;
       esac
     done < "$i/xp.ini"
   fi
 done
-XP_RT=${XP_RT-php}
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+    fi
+  fi
+done
+XP_EXE=${XP_EXE-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
-export XP_RT
+export XP_EXE
 IFS="|"
-${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2410:xar:--
+${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--2976:xar:--
 #!/bin/sh
 
 
@@ -406,6 +484,8 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+dkeys=""
+vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
@@ -414,35 +494,59 @@ for i in "." "$HOME/.xp" "$base" ; do
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
+        default.rt=*)
+          XP_RT=${XP_RT-${line#*=}}
+        ;;
         *.\;*)
           ;;
         *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+        ;;
         runtime.*=*)
           key=${line%=*}
-          if [ default = $key ] ; then
-            XP_RT=${XP_RT-"${line#*=}"}
-          else
-            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
-          fi
+          key=${key//./__}
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=${line#*=}
+        ;;
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=${key//./__}
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=${line#*=}
         ;;
       esac
     done < "$i/xp.ini"
   fi
 done
-XP_RT=${XP_RT-php}
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+    fi
+  fi
+done
+XP_EXE=${XP_EXE-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
-export XP_RT
+export XP_EXE
 IFS="|"
-${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2415:xcc:--
+${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--2981:xcc:--
 #!/bin/sh
 
 
@@ -517,6 +621,8 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+dkeys=""
+vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
@@ -525,35 +631,59 @@ for i in "." "$HOME/.xp" "$base" ; do
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
+        default.rt=*)
+          XP_RT=${XP_RT-${line#*=}}
+        ;;
         *.\;*)
           ;;
         *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+        ;;
         runtime.*=*)
           key=${line%=*}
-          if [ default = $key ] ; then
-            XP_RT=${XP_RT-"${line#*=}"}
-          else
-            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
-          fi
+          key=${key//./__}
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=${line#*=}
+        ;;
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=${key//./__}
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=${line#*=}
         ;;
       esac
     done < "$i/xp.ini"
   fi
 done
-XP_RT=${XP_RT-php}
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+    fi
+  fi
+done
+XP_EXE=${XP_EXE-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
-export XP_RT
+export XP_EXE
 IFS="|"
-${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3543:xp:--
+${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--4109:xp:--
 #!/bin/sh
 
 
@@ -674,6 +804,8 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+dkeys=""
+vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
@@ -682,35 +814,59 @@ for i in "." "$HOME/.xp" "$base" ; do
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
+        default.rt=*)
+          XP_RT=${XP_RT-${line#*=}}
+        ;;
         *.\;*)
           ;;
         *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+        ;;
         runtime.*=*)
           key=${line%=*}
-          if [ default = $key ] ; then
-            XP_RT=${XP_RT-"${line#*=}"}
-          else
-            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
-          fi
+          key=${key//./__}
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=${line#*=}
+        ;;
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=${key//./__}
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=${line#*=}
         ;;
       esac
     done < "$i/xp.ini"
   fi
 done
-XP_RT=${XP_RT-php}
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+    fi
+  fi
+done
+XP_EXE=${XP_EXE-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
-export XP_RT
+export XP_EXE
 IFS="|"
-${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2414:xpcli:--
+${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--2980:xpcli:--
 #!/bin/sh
 
 
@@ -785,6 +941,8 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+dkeys=""
+vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
@@ -793,35 +951,59 @@ for i in "." "$HOME/.xp" "$base" ; do
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
+        default.rt=*)
+          XP_RT=${XP_RT-${line#*=}}
+        ;;
         *.\;*)
           ;;
         *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+        ;;
         runtime.*=*)
           key=${line%=*}
-          if [ default = $key ] ; then
-            XP_RT=${XP_RT-"${line#*=}"}
-          else
-            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
-          fi
+          key=${key//./__}
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=${line#*=}
+        ;;
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=${key//./__}
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=${line#*=}
         ;;
       esac
     done < "$i/xp.ini"
   fi
 done
-XP_RT=${XP_RT-php}
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+    fi
+  fi
+done
+XP_EXE=${XP_EXE-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
-export XP_RT
+export XP_EXE
 IFS="|"
-${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2414:xpi:--
+${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--2980:xpi:--
 #!/bin/sh
 
 
@@ -896,6 +1078,8 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+dkeys=""
+vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
@@ -904,34 +1088,58 @@ for i in "." "$HOME/.xp" "$base" ; do
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
         ;;
+        default.rt=*)
+          XP_RT=${XP_RT-${line#*=}}
+        ;;
         *.\;*)
           ;;
         *.\[*\])
           section=${line#\[}
           section=${section%]}
         ;;
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+        ;;
         runtime.*=*)
           key=${line%=*}
-          if [ default = $key ] ; then
-            XP_RT=${XP_RT-"${line#*=}"}
-          else
-            RT_ARG="$RT_ARG${ifs}-d$key=\"${line#*=}\""
-          fi
+          key=${key//./__}
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=${line#*=}
+        ;;
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=${key//./__}
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=${line#*=}
         ;;
       esac
     done < "$i/xp.ini"
   fi
 done
-XP_RT=${XP_RT-php}
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+    fi
+  fi
+done
+XP_EXE=${XP_EXE-php}
 if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
-export XP_RT
+export XP_EXE
 IFS="|"
-${XP_RT}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 --485:xprt-update.sh:--
 #!/bin/sh
 
