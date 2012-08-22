@@ -50,7 +50,7 @@ namespace Net.XpFramework.Runner
             //                       | USE_XP
             //                       Dot
             string argv = String.Format(
-                "-C -q -dinclude_path=\".{1}{0}{1}{1}{2}\" -dmagic_quotes_gpc=0",
+                "-C -q -dinclude_path=\".{1}{0}{1}{1}{2}\" -dmagic_quotes_gpc=0 -ddisplay_errors=stderr",
                 String.Join(PATH_SEPARATOR, new List<string>(use_xp).ToArray()),
                 PATH_SEPARATOR,
                 String.Join(PATH_SEPARATOR, includes)
