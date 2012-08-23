@@ -13,7 +13,7 @@ namespace Net.XpFramework.Runner
         /// Returns whether this config source is valid
         /// </summary>
         public bool Valid() {
-            return true;
+            return this.ini.Exists();
         }
 
         /// <summary>

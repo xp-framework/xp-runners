@@ -30,12 +30,17 @@ namespace Net.XpFramework.Runner
             this.FileName = file;
         }
 
+        public bool Exists()
+        {
+            return File.Exists(this.FileName);
+        }
+
         public void Parse(bool reset)
         {
             lock(this) 
             {
                 if (this.parsed && !reset) return;    // Short-circuit this
-                if (!File.Exists(this.FileName)) return;
+                if (!this.Exists()) return;
 
                 string section = "default";
                 this.sections[section] = new Dictionary<string, List<string>>();
