@@ -40,26 +40,11 @@ namespace Net.XpFramework.Runner
 
         /// <summary>
         /// Returns the PHP executable to be used from this config source
-        /// based on the given runtime version.
+        /// based on the given runtime version, using the default otherwise.
         /// </summary>
         public string GetExecutable(string runtime) 
         {
             return this.ini.Get("runtime@" + runtime, "default") ?? this.ini.Get("runtime", "default");
-        }
-
-        /// <summary>
-        /// Returns all keys in a given section as key/value pair
-        /// </summary>
-        protected IEnumerable<KeyValuePair<string, IEnumerable<string>>> ArgsInSection(string section)
-        {
-            List<string> empty= new List<string>();
-            foreach (string key in this.ini.Keys(section, empty))
-            {
-                if (!("default".Equals(key) || "extension".Equals(key)))
-                {
-                    yield return new KeyValuePair<string, IEnumerable<string>>(key, this.ini.GetAll(section, key, empty));
-                }
-            }
         }
 
         /// <summary>
@@ -80,7 +65,7 @@ namespace Net.XpFramework.Runner
 
         /// <summary>
         /// Returns the PHP extensions to be loaded from this config source
-        /// based on the given runtime version.
+        /// based on the given runtime version and the defaults.
         /// </summary>
         public IEnumerable<string> GetExtensions(string runtime)
         {
@@ -92,8 +77,23 @@ namespace Net.XpFramework.Runner
         }
 
         /// <summary>
+        /// Returns all keys in a given section as key/value pair
+        /// </summary>
+        protected IEnumerable<KeyValuePair<string, IEnumerable<string>>> ArgsInSection(string section)
+        {
+            var empty= new string[] {};
+            foreach (string key in this.ini.Keys(section, empty))
+            {
+                if (!("default".Equals(key) || "extension".Equals(key)))
+                {
+                    yield return new KeyValuePair<string, IEnumerable<string>>(key, this.ini.GetAll(section, key, empty));
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns the PHP runtime arguments to be used from this config source
-        /// based on the given runtime version.
+        /// based on the given runtime version, overwriting the defaults.
         /// </summary>
         public Dictionary<string, IEnumerable<string>> GetArgs(string runtime)
         {
