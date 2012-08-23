@@ -79,6 +79,19 @@ namespace Net.XpFramework.Runner
         }
 
         /// <summary>
+        /// Returns the PHP extensions to be loaded from this config source
+        /// based on the given runtime version.
+        /// </summary>
+        public IEnumerable<string> GetExtensions(string runtime)
+        {
+            var extensions = this.ini.GetAll("runtime", "extension");
+            var vextensions = this.ini.GetAll("runtime@" + runtime, "extension");
+            if (null == extensions && null == vextensions) return null;
+
+            return Concat<string>(extensions, vextensions);
+        }
+
+        /// <summary>
         /// Returns the PHP runtime arguments to be used from this config source
         /// based on the given runtime version.
         /// </summary>
@@ -86,7 +99,6 @@ namespace Net.XpFramework.Runner
         {
             Dictionary<string, IEnumerable<string>> args= new Dictionary<string, IEnumerable<string>>();
 
-            // Overwrite args in default section with args in version-specific one
             foreach (var pair in ArgsInSection("runtime"))
             {
                 args[pair.Key]= pair.Value;
@@ -94,14 +106,6 @@ namespace Net.XpFramework.Runner
             foreach (var pair in ArgsInSection("runtime@" + runtime))
             {
                 args[pair.Key]= pair.Value;
-            }
-
-            // Merge extensions
-            var extensions = this.ini.GetAll("runtime", "extension");
-            var vextensions = this.ini.GetAll("runtime@" + runtime, "extension");
-            if (null != extensions || null != vextensions)
-            {
-                args["extension"]= Concat<string>(extensions, vextensions);
             }
 
             return args;

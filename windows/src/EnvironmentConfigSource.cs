@@ -37,6 +37,15 @@ namespace Net.XpFramework.Runner
         }
 
         /// <summary>
+        /// Returns the PHP extensions to be loaded from this config source
+        /// based on the given runtime version.
+        /// </summary>
+        public IEnumerable<string> GetExtensions(string runtime)
+        {
+            return null;
+        }
+
+        /// <summary>
         /// Returns the PHP runtime arguments to be used from this config source
         /// based on the given runtime version.
         /// </summary>

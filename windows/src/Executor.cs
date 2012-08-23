@@ -78,7 +78,13 @@ namespace Net.XpFramework.Runner
                 {
                     argv += " -d" + kv.Key + "=\"" + value + "\"";
                 }
-            }      
+            }
+
+            // Add extensions
+            foreach (var ext in configs.GetExtensions(runtime))
+            {
+                argv += " -dextension=" + ext;
+            }
 
             // Spawn runtime
             var proc = new Process();
