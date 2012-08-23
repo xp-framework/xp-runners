@@ -1,7 +1,5 @@
---2999:cgen:--
+--2997:cgen:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\\'
@@ -137,10 +135,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2998:doclet:--
+--2996:doclet:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\\'
@@ -276,10 +272,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3000:unittest:--
+--2998:unittest:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\\'
@@ -415,10 +409,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2995:xar:--
+--2993:xar:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\\'
@@ -554,10 +546,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3000:xcc:--
+--2998:xcc:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\\'
@@ -693,10 +683,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4128:xp:--
+--4126:xp:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\\'
@@ -878,10 +866,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2999:xpcli:--
+--2997:xpcli:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\\'
@@ -1017,10 +1003,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2999:xpi:--
+--2997:xpi:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\\'

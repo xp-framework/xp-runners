@@ -1,7 +1,5 @@
---3077:cgen:--
+--3075:cgen:--
 #!/bin/sh
-
-
 
 
 
@@ -141,10 +139,8 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3076:doclet:--
+--3074:doclet:--
 #!/bin/sh
-
-
 
 
 
@@ -284,10 +280,8 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3078:unittest:--
+--3076:unittest:--
 #!/bin/sh
-
-
 
 
 
@@ -427,10 +421,8 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3073:xar:--
+--3071:xar:--
 #!/bin/sh
-
-
 
 
 
@@ -570,10 +562,8 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3078:xcc:--
+--3076:xcc:--
 #!/bin/sh
-
-
 
 
 
@@ -713,10 +703,8 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4206:xp:--
+--4204:xp:--
 #!/bin/sh
-
-
 
 
 
@@ -902,10 +890,8 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3077:xpcli:--
+--3075:xpcli:--
 #!/bin/sh
-
-
 
 
 
@@ -1045,10 +1031,8 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3077:xpi:--
+--3075:xpi:--
 #!/bin/sh
-
-
 
 
 
