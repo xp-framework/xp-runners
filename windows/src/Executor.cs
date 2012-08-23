@@ -78,8 +78,7 @@ namespace Net.XpFramework.Runner
                 {
                     argv += " -d" + kv.Key + "=\"" + value + "\"";
                 }
-            }
-            
+            }      
 
             // Spawn runtime
             var proc = new Process();

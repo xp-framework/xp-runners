@@ -55,9 +55,25 @@ namespace Net.XpFramework.Runner
             List<string> empty= new List<string>();
             foreach (string key in this.ini.Keys(section, empty))
             {
-                if (!"default".Equals(key))
+                if (!("default".Equals(key) || "extension".Equals(key)))
                 {
                     yield return new KeyValuePair<string, IEnumerable<string>>(key, this.ini.GetAll(section, key, empty));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Concatenates all given enumerables
+        /// </summary>
+        protected IEnumerable<T> Concat<T>(params IEnumerable<T>[] args)
+        {
+            foreach (var enumerable in args)
+            {
+                if (null == enumerable) continue;
+
+                foreach (var e in enumerable)
+                {
+                    yield return e;
                 }
             }
         }
@@ -69,6 +85,8 @@ namespace Net.XpFramework.Runner
         public Dictionary<string, IEnumerable<string>> GetArgs(string runtime)
         {
             Dictionary<string, IEnumerable<string>> args= new Dictionary<string, IEnumerable<string>>();
+
+            // Overwrite args in default section with args in version-specific one
             foreach (var pair in ArgsInSection("runtime"))
             {
                 args[pair.Key]= pair.Value;
@@ -77,6 +95,15 @@ namespace Net.XpFramework.Runner
             {
                 args[pair.Key]= pair.Value;
             }
+
+            // Merge extensions
+            var extensions = this.ini.GetAll("runtime", "extension");
+            var vextensions = this.ini.GetAll("runtime@" + runtime, "extension");
+            if (null != extensions || null != vextensions)
+            {
+                args["extension"]= Concat<string>(extensions, vextensions);
+            }
+
             return args;
         }
         

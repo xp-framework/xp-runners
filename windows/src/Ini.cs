@@ -29,7 +29,7 @@ namespace Net.XpFramework.Runner
         {
             this.FileName = file;
         }
-        
+
         public void Parse(bool reset)
         {
             lock(this) 

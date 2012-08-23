@@ -1,5 +1,7 @@
---2980:cgen:--
+--2982:cgen:--
 #!/bin/sh
+
+
 
 
 
@@ -135,8 +137,10 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2979:doclet:--
+--2981:doclet:--
 #!/bin/sh
+
+
 
 
 
@@ -272,8 +276,10 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2981:unittest:--
+--2983:unittest:--
 #!/bin/sh
+
+
 
 
 
@@ -409,8 +415,10 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2976:xar:--
+--2978:xar:--
 #!/bin/sh
+
+
 
 
 
@@ -546,8 +554,10 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2981:xcc:--
+--2983:xcc:--
 #!/bin/sh
+
+
 
 
 
@@ -683,8 +693,10 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4109:xp:--
+--4111:xp:--
 #!/bin/sh
+
+
 
 
 
@@ -866,8 +878,10 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2980:xpcli:--
+--2982:xpcli:--
 #!/bin/sh
+
+
 
 
 
@@ -1003,8 +1017,10 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---2980:xpi:--
+--2982:xpi:--
 #!/bin/sh
+
+
 
 
 
