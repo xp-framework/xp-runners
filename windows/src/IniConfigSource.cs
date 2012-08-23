@@ -10,6 +10,13 @@ namespace Net.XpFramework.Runner
         private Ini ini;
     
         /// <summary>
+        /// Returns whether this config source is valid
+        /// </summary>
+        public bool Valid() {
+            return true;
+        }
+
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="ini"></param>

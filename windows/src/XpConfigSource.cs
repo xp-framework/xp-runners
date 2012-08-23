@@ -7,6 +7,10 @@ namespace Net.XpFramework.Runner
 {
     interface XpConfigSource 
     {
+        /// <summary>
+        /// Returns whether this config source is valid
+        /// </summary>
+        bool Valid();
 
         /// <summary>
         /// Returns the use_xp setting derived from this config source

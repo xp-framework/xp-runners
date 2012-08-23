@@ -24,6 +24,13 @@ namespace Net.XpFramework.Runner
             }
             return default(T); 
         }
+
+        /// <summary>
+        /// Returns whether this config source is valid
+        /// </summary>
+        public bool Valid() {
+            return true;
+        }
     
         /// <summary>
         /// Returns the use_xp setting derived from this config source
