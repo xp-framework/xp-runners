@@ -12,7 +12,7 @@ namespace Net.XpFramework.Runner
         public CompositeConfigSource(params XpConfigSource[] sources) 
         {
             this.sources = new List<XpConfigSource>(sources);
-            this.sources.RemoveAll(delegate(XpConfigSource o) { return o == null; });
+            this.sources.RemoveAll(delegate(XpConfigSource o) { return o == null || !o.Valid(); });
         }
 
         protected T AskEach<T>(Func<XpConfigSource, T> closure)
