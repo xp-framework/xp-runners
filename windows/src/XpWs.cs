@@ -8,34 +8,52 @@ namespace Net.XpFramework.Runner
 
         static void Main(string[] args)
         {
-        	string server, port;
-        	var pid  = System.Diagnostics.Process.GetCurrentProcess().Id;
+            string server, port;
 
-        	// Parse arguments
-        	if (0 == args.Length) 
-        	{
-        		server = "localhost";
-        		port = "8080";
-        	} 
-        	else 
-        	{
-        		var parsed = args[0].Split(':');
-        		server = parsed[0];
-        		port = parsed.Length > 1 ? parsed[1] : "8080";
-        		Array.Copy(args, 1, args, 0, args.Length - 1);
-        		Array.Resize(ref args, args.Length - 1);
-        	}
+            var pid  = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var addr = new string[] { "localhost" };
+            var profile = "dev";
+            var i = 0;
+            var parsing = true;
+
+            // Parse arguments
+            while (parsing && i < args.Length)
+            {
+                switch (args[i])
+                {
+                    case "-p":
+                        profile = args[++i];
+                        break;
+
+                    default: 
+                        addr = args[i].Split(':');
+                        parsing = false;
+                        break;
+                }
+                i++;
+            }
+
+            server = addr[0];
+            port = addr.Length > 1 ? addr[1] : "8080";
+            if (i > 0)
+            {
+                Array.Copy(args, i, args, 0, args.Length - i);
+                Array.Resize(ref args, args.Length - i);
+            }
 
             // Execute
             var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", new string[] { "." }, args);
             proc.StartInfo.Arguments = "-S " + server + ":" + port + " " + proc.StartInfo.Arguments;
             try
             {
-	            Environment.SetEnvironmentVariable("DOCUMENT_ROOT", "./0");
+                Environment.SetEnvironmentVariable("DOCUMENT_ROOT", "./static");
+                Environment.SetEnvironmentVariable("HTTP_HOST", server);
+                Environment.SetEnvironmentVariable("SERVER_PROFILE", profile);
+
                 proc.Start();
-                Console.Out.WriteLine("[xpws#{0}] running @ {1}:{2}. Press <Enter> to exit", pid, server, port);
+                Console.Out.WriteLine("[xpws-{0}#{1}] running @ {2}:{3}. Press <Enter> to exit", profile, pid, server, port);
                 Console.Read();
-                Console.Out.WriteLine("[xpws#{0}] shutting down...", pid);
+                Console.Out.WriteLine("[xpws-{0}#{1}] shutting down...", profile, pid);
                 proc.Kill();
                 proc.WaitForExit();
                 Environment.Exit(proc.ExitCode);
@@ -43,10 +61,11 @@ namespace Net.XpFramework.Runner
             catch (SystemException e) 
             {
                 Console.Error.WriteLine("*** " + proc.StartInfo.FileName + ": " + e.Message);
+                Environment.Exit(0xFF);
             }
             finally
             {
-            	proc.Close();
+                proc.Close();
             }
         }
     }
