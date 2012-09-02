@@ -46,8 +46,6 @@ namespace Net.XpFramework.Runner
             proc.StartInfo.Arguments = "-S " + server + ":" + port + " " + proc.StartInfo.Arguments;
             try
             {
-                Environment.SetEnvironmentVariable("DOCUMENT_ROOT", "./static");
-                Environment.SetEnvironmentVariable("HTTP_HOST", server);
                 Environment.SetEnvironmentVariable("SERVER_PROFILE", profile);
 
                 proc.Start();
