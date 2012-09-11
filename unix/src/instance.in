@@ -35,14 +35,14 @@ for i in "." "$HOME/.xp" "$base" ; do
 
         runtime.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
           eval "d$key"=${line#*=}
         ;;
 
         runtime@$XP_RT.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
           eval "v$key"=${line#*=}
         ;;
@@ -62,7 +62,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done

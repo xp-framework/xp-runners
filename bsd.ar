@@ -1,5 +1,7 @@
---3128:cgen:--
+--3130:cgen:--
 #!/bin/sh
+
+
 
 
 
@@ -139,8 +141,10 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3127:doclet:--
+--3129:doclet:--
 #!/bin/sh
+
+
 
 
 
@@ -280,8 +284,10 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3129:unittest:--
+--3131:unittest:--
 #!/bin/sh
+
+
 
 
 
@@ -421,8 +427,10 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3124:xar:--
+--3126:xar:--
 #!/bin/sh
+
+
 
 
 
@@ -562,8 +570,10 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3129:xcc:--
+--3131:xcc:--
 #!/bin/sh
+
+
 
 
 
@@ -703,8 +713,10 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4257:xp:--
+--4259:xp:--
 #!/bin/sh
+
+
 
 
 
@@ -890,8 +902,10 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3128:xpcli:--
+--3130:xpcli:--
 #!/bin/sh
+
+
 
 
 
@@ -1031,8 +1045,10 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3128:xpi:--
+--3130:xpi:--
 #!/bin/sh
+
+
 
 
 
@@ -1172,6 +1188,176 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--3611:xpws:--
+#!/bin/sh
+
+
+
+
+
+
+PATHSEP=':'
+DIRSEP='/'
+
+
+if [ -L "$0" ] ; then
+  link="$(readlink "$0")"
+  case "$link" in
+    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
+  esac
+else
+  DIRNAME=$(dirname "$0")
+fi
+
+translate_path() {
+  base="$1"
+  path="$2"
+  
+  case "$path" in
+    ?:*) ;;                                # C:\xp
+    \\*) ;;                                # \\filesrv\shares
+    /*) ;;                                 # /usr/local/lib */
+    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
+    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
+  esac
+
+
+
+
+  echo $path
+
+}
+
+translate_paths() {
+  base="$1"
+  path="$2"
+
+  translated=""
+  IFS="$PATHSEP"
+  for i in $path ; do
+    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
+  done
+  echo "${translated#$PATHSEP}"
+}
+
+locate() {
+  path="$1"
+  file="$2"
+  expect=$3
+
+  IFS="$PATHSEP"
+  for i in $path ; do
+    qualified="$i/$file"
+    if [ -e "$qualified" ] ; then
+      echo "$qualified"
+      if [ $expect = 1 ] ; then return ; fi
+    fi
+  done
+  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+base="$DIRNAME" RUNNER="web" INCLUDE="." xppath="$DIRNAME" ARGS="" IFS="|";
+SERVER_PROFILE=dev
+while [ $# != 0 ]; do
+  case $1 in
+    -p)
+      SERVER_PROFILE=$2
+      shift 2
+      ;;
+    *:*)
+      server=${1%:*}
+      port=${1#*:}
+      shift 1
+      break
+      ;;
+    *)
+      server=$1
+      shift 1
+      break
+      ;;
+  esac
+done
+ADDR=${server-localhost}:${port-8080}
+ifs="|"
+if [ "" = "$USE_XP" ] ; then
+  unset USE_XP
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
+RT_ARG=""
+dkeys=""
+vkeys=""
+for i in "." "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    section=default
+    while read line || [ -n "$line" ] ; do
+      case "$section.$line" in
+        default.use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+        ;;
+        default.rt=*)
+          XP_RT=${XP_RT-${line#*=}}
+        ;;
+        *.\;*)
+          ;;
+        *.\[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+        ;;
+        runtime.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=${line#*=}
+        ;;
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=${line#*=}
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
+    fi
+  fi
+done
+XP_EXE=${XP_EXE-php}
+if [ "" = "$USE_XP" ] ; then
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
+fi
+args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+if [ ! -d /proc/1 ] ; then
+  XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
+  export XP_CMDLINE
+fi
+export XP_EXE
+IFS="|"
+export SERVER_PROFILE
+${XP_EXE}${ifs}-S${ifs}${ADDR}${ifs}${args}${ifs}$tool ${ARGS} "$@" &
+PID=$!
+echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR. Press <Enter> to exit"
+read
+echo "[xpws-$SERVER_PROFILE#$PID] shutting down..."
+kill -TERM $PID
 --483:xprt-update.sh:--
 #!/bin/sh
 
