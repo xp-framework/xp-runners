@@ -1,4 +1,4 @@
---3075:cgen:--
+--3128:cgen:--
 #!/bin/sh
 
 
@@ -97,13 +97,13 @@ for i in "." "$HOME/.xp" "$base" ; do
         ;;
         runtime.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
           eval "d$key"=${line#*=}
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
           eval "v$key"=${line#*=}
         ;;
@@ -121,7 +121,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
@@ -139,7 +139,7 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3074:doclet:--
+--3127:doclet:--
 #!/bin/sh
 
 
@@ -238,13 +238,13 @@ for i in "." "$HOME/.xp" "$base" ; do
         ;;
         runtime.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
           eval "d$key"=${line#*=}
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
           eval "v$key"=${line#*=}
         ;;
@@ -262,7 +262,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
@@ -280,7 +280,7 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3076:unittest:--
+--3129:unittest:--
 #!/bin/sh
 
 
@@ -379,13 +379,13 @@ for i in "." "$HOME/.xp" "$base" ; do
         ;;
         runtime.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
           eval "d$key"=${line#*=}
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
           eval "v$key"=${line#*=}
         ;;
@@ -403,7 +403,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
@@ -421,7 +421,7 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3071:xar:--
+--3124:xar:--
 #!/bin/sh
 
 
@@ -520,13 +520,13 @@ for i in "." "$HOME/.xp" "$base" ; do
         ;;
         runtime.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
           eval "d$key"=${line#*=}
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
           eval "v$key"=${line#*=}
         ;;
@@ -544,7 +544,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
@@ -562,7 +562,7 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3076:xcc:--
+--3129:xcc:--
 #!/bin/sh
 
 
@@ -661,13 +661,13 @@ for i in "." "$HOME/.xp" "$base" ; do
         ;;
         runtime.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
           eval "d$key"=${line#*=}
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
           eval "v$key"=${line#*=}
         ;;
@@ -685,7 +685,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
@@ -703,7 +703,7 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4204:xp:--
+--4257:xp:--
 #!/bin/sh
 
 
@@ -848,13 +848,13 @@ for i in "." "$HOME/.xp" "$base" ; do
         ;;
         runtime.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
           eval "d$key"=${line#*=}
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
           eval "v$key"=${line#*=}
         ;;
@@ -872,7 +872,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
@@ -890,7 +890,7 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3075:xpcli:--
+--3128:xpcli:--
 #!/bin/sh
 
 
@@ -989,13 +989,13 @@ for i in "." "$HOME/.xp" "$base" ; do
         ;;
         runtime.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
           eval "d$key"=${line#*=}
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
           eval "v$key"=${line#*=}
         ;;
@@ -1013,7 +1013,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
@@ -1031,7 +1031,7 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3075:xpi:--
+--3128:xpi:--
 #!/bin/sh
 
 
@@ -1130,13 +1130,13 @@ for i in "." "$HOME/.xp" "$base" ; do
         ;;
         runtime.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
           eval "d$key"=${line#*=}
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
-          key=${key//./__}
+          key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
           eval "v$key"=${line#*=}
         ;;
@@ -1154,7 +1154,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d${k//__/.}=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
