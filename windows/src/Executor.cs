@@ -19,7 +19,7 @@ namespace Net.XpFramework.Runner
         /// <param name="tool"></param>
         /// <param name="includes"></param>
         /// <param name="args"></param>
-        public static int Execute(string base_dir, string runner, string tool, string[] includes, string[] args)
+        public static Process Instance(string base_dir, string runner, string tool, string[] includes, string[] args)
         {
             string home = Environment.GetEnvironmentVariable("HOME");
 
@@ -96,7 +96,7 @@ namespace Net.XpFramework.Runner
                     proc.StartInfo.Arguments +=  " \"" + arg.Replace("\"", "\"\"\"") + "\"";
                 }
             }
-            
+
             // Catch Ctrl+C (only works in "real" consoles, not in a cygwin 
             // shell, for example) and kill the spawned process, see also:
             // http://www.cygwin.com/ml/cygwin/2006-12/msg00151.html
@@ -107,6 +107,21 @@ namespace Net.XpFramework.Runner
             };
             
             proc.StartInfo.UseShellExecute = false;
+            return proc;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="base_dir"></param>
+        /// <param name="runner"></param>
+        /// <param name="tool"></param>
+        /// <param name="includes"></param>
+        /// <param name="args"></param>
+        public static int Execute(string base_dir, string runner, string tool, string[] includes, string[] args)
+        {
+
+            var proc = Instance(base_dir, runner, tool, includes, args);
             try
             {
                 proc.Start();
@@ -115,7 +130,7 @@ namespace Net.XpFramework.Runner
             }
             catch (SystemException e) 
             {
-                throw new ExecutionEngineException(executor + ": " + e.Message, e);
+                throw new ExecutionEngineException(proc.StartInfo.FileName + ": " + e.Message, e);
             } 
             finally
             {
