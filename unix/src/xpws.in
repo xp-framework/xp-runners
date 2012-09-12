@@ -29,6 +29,6 @@ export SERVER_PROFILE
 ${XP_EXE}${ifs}-S${ifs}${ADDR}${ifs}${args}${ifs}$tool ${ARGS} "$@" &
 PID=$!
 echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR. Press <Enter> to exit"
-read
+read enter
 echo "[xpws-$SERVER_PROFILE#$PID] shutting down..."
 kill -TERM $PID

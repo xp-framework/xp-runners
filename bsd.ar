@@ -1,7 +1,5 @@
---3130:cgen:--
+--3128:cgen:--
 #!/bin/sh
-
-
 
 
 
@@ -141,10 +139,8 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3129:doclet:--
+--3127:doclet:--
 #!/bin/sh
-
-
 
 
 
@@ -284,10 +280,8 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3131:unittest:--
+--3129:unittest:--
 #!/bin/sh
-
-
 
 
 
@@ -427,10 +421,8 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3126:xar:--
+--3124:xar:--
 #!/bin/sh
-
-
 
 
 
@@ -570,10 +562,8 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3131:xcc:--
+--3129:xcc:--
 #!/bin/sh
-
-
 
 
 
@@ -713,10 +703,8 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4259:xp:--
+--4257:xp:--
 #!/bin/sh
-
-
 
 
 
@@ -902,10 +890,8 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3130:xpcli:--
+--3128:xpcli:--
 #!/bin/sh
-
-
 
 
 
@@ -1045,10 +1031,8 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3130:xpi:--
+--3128:xpi:--
 #!/bin/sh
-
-
 
 
 
@@ -1188,10 +1172,8 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3611:xpws:--
+--3615:xpws:--
 #!/bin/sh
-
-
 
 
 
@@ -1355,7 +1337,7 @@ export SERVER_PROFILE
 ${XP_EXE}${ifs}-S${ifs}${ADDR}${ifs}${args}${ifs}$tool ${ARGS} "$@" &
 PID=$!
 echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR. Press <Enter> to exit"
-read
+read enter
 echo "[xpws-$SERVER_PROFILE#$PID] shutting down..."
 kill -TERM $PID
 --483:xprt-update.sh:--

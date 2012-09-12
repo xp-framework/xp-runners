@@ -1,7 +1,5 @@
---3035:cgen:--
+--3033:cgen:--
 #!/bin/sh
-
-
 
 
 
@@ -137,10 +135,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3034:doclet:--
+--3032:doclet:--
 #!/bin/sh
-
-
 
 
 
@@ -276,10 +272,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3036:unittest:--
+--3034:unittest:--
 #!/bin/sh
-
-
 
 
 
@@ -415,10 +409,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3031:xar:--
+--3029:xar:--
 #!/bin/sh
-
-
 
 
 
@@ -554,10 +546,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3036:xcc:--
+--3034:xcc:--
 #!/bin/sh
-
-
 
 
 
@@ -693,10 +683,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4164:xp:--
+--4162:xp:--
 #!/bin/sh
-
-
 
 
 
@@ -878,10 +866,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3035:xpcli:--
+--3033:xpcli:--
 #!/bin/sh
-
-
 
 
 
@@ -1017,10 +1003,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3035:xpi:--
+--3033:xpi:--
 #!/bin/sh
-
-
 
 
 
@@ -1156,10 +1140,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3516:xpws:--
+--3520:xpws:--
 #!/bin/sh
-
-
 
 
 
@@ -1319,7 +1301,7 @@ export SERVER_PROFILE
 ${XP_EXE}${ifs}-S${ifs}${ADDR}${ifs}${args}${ifs}$tool ${ARGS} "$@" &
 PID=$!
 echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR. Press <Enter> to exit"
-read
+read enter
 echo "[xpws-$SERVER_PROFILE#$PID] shutting down..."
 kill -TERM $PID
 --485:xprt-update.sh:--
