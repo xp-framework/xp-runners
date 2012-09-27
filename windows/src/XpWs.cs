@@ -13,6 +13,7 @@ namespace Net.XpFramework.Runner
             var pid  = System.Diagnostics.Process.GetCurrentProcess().Id;
             var addr = new string[] { "localhost" };
             var profile = "dev";
+            var root = "";
             var i = 0;
             var parsing = true;
 
@@ -23,6 +24,12 @@ namespace Net.XpFramework.Runner
                 {
                     case "-p":
                         profile = args[++i];
+                        break;
+
+                    case "-r":
+                        var dir = args[++i];
+                        Environment.SetEnvironmentVariable("DOCUMENT_ROOT", dir);
+                        root = " -t " + dir;
                         break;
 
                     default: 
@@ -43,7 +50,7 @@ namespace Net.XpFramework.Runner
 
             // Execute
             var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", new string[] { "." }, args);
-            proc.StartInfo.Arguments = "-S " + server + ":" + port + " " + proc.StartInfo.Arguments;
+            proc.StartInfo.Arguments = "-S " + server + ":" + port + root + " " + proc.StartInfo.Arguments;
             try
             {
                 Environment.SetEnvironmentVariable("SERVER_PROFILE", profile);
