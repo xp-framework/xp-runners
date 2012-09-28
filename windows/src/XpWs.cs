@@ -37,6 +37,10 @@ namespace Net.XpFramework.Runner
                         root = " -t " + dir;
                         break;
 
+                    case "-?":
+                        Execute("class", "xp.scriptlet.Usage", new string[] { "." }, new string[] { "xpws.txt" });
+                        return;
+
                     default: 
                         addr = args[i].Split(':');
                         parsing = false;
