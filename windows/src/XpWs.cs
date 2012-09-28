@@ -8,8 +8,6 @@ namespace Net.XpFramework.Runner
 
         static void Main(string[] args)
         {
-            string server, port;
-
             var pid  = System.Diagnostics.Process.GetCurrentProcess().Id;
             var addr = new string[] { "localhost" };
             var profile = "dev";
@@ -47,8 +45,8 @@ namespace Net.XpFramework.Runner
                 i++;
             }
 
-            server = addr[0];
-            port = addr.Length > 1 ? addr[1] : "8080";
+            var server = addr[0];
+            var port = addr.Length > 1 ? addr[1] : "8080";
             if (i > 0)
             {
                 Array.Copy(args, i, args, 0, args.Length - i);
