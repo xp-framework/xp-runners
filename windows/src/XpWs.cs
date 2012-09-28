@@ -17,6 +17,13 @@ namespace Net.XpFramework.Runner
             var i = 0;
             var parsing = true;
 
+            // Verify we have a web.ini
+            if (!System.IO.File.Exists(Paths.Compose("etc", "web.ini")))
+            {
+                Console.Error.WriteLine("*** Cannot find the web configuration web.ini in etc/, exiting.");
+                Environment.Exit(0x03);
+            }
+
             // Parse arguments
             while (parsing && i < args.Length)
             {
