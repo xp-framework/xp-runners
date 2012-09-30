@@ -1,5 +1,7 @@
---3128:cgen:--
+--3130:cgen:--
 #!/bin/sh
+
+
 
 
 
@@ -139,8 +141,10 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3127:doclet:--
+--3129:doclet:--
 #!/bin/sh
+
+
 
 
 
@@ -280,8 +284,10 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3129:unittest:--
+--3131:unittest:--
 #!/bin/sh
+
+
 
 
 
@@ -421,8 +427,10 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3124:xar:--
+--3126:xar:--
 #!/bin/sh
+
+
 
 
 
@@ -562,8 +570,10 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3129:xcc:--
+--3131:xcc:--
 #!/bin/sh
+
+
 
 
 
@@ -703,8 +713,10 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4257:xp:--
+--4259:xp:--
 #!/bin/sh
+
+
 
 
 
@@ -890,8 +902,10 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3128:xpcli:--
+--3130:xpcli:--
 #!/bin/sh
+
+
 
 
 
@@ -1031,8 +1045,10 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3128:xpi:--
+--3130:xpi:--
 #!/bin/sh
+
+
 
 
 
@@ -1172,8 +1188,10 @@ fi
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3615:xpws:--
+--4055:xpws:--
 #!/bin/sh
+
+
 
 
 
@@ -1239,13 +1257,28 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="web" INCLUDE="." xppath="$DIRNAME" ARGS="" IFS="|";
+if [ ! -e "etc/web.ini" ] ; then
+  echo "*** Cannot find the web configuration web.ini in etc/, exiting." >&2
+  exit 3
+fi
+RUNNER=web
+TOOL=
 SERVER_PROFILE=dev
 while [ $# != 0 ]; do
   case $1 in
     -p)
       SERVER_PROFILE=$2
       shift 2
+      ;;
+    -r)
+      DOCUMENT_ROOT=$2
+      root="-t|$2|"
+      shift 2
+      ;;
+    -?)
+      RUNNER=class
+      TOOL="xp.scriptlet.Usage|xpws.txt"
+      break
       ;;
     *:*)
       server=${1%:*}
@@ -1261,6 +1294,7 @@ while [ $# != 0 ]; do
   esac
 done
 ADDR=${server-localhost}:${port-8080}
+base="$DIRNAME" RUNNER=$RUNNER INCLUDE="." xppath="$DIRNAME" ARGS=$TOOL IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -1333,13 +1367,18 @@ if [ ! -d /proc/1 ] ; then
 fi
 export XP_EXE
 IFS="|"
-export SERVER_PROFILE
-${XP_EXE}${ifs}-S${ifs}${ADDR}${ifs}${args}${ifs}$tool ${ARGS} "$@" &
-PID=$!
-echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR. Press <Enter> to exit"
-read enter
-echo "[xpws-$SERVER_PROFILE#$PID] shutting down..."
-kill -TERM $PID
+if [ $RUNNER = class ] ; then
+  ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+else
+  export SERVER_PROFILE
+  export DOCUMENT_ROOT
+  ${XP_EXE}${ifs}-S${ifs}${ADDR}${ifs}${root}${args}${ifs}$tool ${ARGS} "$@" &
+  PID=$!
+  echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR. Press <Enter> to exit"
+  read enter
+  echo "[xpws-$SERVER_PROFILE#$PID] shutting down..."
+  kill -TERM $PID
+fi
 --483:xprt-update.sh:--
 #!/bin/sh
 
