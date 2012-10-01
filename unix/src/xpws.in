@@ -1,10 +1,5 @@
 #include <common.in>
 
-if [ ! -e "etc/web.ini" ] ; then
-  echo "*** Cannot find the web configuration web.ini in etc/, exiting." >&2
-  exit 3
-fi
-
 RUNNER=web
 TOOL=
 SERVER_PROFILE=dev
@@ -47,6 +42,11 @@ EXEC($RUNNER, ".", $TOOL)
 if [ $RUNNER = class ] ; then
   ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 else
+  if [ ! -e "etc/web.ini" ] ; then
+    echo "*** Cannot find the web configuration web.ini in etc/, exiting." >&2
+    exit 3
+  fi
+
   export SERVER_PROFILE
   export DOCUMENT_ROOT
   ${XP_EXE}${ifs}-S${ifs}${ADDR}${ifs}${root}${args}${ifs}$tool ${ARGS} "$@" &
