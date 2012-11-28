@@ -81,9 +81,13 @@ namespace Net.XpFramework.Runner
             }
 
             // Add extensions
-            foreach (var ext in configs.GetExtensions(runtime))
+            IEnumerable<string> extensions= configs.GetExtensions(runtime);
+            if (null != extensions)
             {
-                argv += " -dextension=" + ext;
+              foreach (var ext in extensions)
+              {
+                  argv += " -dextension=" + ext;
+              }
             }
 
             // Spawn runtime
