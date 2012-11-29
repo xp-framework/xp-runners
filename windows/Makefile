@@ -36,5 +36,5 @@ xpi.exe: src\\Xpi.cs $(CLASSES)
 	$(CSC) $(CSC_OPT) /out:$@ src\\Xpi.cs $(CLASSES)
 
 clean:
-	-rm xp.exe xpcli.exe xar.exe unittest.exe cgen.exe doclet.exe xcc.exe xpi.exe
+	-rm xp.exe xpcli.exe xpws.exe xar.exe unittest.exe cgen.exe doclet.exe xcc.exe xpi.exe
 
