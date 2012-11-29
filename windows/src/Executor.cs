@@ -84,10 +84,10 @@ namespace Net.XpFramework.Runner
             IEnumerable<string> extensions= configs.GetExtensions(runtime);
             if (null != extensions)
             {
-              foreach (var ext in extensions)
-              {
-                  argv += " -dextension=" + ext;
-              }
+                foreach (var ext in extensions)
+                {
+                    argv += " -dextension=" + ext;
+                }
             }
 
             // Spawn runtime
