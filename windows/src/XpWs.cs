@@ -47,7 +47,7 @@ namespace Net.XpFramework.Runner
         static int Inspect(string profile, string server, string port, string root)
         {
             Execute("class", "xp.scriptlet.Inspect", new string[] { "." }, new string[] {
-                root,
+                ".",
                 profile,
                 server + ":" + port
             });
