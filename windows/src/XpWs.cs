@@ -5,18 +5,62 @@ namespace Net.XpFramework.Runner
 {
     class XpWs : BaseRunner
     {
+        delegate int Execution(string profile, string server, string port, string root);
 
-        static void Main(string[] args)
+        /// Delegate: Serve web
+        static int Serve(string profile, string server, string port, string root)
         {
             var pid  = System.Diagnostics.Process.GetCurrentProcess().Id;
+
+            if (!String.IsNullOrEmpty(root))
+            {
+                Environment.SetEnvironmentVariable("DOCUMENT_ROOT", " -t " + root);
+            }
+
+            // Execute
+            var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", new string[] { "." }, new string[] { });
+            proc.StartInfo.Arguments = "-S " + server + ":" + port + root + " " + proc.StartInfo.Arguments;
+            try
+            {
+                Environment.SetEnvironmentVariable("SERVER_PROFILE", profile);
+
+                proc.Start();
+                Console.Out.WriteLine("[xpws-{0}#{1}] running @ {2}:{3}. Press <Enter> to exit", profile, pid, server, port);
+                Console.Read();
+                Console.Out.WriteLine("[xpws-{0}#{1}] shutting down...", profile, pid);
+                proc.Kill();
+                proc.WaitForExit();
+                return proc.ExitCode;
+            }
+            catch (SystemException e)
+            {
+                Console.Error.WriteLine("*** " + proc.StartInfo.FileName + ": " + e.Message);
+                return 0xFF;
+            }
+            finally
+            {
+                proc.Close();
+            }
+        }
+
+        /// Delegate: Inspect web setup
+        static int Inspect(string profile, string server, string port, string root)
+        {
+            Execute("class", "xp.scriptlet.Inspect", new string[] { "." }, new string[] { profile, server, port, root });
+            return 0;
+        }
+
+        /// Entry point
+        static void Main(string[] args)
+        {
+            Execution action = Serve;
             var addr = new string[] { "localhost" };
             var profile = "dev";
             var root = "";
-            var i = 0;
-            var parsing = true;
 
             // Parse arguments
-            while (parsing && i < args.Length)
+            var i = 0;
+            while (i < args.Length)
             {
                 switch (args[i])
                 {
@@ -25,18 +69,19 @@ namespace Net.XpFramework.Runner
                         break;
 
                     case "-r":
-                        var dir = args[++i];
-                        Environment.SetEnvironmentVariable("DOCUMENT_ROOT", dir);
-                        root = " -t " + dir;
+                        root = args[++i];
+                        break;
+
+                    case "-i":
+                        action = Inspect;
                         break;
 
                     case "-?":
                         Execute("class", "xp.scriptlet.Usage", new string[] { "." }, new string[] { "xpws.txt" });
                         return;
 
-                    default: 
+                    default:
                         addr = args[i].Split(':');
-                        parsing = false;
                         break;
                 }
                 i++;
@@ -49,38 +94,8 @@ namespace Net.XpFramework.Runner
                 Environment.Exit(0x03);
             }
 
-            var server = addr[0];
-            var port = addr.Length > 1 ? addr[1] : "8080";
-            if (i > 0)
-            {
-                Array.Copy(args, i, args, 0, args.Length - i);
-                Array.Resize(ref args, args.Length - i);
-            }
-
-            // Execute
-            var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", new string[] { "." }, args);
-            proc.StartInfo.Arguments = "-S " + server + ":" + port + root + " " + proc.StartInfo.Arguments;
-            try
-            {
-                Environment.SetEnvironmentVariable("SERVER_PROFILE", profile);
-
-                proc.Start();
-                Console.Out.WriteLine("[xpws-{0}#{1}] running @ {2}:{3}. Press <Enter> to exit", profile, pid, server, port);
-                Console.Read();
-                Console.Out.WriteLine("[xpws-{0}#{1}] shutting down...", profile, pid);
-                proc.Kill();
-                proc.WaitForExit();
-                Environment.Exit(proc.ExitCode);
-            }
-            catch (SystemException e) 
-            {
-                Console.Error.WriteLine("*** " + proc.StartInfo.FileName + ": " + e.Message);
-                Environment.Exit(0xFF);
-            }
-            finally
-            {
-                proc.Close();
-            }
+            // Run
+            Environment.Exit(action(profile, addr[0], addr.Length > 1 ? addr[1] : "8080", root));
         }
     }
 }
