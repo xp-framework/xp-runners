@@ -1,7 +1,5 @@
---3052:cgen:--
+--3050:cgen:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\\'
@@ -137,10 +135,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3051:doclet:--
+--3049:doclet:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\\'
@@ -276,10 +272,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3053:unittest:--
+--3051:unittest:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\\'
@@ -415,10 +409,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3048:xar:--
+--3046:xar:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\\'
@@ -554,10 +546,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3053:xcc:--
+--3051:xcc:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\\'
@@ -693,10 +683,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4181:xp:--
+--4179:xp:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\\'
@@ -878,10 +866,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3052:xpcli:--
+--3050:xpcli:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\\'
@@ -1017,10 +1003,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3052:xpi:--
+--3050:xpi:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\\'
@@ -1156,10 +1140,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3985:xpws:--
+--4118:xpws:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\\'
@@ -1238,6 +1220,11 @@ while [ $# != 0 ]; do
       DOCUMENT_ROOT=$2
       root="-t|$2|"
       shift 2
+      ;;
+    -i)
+      RUNNER=class
+      TOOL="xp.scriptlet.Inspect|.|${SERVER_PROFILE}|${server-localhost}:${port-8080}"
+      break
       ;;
     -?)
       RUNNER=class

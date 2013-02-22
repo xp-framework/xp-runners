@@ -1,7 +1,5 @@
---3035:cgen:--
+--3033:cgen:--
 #!/bin/sh
-
-
 
 
 
@@ -137,10 +135,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3034:doclet:--
+--3032:doclet:--
 #!/bin/sh
-
-
 
 
 
@@ -276,10 +272,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3036:unittest:--
+--3034:unittest:--
 #!/bin/sh
-
-
 
 
 
@@ -415,10 +409,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3031:xar:--
+--3029:xar:--
 #!/bin/sh
-
-
 
 
 
@@ -554,10 +546,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3036:xcc:--
+--3034:xcc:--
 #!/bin/sh
-
-
 
 
 
@@ -693,10 +683,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4164:xp:--
+--4162:xp:--
 #!/bin/sh
-
-
 
 
 
@@ -878,10 +866,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3035:xpcli:--
+--3033:xpcli:--
 #!/bin/sh
-
-
 
 
 
@@ -1017,10 +1003,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3035:xpi:--
+--3033:xpi:--
 #!/bin/sh
-
-
 
 
 
@@ -1156,10 +1140,8 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3968:xpws:--
+--4101:xpws:--
 #!/bin/sh
-
-
 
 
 
@@ -1238,6 +1220,11 @@ while [ $# != 0 ]; do
       DOCUMENT_ROOT=$2
       root="-t|$2|"
       shift 2
+      ;;
+    -i)
+      RUNNER=class
+      TOOL="xp.scriptlet.Inspect|.|${SERVER_PROFILE}|${server-localhost}:${port-8080}"
+      break
       ;;
     -?)
       RUNNER=class
