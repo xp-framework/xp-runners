@@ -15,6 +15,11 @@ while [ $# != 0 ]; do
       root="-t|$2|"
       shift 2
       ;;
+    -i)
+      RUNNER=class
+      TOOL="xp.scriptlet.Inspect|.|${SERVER_PROFILE}|${server-localhost}:${port-8080}"
+      break
+      ;;
     -?)
       RUNNER=class
       TOOL="xp.scriptlet.Usage|xpws.txt"
