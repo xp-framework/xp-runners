@@ -222,8 +222,9 @@ namespace Net.XpFramework.Runner
         /// <returns></returns>
         public static string Resolve(string path)
         {
-            var normalized = path.Replace('/', Path.DirectorySeparatorChar).TrimEnd(Path.DirectorySeparatorChar);
-            if (!File.Exists(normalized))
+            var info = new FileInfo(path);
+            var normalized = info.FullName.TrimEnd(Path.DirectorySeparatorChar);
+            if (!info.Exists)
             {
                 var link = normalized + ".lnk";
                 if (File.Exists(link)) 
