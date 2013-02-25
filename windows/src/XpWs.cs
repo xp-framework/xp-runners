@@ -5,24 +5,27 @@ namespace Net.XpFramework.Runner
 {
     class XpWs : BaseRunner
     {
-        delegate int Execution(string profile, string server, string port, string root);
+        delegate int Execution(string profile, string server, string port, string web, string root, string config, string[] inc);
 
         /// Delegate: Serve web
-        static int Serve(string profile, string server, string port, string root)
+        static int Serve(string profile, string server, string port, string web, string root, string config, string[] inc)
         {
-            var pid  = System.Diagnostics.Process.GetCurrentProcess().Id;
-
-            if (!String.IsNullOrEmpty(root))
-            {
-                Environment.SetEnvironmentVariable("DOCUMENT_ROOT", " -t " + root);
-            }
+            var pid = System.Diagnostics.Process.GetCurrentProcess().Id;
 
             // Execute
-            var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", new string[] { "." }, new string[] { });
-            proc.StartInfo.Arguments = "-S " + server + ":" + port + root + " " + proc.StartInfo.Arguments;
+            var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", inc, new string[] { });
+            proc.StartInfo.Arguments = (
+                "-S " + server + ":" + port +
+                (String.IsNullOrEmpty(root) ? "" : " -t \"" + root + "\"") +
+                " -duser_dir=\"" + config + "\" " +
+                proc.StartInfo.Arguments
+            );
+
             try
             {
+                Environment.SetEnvironmentVariable("WEB_ROOT", web);
                 Environment.SetEnvironmentVariable("SERVER_PROFILE", profile);
+                Environment.SetEnvironmentVariable("DOCUMENT_ROOT", root);
 
                 proc.Start();
                 Console.Out.WriteLine("[xpws-{0}#{1}] running @ {2}:{3}. Press <Enter> to exit", profile, pid, server, port);
@@ -44,10 +47,12 @@ namespace Net.XpFramework.Runner
         }
 
         /// Delegate: Inspect web setup
-        static int Inspect(string profile, string server, string port, string root)
+        static int Inspect(string profile, string server, string port, string web, string root, string config, string[] inc)
         {
-            Execute("class", "xp.scriptlet.Inspect", new string[] { "." }, new string[] {
-                ".",
+            Execute("class", "xp.scriptlet.Inspect", inc, new string[]
+            {
+                web,
+                config,
                 profile,
                 server + ":" + port
             });
@@ -59,8 +64,11 @@ namespace Net.XpFramework.Runner
         {
             Execution action = Serve;
             var addr = new string[] { "localhost" };
-            var profile = "dev";
+            var inc = new List<string>(new string[] { "." });
+            var web = ".";
             var root = "";
+            var config = "etc";
+            var profile = "dev";
 
             // Parse arguments
             var i = 0;
@@ -76,12 +84,24 @@ namespace Net.XpFramework.Runner
                         root = args[++i];
                         break;
 
+                    case "-w":
+                        web = args[++i];
+                        break;
+
+                    case "-c":
+                        config = args[++i];
+                        break;
+
+                    case "-cp":
+                        inc.Add(Paths.Resolve(args[++i]));
+                        break;
+
                     case "-i":
                         action = Inspect;
                         break;
 
                     case "-?":
-                        Execute("class", "xp.scriptlet.Usage", new string[] { "." }, new string[] { "xpws.txt" });
+                        Execute("class", "xp.scriptlet.Usage", inc.ToArray(), new string[] { "xpws.txt" });
                         return;
 
                     default:
@@ -92,14 +112,38 @@ namespace Net.XpFramework.Runner
             }
 
             // Verify we have a web.ini
-            if (!System.IO.File.Exists(Paths.Compose("etc", "web.ini")))
+            if (!System.IO.File.Exists(Paths.Compose(config, "web.ini")))
             {
                 Console.Error.WriteLine("*** Cannot find the web configuration web.ini in etc/, exiting.");
                 Environment.Exit(0x03);
             }
 
+            // Use default document root if not doc root is supplied *and* a "static"
+            // subdirectory exists inside the current directory. Otherwise leave the
+            // document root empty: PHP won't start with a non-existant "-t" directory!
+            if (String.IsNullOrEmpty(root))
+            {
+                var path = Paths.Compose(Paths.Resolve(web), "static");
+                if (System.IO.Directory.Exists(path))
+                {
+                    root = path;
+                }
+            }
+            else
+            {
+                root = Paths.Resolve(root);
+            }
+
             // Run
-            Environment.Exit(action(profile, addr[0], addr.Length > 1 ? addr[1] : "8080", root));
+            Environment.Exit(action(
+                profile,
+                addr[0],
+                addr.Length > 1 ? addr[1] : "8080",
+                Paths.Resolve(web),
+                root,
+                Paths.Resolve(config),
+                inc.ToArray()
+            ));
         }
     }
 }
