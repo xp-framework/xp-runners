@@ -10,16 +10,18 @@ namespace Net.XpFramework.Runner
         /// Delegate: Serve web
         static int Serve(string profile, string server, string port, string root)
         {
-            var pid  = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var pid = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var args = "-S " + server + ":" + port;
 
             if (!String.IsNullOrEmpty(root))
             {
-                Environment.SetEnvironmentVariable("DOCUMENT_ROOT", " -t " + root);
+                Environment.SetEnvironmentVariable("DOCUMENT_ROOT", root);
+                args += " -t " + root;
             }
 
             // Execute
             var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", new string[] { "." }, new string[] { });
-            proc.StartInfo.Arguments = "-S " + server + ":" + port + root + " " + proc.StartInfo.Arguments;
+            proc.StartInfo.Arguments = args + " " + proc.StartInfo.Arguments;
             try
             {
                 Environment.SetEnvironmentVariable("SERVER_PROFILE", profile);
