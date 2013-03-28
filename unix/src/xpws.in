@@ -67,6 +67,13 @@ if [ $WEB_CONFIG != "?" ] && [ ! -e "$WEB_CONFIG/web.ini" ] ; then
   exit 3
 fi
 
+if [ "" = "$root" ] ; then
+  if [ -d "$WEB_ROOT/static" ] ; then
+    DOCUMENT_ROOT=$WEB_ROOT/static
+    root="-t $DOCUMENT_ROOT"
+  fi
+fi
+
 if [ $RUNNER = class ] ; then
   ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 else
