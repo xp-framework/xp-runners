@@ -28,7 +28,7 @@ namespace Net.XpFramework.Runner
                 Environment.SetEnvironmentVariable("DOCUMENT_ROOT", root);
 
                 proc.Start();
-                Console.Out.WriteLine("[xpws-{0}#{1}] running @ {2}:{3}. Press <Enter> to exit", profile, pid, server, port);
+                Console.Out.WriteLine("[xpws-{0}#{1}] running {2}:{3} @ {4} - Press <Enter> to exit", profile, pid, server, port, web);
                 Console.Read();
                 Console.Out.WriteLine("[xpws-{0}#{1}] shutting down...", profile, pid);
                 proc.Kill();
