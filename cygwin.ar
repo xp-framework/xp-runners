@@ -1,10 +1,10 @@
---3052:cgen:--
+--3051:cgen:--
 #!/bin/sh
 
 
 
 PATHSEP=';'
-DIRSEP='\\'
+DIRSEP='\'
 
 
 
@@ -137,13 +137,13 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3051:doclet:--
+--3050:doclet:--
 #!/bin/sh
 
 
 
 PATHSEP=';'
-DIRSEP='\\'
+DIRSEP='\'
 
 
 
@@ -276,13 +276,13 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3053:unittest:--
+--3052:unittest:--
 #!/bin/sh
 
 
 
 PATHSEP=';'
-DIRSEP='\\'
+DIRSEP='\'
 
 
 
@@ -415,13 +415,13 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3048:xar:--
+--3047:xar:--
 #!/bin/sh
 
 
 
 PATHSEP=';'
-DIRSEP='\\'
+DIRSEP='\'
 
 
 
@@ -554,13 +554,13 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3053:xcc:--
+--3052:xcc:--
 #!/bin/sh
 
 
 
 PATHSEP=';'
-DIRSEP='\\'
+DIRSEP='\'
 
 
 
@@ -693,13 +693,13 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4181:xp:--
+--4180:xp:--
 #!/bin/sh
 
 
 
 PATHSEP=';'
-DIRSEP='\\'
+DIRSEP='\'
 
 
 
@@ -878,13 +878,13 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3052:xpcli:--
+--3051:xpcli:--
 #!/bin/sh
 
 
 
 PATHSEP=';'
-DIRSEP='\\'
+DIRSEP='\'
 
 
 
@@ -1017,13 +1017,13 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3052:xpi:--
+--3051:xpi:--
 #!/bin/sh
 
 
 
 PATHSEP=';'
-DIRSEP='\\'
+DIRSEP='\'
 
 
 
@@ -1156,13 +1156,13 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 export XP_EXE
 IFS="|"
 ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4632:xpws:--
+--4840:xpws:--
 #!/bin/sh
 
 
 
 PATHSEP=';'
-DIRSEP='\\'
+DIRSEP='\'
 
 
 
@@ -1231,7 +1231,6 @@ INCLUDE_PATH="."
 SERVER_PROFILE=dev
 WEB_ROOT=.
 WEB_CONFIG=etc
-root=
 while [ $# != 0 ]; do
   case $1 in
     -p)
@@ -1240,7 +1239,10 @@ while [ $# != 0 ]; do
       ;;
     -r)
       DOCUMENT_ROOT=$2
-      root="-t|$2|"
+      if [ ! -d "$DOCUMENT_ROOT" ] ; then
+        echo "*** Document root $DOCUMENT_ROOT does not exist, exiting." >&2
+        exit 3
+      fi
       shift 2
       ;;
     -c)
@@ -1354,19 +1356,22 @@ if [ $WEB_CONFIG != "?" ] && [ ! -e "$WEB_CONFIG/web.ini" ] ; then
   echo "*** Cannot find the web configuration web.ini in $WEB_CONFIG/, exiting." >&2
   exit 3
 fi
-if [ "" = "$root" ] ; then
-  if [ -d "$WEB_ROOT/static" ] ; then
-    DOCUMENT_ROOT=$WEB_ROOT/static
-    root="-t $DOCUMENT_ROOT"
-  fi
-fi
 if [ $RUNNER = class ] ; then
   ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 else
+  if [ "" = "$DOCUMENT_ROOT" ] ; then
+    if [ -d "$WEB_ROOT/static" ] ; then
+      DOCUMENT_ROOT="$WEB_ROOT/static"
+    else
+      DOCUMENT_ROOT=.
+    fi
+  else
+    DOCUMENT_ROOT=${DOCUMENT_ROOT%/}
+  fi
+  export WEB_ROOT
   export SERVER_PROFILE
   export DOCUMENT_ROOT
-  export WEB_ROOT
-  ${XP_EXE}${ifs}-S${ifs}${ADDR}${ifs}${root}-duser_dir="$WEB_CONFIG"${ifs}${args}${ifs}$tool ${ARGS} "$@" &
+  ${XP_EXE}${ifs}-S${ifs}${ADDR}${ifs}-t${ifs}"${DOCUMENT_ROOT}"${ifs}-duser_dir="$WEB_CONFIG"${ifs}${args}${ifs}$tool ${ARGS} "$@" &
   PID=$!
   echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR @ $WEB_ROOT - Press <Enter> to exit"
   read enter

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 
 namespace Net.XpFramework.Runner
@@ -12,11 +13,23 @@ namespace Net.XpFramework.Runner
         {
             var pid = System.Diagnostics.Process.GetCurrentProcess().Id;
 
+            // If no document root has been supplied, check for an existing "static"
+            // subdirectory inside the web root; otherwise just use the web roor
+            if (String.IsNullOrEmpty(root))
+            {
+                var path = Paths.Compose(Paths.Resolve(web), "static");
+                root = Directory.Exists(path) ? path : web;
+            }
+            else
+            {
+                root = Paths.Resolve(root);
+            }
+
             // Execute
             var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", inc, new string[] { });
             proc.StartInfo.Arguments = (
                 "-S " + server + ":" + port +
-                (String.IsNullOrEmpty(root) ? "" : " -t \"" + root + "\"") +
+                " -t \"" + root + "\"" +
                 " -duser_dir=\"" + config + "\" " +
                 proc.StartInfo.Arguments
             );
@@ -82,6 +95,11 @@ namespace Net.XpFramework.Runner
 
                     case "-r":
                         root = args[++i];
+                        if (!Directory.Exists(root))
+                        {
+                            Console.Error.WriteLine("*** Document root {0} does not exist, exiting.", root);
+                            Environment.Exit(0x03);
+                        }
                         break;
 
                     case "-w":
@@ -112,26 +130,10 @@ namespace Net.XpFramework.Runner
             }
 
             // Verify we have a web.ini
-            if (!System.IO.File.Exists(Paths.Compose(config, "web.ini")))
+            if (!File.Exists(Paths.Compose(config, "web.ini")))
             {
                 Console.Error.WriteLine("*** Cannot find the web configuration web.ini in {0}/, exiting.", config);
                 Environment.Exit(0x03);
-            }
-
-            // Use default document root if not doc root is supplied *and* a "static"
-            // subdirectory exists inside the current directory. Otherwise leave the
-            // document root empty: PHP won't start with a non-existant "-t" directory!
-            if (String.IsNullOrEmpty(root))
-            {
-                var path = Paths.Compose(Paths.Resolve(web), "static");
-                if (System.IO.Directory.Exists(path))
-                {
-                    root = path;
-                }
-            }
-            else
-            {
-                root = Paths.Resolve(root);
             }
 
             // Run

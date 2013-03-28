@@ -1,6 +1,6 @@
 #ifdef __CYGWIN
 PATHSEP=';'
-DIRSEP='\\'
+DIRSEP='\'
 #else
 PATHSEP=':'
 DIRSEP='/'
@@ -28,7 +28,7 @@ translate_path() {
     *) path=$base$DIRSEP$path ;;           # lib, ../lib, ./classes
   esac
 
-#ifdef __CYGWIN  
+#ifdef __CYGWIN
   echo $(cygpath -m "$path")
 #else
   echo $path
