@@ -2,7 +2,10 @@
 
 RUNNER=web
 TOOL=
+INCLUDE_PATH="."
 SERVER_PROFILE=dev
+WEB_ROOT=.
+WEB_CONFIG=etc
 
 while [ $# != 0 ]; do
   case $1 in
@@ -12,17 +15,33 @@ while [ $# != 0 ]; do
       ;;
     -r)
       DOCUMENT_ROOT=$2
-      root="-t|$2|"
+      if [ ! -d "$DOCUMENT_ROOT" ] ; then
+        echo "*** Document root $DOCUMENT_ROOT does not exist, exiting." >&2
+        exit 3
+      fi
+      shift 2
+      ;;
+    -c)
+      WEB_CONFIG=$2
+      shift 2
+      ;;
+    -w)
+      WEB_ROOT=$2
+      shift 2
+      ;;
+    -cp)
+      INCLUDE_PATH=${INCLUDE_PATH}${PATHSEP}$2
       shift 2
       ;;
     -i)
       RUNNER=class
-      TOOL="xp.scriptlet.Inspect|.|${SERVER_PROFILE}|${server-localhost}:${port-8080}"
-      break
+      TOOL='xp.scriptlet.Inspect|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}'
+      shift 1
       ;;
     -?)
       RUNNER=class
       TOOL="xp.scriptlet.Usage|xpws.txt"
+      WEB_CONFIG=?
       break
       ;;
     *:*)
@@ -40,23 +59,36 @@ while [ $# != 0 ]; do
 done
 
 ADDR=${server-localhost}:${port-8080}
-EXEC($RUNNER, ".", $TOOL)
+eval 'TOOL="'$TOOL'"'
+EXEC($RUNNER, $INCLUDE_PATH, $TOOL)
 
 #include <instance.in>
+
+if [ $WEB_CONFIG != "?" ] && [ ! -e "$WEB_CONFIG/web.ini" ] ; then
+  echo "*** Cannot find the web configuration web.ini in $WEB_CONFIG/, exiting." >&2
+  exit 3
+fi
 
 if [ $RUNNER = class ] ; then
   ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 else
-  if [ ! -e "etc/web.ini" ] ; then
-    echo "*** Cannot find the web configuration web.ini in etc/, exiting." >&2
-    exit 3
+  if [ "" = "$DOCUMENT_ROOT" ] ; then
+    if [ -d "$WEB_ROOT/static" ] ; then
+      DOCUMENT_ROOT="$WEB_ROOT/static"
+    else
+      DOCUMENT_ROOT=.
+    fi
+  else
+    DOCUMENT_ROOT=${DOCUMENT_ROOT%/}
   fi
 
+  export WEB_ROOT
   export SERVER_PROFILE
   export DOCUMENT_ROOT
-  ${XP_EXE}${ifs}-S${ifs}${ADDR}${ifs}${root}${args}${ifs}$tool ${ARGS} "$@" &
+
+  ${XP_EXE}${ifs}-S${ifs}${ADDR}${ifs}-t${ifs}"${DOCUMENT_ROOT}"${ifs}-duser_dir="$WEB_CONFIG"${ifs}${args}${ifs}$tool ${ARGS} "$@" &
   PID=$!
-  echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR. Press <Enter> to exit"
+  echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR @ $WEB_ROOT - Press <Enter> to exit"
   read enter
   echo "[xpws-$SERVER_PROFILE#$PID] shutting down..."
   kill -TERM $PID

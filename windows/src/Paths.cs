@@ -222,15 +222,17 @@ namespace Net.XpFramework.Runner
         /// <returns></returns>
         public static string Resolve(string path)
         {
-            if (!File.Exists(path)) 
+            var info = new FileInfo(path);
+            var normalized = info.FullName.TrimEnd(Path.DirectorySeparatorChar);
+            if (!info.Exists)
             {
-                string link = path.TrimEnd(Path.DirectorySeparatorChar) + ".lnk";
+                var link = normalized + ".lnk";
                 if (File.Exists(link)) 
                 {
                     return ResolveShortcut(link);
                 }
             }
-            return path;
+            return normalized;
         }
         
         /// <summary>
@@ -246,7 +248,7 @@ namespace Net.XpFramework.Runner
             foreach (string path in paths)
             {
                 // Normalize path
-                string normalized = path.Replace('/', Path.DirectorySeparatorChar);
+                var normalized = path.Replace('/', Path.DirectorySeparatorChar);
 
                 if (normalized.StartsWith("~"))
                 {

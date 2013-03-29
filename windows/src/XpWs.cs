@@ -1,33 +1,47 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 
 namespace Net.XpFramework.Runner
 {
     class XpWs : BaseRunner
     {
-        delegate int Execution(string profile, string server, string port, string root);
+        delegate int Execution(string profile, string server, string port, string web, string root, string config, string[] inc);
 
         /// Delegate: Serve web
-        static int Serve(string profile, string server, string port, string root)
+        static int Serve(string profile, string server, string port, string web, string root, string config, string[] inc)
         {
             var pid = System.Diagnostics.Process.GetCurrentProcess().Id;
-            var args = "-S " + server + ":" + port;
 
-            if (!String.IsNullOrEmpty(root))
+            // If no document root has been supplied, check for an existing "static"
+            // subdirectory inside the web root; otherwise just use the web roor
+            if (String.IsNullOrEmpty(root))
             {
-                Environment.SetEnvironmentVariable("DOCUMENT_ROOT", root);
-                args += " -t " + root;
+                var path = Paths.Compose(Paths.Resolve(web), "static");
+                root = Directory.Exists(path) ? path : web;
+            }
+            else
+            {
+                root = Paths.Resolve(root);
             }
 
             // Execute
-            var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", new string[] { "." }, new string[] { });
-            proc.StartInfo.Arguments = args + " " + proc.StartInfo.Arguments;
+            var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", inc, new string[] { });
+            proc.StartInfo.Arguments = (
+                "-S " + server + ":" + port +
+                " -t \"" + root + "\"" +
+                " -duser_dir=\"" + config + "\" " +
+                proc.StartInfo.Arguments
+            );
+
             try
             {
+                Environment.SetEnvironmentVariable("WEB_ROOT", web);
                 Environment.SetEnvironmentVariable("SERVER_PROFILE", profile);
+                Environment.SetEnvironmentVariable("DOCUMENT_ROOT", root);
 
                 proc.Start();
-                Console.Out.WriteLine("[xpws-{0}#{1}] running @ {2}:{3}. Press <Enter> to exit", profile, pid, server, port);
+                Console.Out.WriteLine("[xpws-{0}#{1}] running {2}:{3} @ {4} - Press <Enter> to exit", profile, pid, server, port, web);
                 Console.Read();
                 Console.Out.WriteLine("[xpws-{0}#{1}] shutting down...", profile, pid);
                 proc.Kill();
@@ -46,10 +60,12 @@ namespace Net.XpFramework.Runner
         }
 
         /// Delegate: Inspect web setup
-        static int Inspect(string profile, string server, string port, string root)
+        static int Inspect(string profile, string server, string port, string web, string root, string config, string[] inc)
         {
-            Execute("class", "xp.scriptlet.Inspect", new string[] { "." }, new string[] {
-                ".",
+            Execute("class", "xp.scriptlet.Inspect", inc, new string[]
+            {
+                web,
+                config,
                 profile,
                 server + ":" + port
             });
@@ -61,8 +77,11 @@ namespace Net.XpFramework.Runner
         {
             Execution action = Serve;
             var addr = new string[] { "localhost" };
-            var profile = "dev";
+            var inc = new List<string>(new string[] { "." });
+            var web = ".";
             var root = "";
+            var config = "etc";
+            var profile = "dev";
 
             // Parse arguments
             var i = 0;
@@ -76,6 +95,23 @@ namespace Net.XpFramework.Runner
 
                     case "-r":
                         root = args[++i];
+                        if (!Directory.Exists(root))
+                        {
+                            Console.Error.WriteLine("*** Document root {0} does not exist, exiting.", root);
+                            Environment.Exit(0x03);
+                        }
+                        break;
+
+                    case "-w":
+                        web = args[++i];
+                        break;
+
+                    case "-c":
+                        config = args[++i];
+                        break;
+
+                    case "-cp":
+                        inc.Add(Paths.Resolve(args[++i]));
                         break;
 
                     case "-i":
@@ -83,7 +119,7 @@ namespace Net.XpFramework.Runner
                         break;
 
                     case "-?":
-                        Execute("class", "xp.scriptlet.Usage", new string[] { "." }, new string[] { "xpws.txt" });
+                        Execute("class", "xp.scriptlet.Usage", inc.ToArray(), new string[] { "xpws.txt" });
                         return;
 
                     default:
@@ -94,14 +130,22 @@ namespace Net.XpFramework.Runner
             }
 
             // Verify we have a web.ini
-            if (!System.IO.File.Exists(Paths.Compose("etc", "web.ini")))
+            if (!File.Exists(Paths.Compose(config, "web.ini")))
             {
-                Console.Error.WriteLine("*** Cannot find the web configuration web.ini in etc/, exiting.");
+                Console.Error.WriteLine("*** Cannot find the web configuration web.ini in {0}/, exiting.", config);
                 Environment.Exit(0x03);
             }
 
             // Run
-            Environment.Exit(action(profile, addr[0], addr.Length > 1 ? addr[1] : "8080", root));
+            Environment.Exit(action(
+                profile,
+                addr[0],
+                addr.Length > 1 ? addr[1] : "8080",
+                Paths.Resolve(web),
+                root,
+                Paths.Resolve(config),
+                inc.ToArray()
+            ));
         }
     }
 }
