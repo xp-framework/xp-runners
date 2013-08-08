@@ -1,3 +1,3 @@
 #include <instance.in>
 
-${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
