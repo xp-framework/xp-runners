@@ -116,10 +116,14 @@ namespace Net.XpFramework.Runner
                 }
             }
 
+            // Find entry point
+            var entry = Paths.Locate(use_xp, new string[] { "tools\\" + runner + ".php" }, true).GetEnumerator();
+            entry.MoveNext();
+
             // Spawn runtime
             var proc = new Process();
             proc.StartInfo.FileName = executor;
-            proc.StartInfo.Arguments = argv + " \"" + new List<string>(Paths.Locate(use_xp, "tools\\" + runner + ".php", true))[0] + "\" " + tool;
+            proc.StartInfo.Arguments = argv + " \"" + entry.Current + "\" " + tool;
             if (args.Length > 0)
             {
                 foreach (string arg in args) 

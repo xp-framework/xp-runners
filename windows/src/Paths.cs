@@ -191,26 +191,28 @@ namespace Net.XpFramework.Runner
         /// looking up program names in $ENV{PATH}.
         /// </summary>
         /// <param name="bases"></param>
-        /// <param name="file"></param>
+        /// <param name="files"></param>
         /// <param name="expect">Whether we expect a non-empty list</param>
         /// <returns></returns>
-        public static IEnumerable<string> Locate(IEnumerable<string> bases, string file, bool expect)
+        public static IEnumerable<string> Locate(IEnumerable<string> bases, string[] files, bool expect)
         {
             bool found = false;
             foreach (string path in bases)
             {
-                string qualified = path.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar + file;
-                
-                if (File.Exists(qualified))
+                foreach (string file in files)
                 {
-                    found = true;
-                    yield return qualified;
+                    string qualified = path.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar + file;
+                    if (File.Exists(qualified))
+                    {
+                        found = true;
+                        yield return qualified;
+                    }
                 }
 
             }
             if (expect && !found)
             {
-                throw new FileNotFoundException("Cannot find " + file + " in [" + String.Join(", ", new List<string>(bases).ToArray()) + "]");
+                throw new FileNotFoundException("Cannot find [" + String.Join(", ", files) + "] in [" + String.Join(", ", new List<string>(bases).ToArray()) + "]");
             }
         }
         
