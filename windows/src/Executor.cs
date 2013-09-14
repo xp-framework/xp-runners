@@ -12,13 +12,39 @@ namespace Net.XpFramework.Runner
         private static List<string> EMPTY_LIST = new List<string>();
 
         /// <summary>
-        /// 
+        /// Encodes a given string for use in a command line argument. The returned
+        /// string is enclosed in double quotes. Double quotes and backslashes have
+        /// been escaped.
         /// </summary>
-        /// <param name="base_dir"></param>
-        /// <param name="runner"></param>
-        /// <param name="tool"></param>
-        /// <param name="includes"></param>
-        /// <param name="args"></param>
+        private static string Encode(string arg, Encoding enc)
+        {
+            var bytes = enc.GetBytes(arg);
+            var ret = new StringBuilder();
+
+            ret.Append('"');
+            for (var i = 0; i < bytes.Length; i++)
+            {
+                if (34 == bytes[i])
+                {
+                    ret.Append("\"\"");     // Double-quote -> double double-quote
+                }
+                else if (92 == bytes[i])
+                {
+                    ret.Append("\\\\");     // Backslash -> double backslash
+                }
+                else
+                {
+                    ret.Append(Convert.ToString((char)bytes[i]));
+                }
+            }
+            ret.Append('"');
+
+            return ret.ToString();
+        }
+
+        /// <summary>
+        /// Creates the executor process instance
+        /// </summary>
         public static Process Instance(string base_dir, string runner, string tool, string[] includes, string[] args)
         {
             string home = Environment.GetEnvironmentVariable("HOME");
@@ -98,7 +124,7 @@ namespace Net.XpFramework.Runner
             {
                 foreach (string arg in args) 
                 {
-                    proc.StartInfo.Arguments +=  " \"" + arg.Replace("\"", "\"\"").Replace("\\\"\"", "\\\\\\\"") + "\"";
+                    proc.StartInfo.Arguments +=  " " + Encode(arg, Encoding.UTF8);
                 }
             }
 
@@ -116,13 +142,8 @@ namespace Net.XpFramework.Runner
         }
 
         /// <summary>
-        /// 
+        /// Creates and runs the executor instance. Returns the process' exitcode.
         /// </summary>
-        /// <param name="base_dir"></param>
-        /// <param name="runner"></param>
-        /// <param name="tool"></param>
-        /// <param name="includes"></param>
-        /// <param name="args"></param>
         public static int Execute(string base_dir, string runner, string tool, string[] includes, string[] args)
         {
 
