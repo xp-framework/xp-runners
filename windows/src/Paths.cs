@@ -276,8 +276,10 @@ namespace Net.XpFramework.Runner
         public static string Compose(params string[] components) 
         {
             var s = new StringBuilder();
-            foreach (string component in components) {
-                s.Append(component.TrimEnd(new char[] { Path.DirectorySeparatorChar })).Append(Path.DirectorySeparatorChar);
+            var sep = new char[] { Path.DirectorySeparatorChar };
+            foreach (string component in components)
+            {
+                s.Append(component.TrimEnd(sep)).Append(sep);
             }
             s.Length--;           // Remove last directory separator
             return s.ToString();
