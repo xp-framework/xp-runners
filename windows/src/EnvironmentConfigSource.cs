@@ -44,6 +44,14 @@ namespace Net.XpFramework.Runner
         }
 
         /// <summary>
+        /// Returns whether PHP defines a "wmain()" entry point
+        /// </summary>
+        public bool? GetWMain(string runtime)
+        {
+            return null;
+        }
+
+        /// <summary>
         /// Returns the PHP extensions to be loaded from this config source
         /// based on the given runtime version and the defaults.
         /// </summary>

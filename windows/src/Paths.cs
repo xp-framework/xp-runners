@@ -215,6 +215,25 @@ namespace Net.XpFramework.Runner
                 throw new FileNotFoundException("Cannot find [" + String.Join(", ", files) + "] in [" + String.Join(", ", new List<string>(bases).ToArray()) + "]");
             }
         }
+
+        /// <summary>
+        /// Find a file inside multiple base paths. See Locate().
+        /// </summary>
+        /// <param name="bases"></param>
+        /// <param name="file"></param>
+        /// <returns>the qualified file name or null if nothing can be found</returns>
+        public static string Find(IEnumerable<string> bases, string file)
+        {
+            var locator = Locate(bases, new string[] { file }, false).GetEnumerator();
+            if (locator.MoveNext())
+            {
+                return locator.Current;
+            }
+            else
+            {
+                return null;
+            }
+        }
         
         /// <summary>
         /// Resolve a path. If the path is actually a shell link (.lnk file), this link's target path

@@ -6,6 +6,8 @@ using System.Diagnostics;
 
 namespace Net.XpFramework.Runner
 {
+    delegate string Argument(string arg);
+
     class Executor
     {
         private static string PATH_SEPARATOR = new string(new char[] { Path.PathSeparator});
@@ -16,9 +18,39 @@ namespace Net.XpFramework.Runner
         /// string is enclosed in double quotes. Double quotes and backslashes have
         /// been escaped.
         /// </summary>
-        private static string Encode(string arg, Encoding enc)
+        private static string Pass(string arg)
         {
-            var bytes = enc.GetBytes(arg);
+            var ret = new StringBuilder();
+
+            ret.Append('"');
+            for (var i = 0; i < arg.Length; i++)
+            {
+                if ('"' == arg[i])
+                {
+                    ret.Append("\"\"");     // Double-quote -> double double-quote
+                }
+                else if ('\\' == arg[i])
+                {
+                    ret.Append("\\\\");     // Backslash -> double backslash
+                }
+                else
+                {
+                    ret.Append(arg[i]);
+                }
+            }
+            ret.Append('"');
+
+            return ret.ToString();
+        }
+
+        /// <summary>
+        /// Encodes a given string for use in a command line argument, using UTF-8.
+        /// bytes. The returned string is enclosed in double quotes. Double quotes 
+        /// and backslashes have been escaped.
+        /// </summary>
+        private static string Encode(string arg)
+        {
+            var bytes = Encoding.UTF8.GetBytes(arg);
             var ret = new StringBuilder();
 
             ret.Append('"');
@@ -61,8 +93,10 @@ namespace Net.XpFramework.Runner
             IEnumerable<string> use_xp = configs.GetUse();
             string runtime = configs.GetRuntime();
             string executor = configs.GetExecutable(runtime) ?? "php";
+            bool wmain = configs.GetWMain(runtime) ?? false;
             
-            if (null == use_xp) {
+            if (null == use_xp)
+            {
                 throw new EntryPointNotFoundException("Cannot determine use_xp setting from " + configs);
             }
         
@@ -116,19 +150,44 @@ namespace Net.XpFramework.Runner
                 }
             }
 
-            // Find entry point
-            var entry = Paths.Locate(use_xp, new string[] { "tools\\" + runner + ".php" }, true).GetEnumerator();
-            entry.MoveNext();
+            // Find entry point, which is either a file called [runner]-main.php, which
+            // will receive the arguments in UTF-8, or a file called [runner].php, which
+            // assumes the arguments come in in platform encoding.
+            string entry = null;
+            Argument argument = Pass;
+            if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + "-main.php")))
+            {
+
+                // Windows encodes the command line arguments to platform encoding for PHP,
+                // which doesn't define a "wmain()", so we'll need to double-encode our $argv
+                // here. In case this changes, and this is a very long shot at PHP's future,
+                // the "wmain" configuration option must be set in the [runtime] section,
+                // and we'll leave the argument as-is; assuming PHP will internally convert 
+                // it to something useful (e.g. "utf-8") and indicate this to userland. 
+                if (!wmain)
+                {
+                    argument = Encode;
+                    argv += " -diconv.input_encoding=utf-8";
+                }
+            }
+            else if (null != (entry = Paths.Find(use_xp, "tools\\" + runner.Replace("cli", "class") + ".php")))
+            {
+                // Pass
+            }
+            else
+            {
+                throw new EntryPointNotFoundException("Cannot find tool in " + use_xp);
+            }
 
             // Spawn runtime
             var proc = new Process();
             proc.StartInfo.FileName = executor;
-            proc.StartInfo.Arguments = argv + " \"" + entry.Current + "\" " + tool;
+            proc.StartInfo.Arguments = argv + " \"" + entry + "\" " + tool;
             if (args.Length > 0)
             {
                 foreach (string arg in args) 
                 {
-                    proc.StartInfo.Arguments +=  " " + Encode(arg, Encoding.UTF8);
+                    proc.StartInfo.Arguments +=  " " + argument(arg);
                 }
             }
 

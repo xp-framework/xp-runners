@@ -8,7 +8,7 @@ namespace Net.XpFramework.Runner
 
         static void Main(string[] args)
         {
-            Execute("class", "xp.doclet.Runner", new string[] { "." }, args);
+            Execute("cli", "xp.doclet.Runner", new string[] { "." }, args);
         }
     }
 }
