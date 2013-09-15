@@ -49,6 +49,6 @@ else
   shift $OPTIND
 fi
 
-EXEC("class", $INCLUDE_PATH, $TOOL)
+EXEC("cli", $INCLUDE_PATH, $TOOL)
 
 #include <exec.in> 

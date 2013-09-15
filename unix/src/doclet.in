@@ -1,5 +1,5 @@
 #include <common.in>
 
-EXEC("class", ".", xp.doclet.Runner)
+EXEC("cli", ".", xp.doclet.Runner)
 
 #include <exec.in> 

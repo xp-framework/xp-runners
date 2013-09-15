@@ -1,5 +1,5 @@
 #include <common.in>
 
-EXEC("class", ".", xp.install.Runner)
+EXEC("cli", ".", xp.install.Runner)
 
 #include <exec.in> 

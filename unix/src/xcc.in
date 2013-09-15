@@ -1,5 +1,5 @@
 #include <common.in>
 
-EXEC("class", ".", xp.compiler.Runner)
+EXEC("cli", ".", xp.compiler.Runner)
 
 #include <exec.in> 
