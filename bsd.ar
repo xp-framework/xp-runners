@@ -1,7 +1,5 @@
---3130:cgen:--
+--3228:cgen:--
 #!/bin/sh
-
-
 
 
 
@@ -67,7 +65,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.codegen.Runner IFS="|";
+base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.codegen.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -133,18 +131,19 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
   export XP_CMDLINE
 fi
 export XP_EXE
 IFS="|"
-${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3129:doclet:--
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--3227:doclet:--
 #!/bin/sh
-
-
 
 
 
@@ -210,7 +209,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.doclet.Runner IFS="|";
+base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.doclet.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -276,18 +275,19 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
   export XP_CMDLINE
 fi
 export XP_EXE
 IFS="|"
-${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3131:unittest:--
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--3229:unittest:--
 #!/bin/sh
-
-
 
 
 
@@ -353,7 +353,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.unittest.Runner IFS="|";
+base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.unittest.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -419,18 +419,19 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
   export XP_CMDLINE
 fi
 export XP_EXE
 IFS="|"
-${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3126:xar:--
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--3224:xar:--
 #!/bin/sh
-
-
 
 
 
@@ -496,7 +497,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.xar.Runner IFS="|";
+base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.xar.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -562,18 +563,19 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
   export XP_CMDLINE
 fi
 export XP_EXE
 IFS="|"
-${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3131:xcc:--
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--3229:xcc:--
 #!/bin/sh
-
-
 
 
 
@@ -639,7 +641,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.compiler.Runner IFS="|";
+base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.compiler.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -705,18 +707,19 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
   export XP_CMDLINE
 fi
 export XP_EXE
 IFS="|"
-${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4259:xp:--
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--4357:xp:--
 #!/bin/sh
-
-
 
 
 
@@ -828,7 +831,7 @@ else
   done
   shift $OPTIND
 fi
-base="$DIRNAME" RUNNER="class" INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
+base="$DIRNAME" RUNNER="cli" INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -894,18 +897,19 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
   export XP_CMDLINE
 fi
 export XP_EXE
 IFS="|"
-${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3130:xpcli:--
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--3228:xpcli:--
 #!/bin/sh
-
-
 
 
 
@@ -971,7 +975,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.command.Runner IFS="|";
+base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.command.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -1037,18 +1041,19 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
   export XP_CMDLINE
 fi
 export XP_EXE
 IFS="|"
-${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3130:xpi:--
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--3228:xpi:--
 #!/bin/sh
-
-
 
 
 
@@ -1114,7 +1119,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.install.Runner IFS="|";
+base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.install.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -1180,18 +1185,19 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
   export XP_CMDLINE
 fi
 export XP_EXE
 IFS="|"
-${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4919:xpws:--
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--5014:xpws:--
 #!/bin/sh
-
-
 
 
 
@@ -1381,7 +1387,10 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
   export XP_CMDLINE

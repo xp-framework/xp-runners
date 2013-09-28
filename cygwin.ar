@@ -1,7 +1,5 @@
---3051:cgen:--
+--3349:cgen:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\'
@@ -67,7 +65,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.codegen.Runner IFS="|";
+base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.codegen.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -133,14 +131,23 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+else
+  _args=()
+  IFS=" "
+  for arg in "$@" ; do
+    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+  done
+  set -- "${_args[@]}"
+  args="$args${ifs}-diconv.input_encoding=utf-8"
+fi
 export XP_EXE
 IFS="|"
-${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3050:doclet:--
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--3348:doclet:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\'
@@ -206,7 +213,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.doclet.Runner IFS="|";
+base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.doclet.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -272,14 +279,23 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+else
+  _args=()
+  IFS=" "
+  for arg in "$@" ; do
+    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+  done
+  set -- "${_args[@]}"
+  args="$args${ifs}-diconv.input_encoding=utf-8"
+fi
 export XP_EXE
 IFS="|"
-${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3052:unittest:--
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--3350:unittest:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\'
@@ -345,7 +361,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.unittest.Runner IFS="|";
+base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.unittest.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -411,14 +427,23 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+else
+  _args=()
+  IFS=" "
+  for arg in "$@" ; do
+    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+  done
+  set -- "${_args[@]}"
+  args="$args${ifs}-diconv.input_encoding=utf-8"
+fi
 export XP_EXE
 IFS="|"
-${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3047:xar:--
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--3345:xar:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\'
@@ -484,7 +509,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.xar.Runner IFS="|";
+base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.xar.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -550,14 +575,23 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+else
+  _args=()
+  IFS=" "
+  for arg in "$@" ; do
+    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+  done
+  set -- "${_args[@]}"
+  args="$args${ifs}-diconv.input_encoding=utf-8"
+fi
 export XP_EXE
 IFS="|"
-${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3052:xcc:--
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--3350:xcc:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\'
@@ -623,7 +657,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.compiler.Runner IFS="|";
+base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.compiler.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -689,14 +723,23 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+else
+  _args=()
+  IFS=" "
+  for arg in "$@" ; do
+    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+  done
+  set -- "${_args[@]}"
+  args="$args${ifs}-diconv.input_encoding=utf-8"
+fi
 export XP_EXE
 IFS="|"
-${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4180:xp:--
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--4478:xp:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\'
@@ -808,7 +851,7 @@ else
   done
   shift $OPTIND
 fi
-base="$DIRNAME" RUNNER="class" INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
+base="$DIRNAME" RUNNER="cli" INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -874,14 +917,23 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+else
+  _args=()
+  IFS=" "
+  for arg in "$@" ; do
+    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+  done
+  set -- "${_args[@]}"
+  args="$args${ifs}-diconv.input_encoding=utf-8"
+fi
 export XP_EXE
 IFS="|"
-${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3051:xpcli:--
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--3349:xpcli:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\'
@@ -947,7 +999,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.command.Runner IFS="|";
+base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.command.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -1013,14 +1065,23 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+else
+  _args=()
+  IFS=" "
+  for arg in "$@" ; do
+    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+  done
+  set -- "${_args[@]}"
+  args="$args${ifs}-diconv.input_encoding=utf-8"
+fi
 export XP_EXE
 IFS="|"
-${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3051:xpi:--
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--3349:xpi:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\'
@@ -1086,7 +1147,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.install.Runner IFS="|";
+base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.install.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -1152,14 +1213,23 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+else
+  _args=()
+  IFS=" "
+  for arg in "$@" ; do
+    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+  done
+  set -- "${_args[@]}"
+  args="$args${ifs}-diconv.input_encoding=utf-8"
+fi
 export XP_EXE
 IFS="|"
-${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4840:xpws:--
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--5135:xpws:--
 #!/bin/sh
-
-
 
 PATHSEP=';'
 DIRSEP='\'
@@ -1349,7 +1419,18 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+else
+  _args=()
+  IFS=" "
+  for arg in "$@" ; do
+    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+  done
+  set -- "${_args[@]}"
+  args="$args${ifs}-diconv.input_encoding=utf-8"
+fi
 export XP_EXE
 IFS="|"
 if [ $WEB_CONFIG != "?" ] && [ ! -e "$WEB_CONFIG/web.ini" ] ; then
