@@ -95,7 +95,11 @@ elif [ $ACTION = stop ] ; then
     echo "*** xpws not running"
     exit 1
   fi
+elif [ -f $PIDFILE ] ; then
+  echo "*** xpws already running"
+  exit 255
 else
+
   if [ "" = "$DOCUMENT_ROOT" ] ; then
     if [ -d "$WEB_ROOT/static" ] ; then
       DOCUMENT_ROOT="$WEB_ROOT/static"
