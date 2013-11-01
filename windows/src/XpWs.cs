@@ -9,8 +9,18 @@ namespace Net.XpFramework.Runner
     {
         delegate int Execution(string profile, string server, string port, string web, string root, string config, string[] inc);
 
+        protected static string PidFile()
+        {
+            return Paths.Compose(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ".xpws.pid");
+        }
+
         protected static Process NewProcess(string profile, string server, string port, string web, string root, string config, string[] inc)
         {
+            if (File.Exists(PidFile()))
+            {
+                throw new InvalidOperationException("xpws already running");
+            }
+
             // If no document root has been supplied, check for an existing "static"
             // subdirectory inside the web root; otherwise just use the web roor
             if (String.IsNullOrEmpty(root))
@@ -42,9 +52,10 @@ namespace Net.XpFramework.Runner
         /// Delegate: Serve web
         static int Serve(string profile, string server, string port, string web, string root, string config, string[] inc)
         {
-            var proc = NewProcess(profile, server, port, web, root, config, inc);
+            Process proc = null;
             try
             {
+                proc = NewProcess(profile, server, port, web, root, config, inc);
                 proc.Start();
                 Console.Out.WriteLine("[xpws-{0}#{1}] running {2}:{3} @ {4} - Press <Enter> to exit", profile, proc.Id, server, port, web);
                 Console.Read();
@@ -53,6 +64,11 @@ namespace Net.XpFramework.Runner
                 proc.WaitForExit();
                 return proc.ExitCode;
             }
+            catch (InvalidOperationException e)
+            {
+                Console.Error.WriteLine("*** " + e.Message);
+                return 0xFE;
+            }
             catch (SystemException e)
             {
                 Console.Error.WriteLine("*** " + proc.StartInfo.FileName + ": " + e.Message);
@@ -60,21 +76,17 @@ namespace Net.XpFramework.Runner
             }
             finally
             {
-                proc.Close();
+                if (proc != null) proc.Close();
             }
-        }
-
-        protected static string PidFile()
-        {
-            return Paths.Compose(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ".xpws.pid");
         }
 
         /// Delegate: Start serving web
         static int Start(string profile, string server, string port, string web, string root, string config, string[] inc)
         {
-            var proc = NewProcess(profile, server, port, web, root, config, inc);
+            Process proc = null;
             try
             {
+                proc = NewProcess(profile, server, port, web, root, config, inc);
                 proc.Start();
 
                 // Write PID file and exit
@@ -82,6 +94,11 @@ namespace Net.XpFramework.Runner
                 Console.Out.WriteLine("[xpws-{0}#{1}] running {2}:{3} @ {4} - Use xpws stop to end", profile, proc.Id, server, port, web);
                 return 0;
             }
+            catch (InvalidOperationException e)
+            {
+                Console.Error.WriteLine("*** " + e.Message);
+                return 0xFE;
+            }
             catch (SystemException e)
             {
                 Console.Error.WriteLine("*** " + proc.StartInfo.FileName + ": " + e.Message);
@@ -89,7 +106,7 @@ namespace Net.XpFramework.Runner
             }
             finally
             {
-                proc.Close();
+                if (proc != null) proc.Close();
             }
         }
 
