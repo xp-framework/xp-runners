@@ -66,7 +66,7 @@ namespace Net.XpFramework.Runner
 
         protected static string PidFile()
         {
-            return Paths.Compose(Environment.GetFolderPath(Environment.SpecialFolder.Personal), ".xpws.pid");
+            return Paths.Compose(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ".xpws.pid");
         }
 
         /// Delegate: Start serving web
