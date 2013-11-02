@@ -35,20 +35,20 @@ while [ $# != 0 ]; do
       INCLUDE_PATH=${INCLUDE_PATH}${PATHSEP}$2
       shift 2
       ;;
-    -i)
-      RUNNER=class
-      TOOL='xp.scriptlet.Inspect|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}'
-      shift 1
-      ;;
     -?)
       RUNNER=class
       TOOL="xp.scriptlet.Usage|xpws.txt"
       WEB_CONFIG=?
       break
       ;;
+    info)
+      RUNNER=class
+      TOOL='xp.scriptlet.Inspect|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}'
+      shift 1
+      ;;
     start|stop|status)
       ACTION=$1
-      break
+      shift 1
       ;;
     *:*)
       server=${1%:*}

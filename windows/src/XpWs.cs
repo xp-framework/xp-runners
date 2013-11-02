@@ -224,13 +224,13 @@ namespace Net.XpFramework.Runner
                         inc.Add(Paths.Resolve(args[++i]));
                         break;
 
-                    case "-i":
-                        action = Inspect;
-                        break;
-
                     case "-?":
                         Execute("class", "xp.scriptlet.Usage", inc.ToArray(), new string[] { "xpws.txt" });
                         return;
+
+                    case "info":
+                        action = Inspect;
+                        break;
 
                     case "start":
                         action = Start;
