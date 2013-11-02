@@ -46,7 +46,7 @@ while [ $# != 0 ]; do
       TOOL='xp.scriptlet.Inspect|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}'
       shift 1
       ;;
-    start|stop|status)
+    start|stop|status|serve)
       ACTION=$1
       shift 1
       ;;

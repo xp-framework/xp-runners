@@ -232,6 +232,10 @@ namespace Net.XpFramework.Runner
                         action = Inspect;
                         break;
 
+                    case "serve":
+                        action = Serve;
+                        break;
+
                     case "start":
                         action = Start;
                         break;
