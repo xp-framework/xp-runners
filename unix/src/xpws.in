@@ -7,7 +7,7 @@ SERVER_PROFILE=dev
 WEB_ROOT=.
 WEB_CONFIG=etc
 ACTION=serve
-PIDFILE=.xpws.pid
+PIDFILE="$HOME/.xpws.pid"
 
 while [ $# != 0 ]; do
   case $1 in
@@ -78,24 +78,24 @@ fi
 if [ $RUNNER = class ] ; then
   ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 elif [ $ACTION = status ] ; then
-  if [ -f $PIDFILE ] ; then
-    echo "[xpws-$(cat $PIDFILE)] running $(realpath $PIDFILE)"
+  if [ -f "$PIDFILE" ] ; then
+    echo "[xpws-"$(cat "$PIDFILE")"] running "$(realpath "$PIDFILE")
   else
     echo "xpws not running"
     exit 1
   fi
 elif [ $ACTION = stop ] ; then
-  if [ -f $PIDFILE ] ; then
-    running=$(cat $PIDFILE)
+  if [ -f "$PIDFILE" ] ; then
+    running=$(cat "$PIDFILE")
     PID=${running#*'#'}
     echo "[xpws-$running] shutting down..."
     kill -TERM $PID
-    rm $PIDFILE
+    rm "$PIDFILE"
   else
     echo "*** xpws not running"
     exit 1
   fi
-elif [ -f $PIDFILE ] ; then
+elif [ -f "$PIDFILE" ] ; then
   echo "*** xpws already running"
   exit 255
 else
@@ -124,6 +124,6 @@ else
     kill -TERM $PID
   else
     echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR @ $WEB_ROOT - Use xpws stop to end"
-    echo $SERVER_PROFILE#$PID > $PIDFILE
+    echo $SERVER_PROFILE#$PID > "$PIDFILE"
   fi
 fi
