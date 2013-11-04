@@ -8,6 +8,7 @@ WEB_ROOT=.
 WEB_CONFIG=etc
 ACTION=serve
 PIDFILE="$HOME/.xpws.pid"
+REDIR=
 
 while [ $# != 0 ]; do
   case $1 in
@@ -29,6 +30,11 @@ while [ $# != 0 ]; do
       ;;
     -w)
       WEB_ROOT=$2
+      shift 2
+      ;;
+    -l)
+      REDIR="1>$2 2>&1"
+      touch $2 || exit
       shift 2
       ;;
     -cp)
@@ -114,7 +120,7 @@ else
   export SERVER_PROFILE
   export DOCUMENT_ROOT
 
-  ${XP_EXE}${ifs}-S${ifs}${ADDR}${ifs}-t${ifs}"${DOCUMENT_ROOT}"${ifs}-duser_dir="$WEB_CONFIG"${ifs}${args}${ifs}$tool ${ARGS} "$@" &
+  ${XP_EXE}${ifs}-S${ifs}${ADDR}${ifs}-t${ifs}"${DOCUMENT_ROOT}"${ifs}-duser_dir="$WEB_CONFIG"${ifs}${args}${ifs}$tool ${ARGS} "$@" $REDIR &
   PID=$!
 
   if [ serve = $ACTION ] ; then
