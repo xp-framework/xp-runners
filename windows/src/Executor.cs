@@ -170,7 +170,7 @@ namespace Net.XpFramework.Runner
                     argv += " -diconv.input_encoding=utf-8";
                 }
             }
-            else if (null != (entry = Paths.Find(use_xp, "tools\\" + runner.Replace("cli", "class") + ".php")))
+            else if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + ".php")))
             {
                 // Pass
             }

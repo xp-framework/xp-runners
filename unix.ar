@@ -1,4 +1,4 @@
---3133:cgen:--
+--3122:cgen:--
 #!/bin/sh
 
 
@@ -133,12 +133,12 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3132:doclet:--
+--3121:doclet:--
 #!/bin/sh
 
 
@@ -273,12 +273,12 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3134:unittest:--
+--3123:unittest:--
 #!/bin/sh
 
 
@@ -413,12 +413,12 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3129:xar:--
+--3118:xar:--
 #!/bin/sh
 
 
@@ -553,12 +553,12 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3134:xcc:--
+--3123:xcc:--
 #!/bin/sh
 
 
@@ -693,12 +693,12 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4262:xp:--
+--4251:xp:--
 #!/bin/sh
 
 
@@ -879,12 +879,12 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3133:xpcli:--
+--3122:xpcli:--
 #!/bin/sh
 
 
@@ -1019,12 +1019,12 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3133:xpi:--
+--3122:xpi:--
 #!/bin/sh
 
 
@@ -1159,12 +1159,12 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4919:xpws:--
+--4908:xpws:--
 #!/bin/sh
 
 
@@ -1357,7 +1357,7 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"

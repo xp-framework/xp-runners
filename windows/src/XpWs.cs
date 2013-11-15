@@ -62,7 +62,7 @@ namespace Net.XpFramework.Runner
         /// Delegate: Inspect web setup
         static int Inspect(string profile, string server, string port, string web, string root, string config, string[] inc)
         {
-            Execute("cli", "xp.scriptlet.Inspect", inc, new string[]
+            Execute("class", "xp.scriptlet.Inspect", inc, new string[]
             {
                 web,
                 config,
@@ -119,7 +119,7 @@ namespace Net.XpFramework.Runner
                         break;
 
                     case "-?":
-                        Execute("cli", "xp.scriptlet.Usage", inc.ToArray(), new string[] { "xpws.txt" });
+                        Execute("class", "xp.scriptlet.Usage", inc.ToArray(), new string[] { "xpws.txt" });
                         return;
 
                     default:
