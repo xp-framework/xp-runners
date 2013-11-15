@@ -75,7 +75,7 @@ namespace Net.XpFramework.Runner
             }
 
             // Execute
-            Execute("cli", tool, includes.ToArray(), argv);
+            Execute("class", tool, includes.ToArray(), argv);
         }
     }
 }

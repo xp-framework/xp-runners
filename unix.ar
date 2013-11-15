@@ -1,4 +1,4 @@
---3133:cgen:--
+--3124:cgen:--
 #!/bin/sh
 
 
@@ -65,7 +65,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.codegen.Runner IFS="|";
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.codegen.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -133,12 +133,12 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3132:doclet:--
+--3123:doclet:--
 #!/bin/sh
 
 
@@ -205,7 +205,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.doclet.Runner IFS="|";
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.doclet.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -273,12 +273,12 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3134:unittest:--
+--3125:unittest:--
 #!/bin/sh
 
 
@@ -345,7 +345,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.unittest.Runner IFS="|";
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.unittest.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -413,12 +413,12 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3129:xar:--
+--3120:xar:--
 #!/bin/sh
 
 
@@ -485,7 +485,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.xar.Runner IFS="|";
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.xar.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -553,12 +553,12 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3134:xcc:--
+--3125:xcc:--
 #!/bin/sh
 
 
@@ -625,7 +625,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.compiler.Runner IFS="|";
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.compiler.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -693,12 +693,12 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4262:xp:--
+--4253:xp:--
 #!/bin/sh
 
 
@@ -811,7 +811,7 @@ else
   done
   shift $OPTIND
 fi
-base="$DIRNAME" RUNNER="cli" INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
+base="$DIRNAME" RUNNER="class" INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -879,12 +879,12 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3133:xpcli:--
+--3124:xpcli:--
 #!/bin/sh
 
 
@@ -951,7 +951,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.command.Runner IFS="|";
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.command.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -1019,12 +1019,12 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3133:xpi:--
+--3124:xpi:--
 #!/bin/sh
 
 
@@ -1091,7 +1091,7 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
-base="$DIRNAME" RUNNER="cli" INCLUDE="." xppath="$DIRNAME" ARGS=xp.install.Runner IFS="|";
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.install.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
   unset USE_XP
@@ -1159,12 +1159,12 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4919:xpws:--
+--4908:xpws:--
 #!/bin/sh
 
 
@@ -1357,7 +1357,7 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER//cli/class}".php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"

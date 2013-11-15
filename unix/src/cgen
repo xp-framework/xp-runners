@@ -107,4 +107,4 @@ execute() {
   echo ${executor}${ifs}${args}${ifs}$(locate "$USE_XP" "tools/"${runner}".php" 1)
 }
 
-cmd=$(execute "$DIRNAME" "cli" "."); IFS="|"; $cmd xp.codegen.Runner "$@";
+cmd=$(execute "$DIRNAME" "class" "."); IFS="|"; $cmd xp.codegen.Runner "$@";
