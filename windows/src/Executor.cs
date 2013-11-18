@@ -116,21 +116,6 @@ namespace Net.XpFramework.Runner
                 String.Join(PATH_SEPARATOR, includes)
             );
             
-            // If input or output encoding are not equal to default, also pass their
-            // names inside an LC_CONSOLE environment variable. Only do this inside
-            // real Windows console windows!
-            //
-            // See http://msdn.microsoft.com/en-us/library/system.text.encoding.headername.aspx
-            // and http://msdn.microsoft.com/en-us/library/system.text.encoding.aspx
-            if (null == Environment.GetEnvironmentVariable("TERM")) 
-            {
-                Encoding defaultEncoding = Encoding.Default;
-                if (!defaultEncoding.Equals(Console.InputEncoding) || !defaultEncoding.Equals(Console.OutputEncoding)) 
-                {
-                    Environment.SetEnvironmentVariable("LC_CONSOLE", Console.InputEncoding.HeaderName + "," + Console.OutputEncoding.HeaderName);
-                }
-            }
-            
             // Look for PHP configuration
             foreach (KeyValuePair<string, IEnumerable<string>> kv in configs.GetArgs(runtime))
             {
@@ -167,7 +152,22 @@ namespace Net.XpFramework.Runner
                 if (!wmain)
                 {
                     argument = Encode;
-                    argv += " -diconv.input_encoding=utf-8";
+                    argv += " -dencoding=utf-8";
+                }
+                else
+                {
+                    argv += " -dencoding=" + Encoding.Default.HeaderName.Replace("Windows-", "cp");
+                }
+
+                // Pass Console input and output encoding; but only inside real console windows.
+                //
+                // See http://msdn.microsoft.com/en-us/library/system.text.encoding.headername.aspx
+                // and http://msdn.microsoft.com/en-us/library/system.text.encoding.aspx
+                if (null == Environment.GetEnvironmentVariable("TERM")) 
+                {
+                    // argv += "," + Console.InputEncoding.HeaderName.Replace("Windows-", "cp") + "," + Console.OutputEncoding.HeaderName.Replace("Windows-", "cp");
+                    // Console.OutputEncoding = Encoding.UTF8;
+                    // argv += ",utf-16,utf-16";
                 }
             }
             else if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + ".php")))
@@ -187,6 +187,13 @@ namespace Net.XpFramework.Runner
             {
                 foreach (string arg in args) 
                 {
+                    // Console.Error.Write("ARG '{0}' = `", arg);
+                    // var bytes = Encoding.UTF8.GetBytes(arg);
+                    // for (var i = 0; i < bytes.Length; i++)
+                    // {
+                    //    Console.Error.Write("\\{0}", Convert.ToString(bytes[i], 8));
+                    // }
+                    // Console.Error.WriteLine('`');
                     proc.StartInfo.Arguments +=  " " + argument(arg);
                 }
             }
@@ -201,6 +208,20 @@ namespace Net.XpFramework.Runner
             };
             
             proc.StartInfo.UseShellExecute = false;
+            proc.StartInfo.RedirectStandardOutput = true;
+            proc.StartInfo.RedirectStandardError = true;
+
+            // Route output through this command. This way, we prevent 
+            // PHP garbling the output on a Windows console window.
+            proc.OutputDataReceived += new DataReceivedEventHandler(delegate(object sendingProcess, DataReceivedEventArgs outLine)
+            {
+                if (null != outLine.Data) Console.Out.WriteLine(outLine.Data);
+            });
+            proc.ErrorDataReceived += new DataReceivedEventHandler(delegate(object sendingProcess, DataReceivedEventArgs outLine)
+            {
+                if (null != outLine.Data) Console.Error.WriteLine(outLine.Data);
+            });
+
             return proc;
         }
 
@@ -209,11 +230,15 @@ namespace Net.XpFramework.Runner
         /// </summary>
         public static int Execute(string base_dir, string runner, string tool, string[] includes, string[] args)
         {
+            var encoding = Console.OutputEncoding;
+            Console.OutputEncoding = Encoding.UTF8;
 
             var proc = Instance(base_dir, runner, tool, includes, args);
             try
             {
                 proc.Start();
+                proc.BeginOutputReadLine();
+                proc.BeginErrorReadLine();
                 proc.WaitForExit();
                 return proc.ExitCode;
             }
@@ -223,6 +248,7 @@ namespace Net.XpFramework.Runner
             } 
             finally
             {
+                Console.OutputEncoding = encoding;
                 proc.Close();
             }
         }
