@@ -12,6 +12,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
