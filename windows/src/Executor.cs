@@ -44,32 +44,27 @@ namespace Net.XpFramework.Runner
         }
 
         /// <summary>
-        /// Encodes a given string for use in a command line argument, using UTF-8.
-        /// bytes. The returned string is enclosed in double quotes. Double quotes 
-        /// and backslashes have been escaped.
+        /// Encodes a given string for use in a command line argument, using unicode
+        /// escape sequences. The returned string is enclosed in double quotes. Double
+        /// quotes and backslashes have been escaped.
         /// </summary>
         private static string Encode(string arg)
         {
-            var bytes = Encoding.UTF8.GetBytes(arg);
             var ret = new StringBuilder();
 
-            ret.Append('"');
-            for (var i = 0; i < bytes.Length; i++)
+            ret.Append("\"\"\"");
+            for (var i = 0; i < arg.Length; i++)
             {
-                if (34 == bytes[i])
+                if ('"' == arg[i] || '\\' == arg[i] || arg[i] < ' ' || arg[i] > '~')
                 {
-                    ret.Append("\"\"");     // Double-quote -> double double-quote
-                }
-                else if (92 == bytes[i])
-                {
-                    ret.Append("\\\\");     // Backslash -> double backslash
+                    ret.Append("\\u").Append(((int)arg[i]).ToString("X4"));
                 }
                 else
                 {
-                    ret.Append(Convert.ToString((char)bytes[i]));
+                    ret.Append(arg[i]);
                 }
             }
-            ret.Append('"');
+            ret.Append("\"\"\"");
 
             return ret.ToString();
         }
@@ -152,22 +147,11 @@ namespace Net.XpFramework.Runner
                 if (!wmain)
                 {
                     argument = Encode;
-                    argv += " -dencoding=utf-8";
+                    argv += " -dencoding=escaped,utf-8,utf-8";
                 }
                 else
                 {
-                    argv += " -dencoding=" + Encoding.Default.HeaderName.Replace("Windows-", "cp");
-                }
-
-                // Pass Console input and output encoding; but only inside real console windows.
-                //
-                // See http://msdn.microsoft.com/en-us/library/system.text.encoding.headername.aspx
-                // and http://msdn.microsoft.com/en-us/library/system.text.encoding.aspx
-                if (null == Environment.GetEnvironmentVariable("TERM")) 
-                {
-                    // argv += "," + Console.InputEncoding.HeaderName.Replace("Windows-", "cp") + "," + Console.OutputEncoding.HeaderName.Replace("Windows-", "cp");
-                    // Console.OutputEncoding = Encoding.UTF8;
-                    // argv += ",utf-16,utf-16";
+                    argv += " -dencoding=utf-8,utf-8,utf-8";
                 }
             }
             else if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + ".php")))
@@ -187,13 +171,6 @@ namespace Net.XpFramework.Runner
             {
                 foreach (string arg in args) 
                 {
-                    // Console.Error.Write("ARG '{0}' = `", arg);
-                    // var bytes = Encoding.UTF8.GetBytes(arg);
-                    // for (var i = 0; i < bytes.Length; i++)
-                    // {
-                    //    Console.Error.Write("\\{0}", Convert.ToString(bytes[i], 8));
-                    // }
-                    // Console.Error.WriteLine('`');
                     proc.StartInfo.Arguments +=  " " + argument(arg);
                 }
             }
