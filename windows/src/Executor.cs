@@ -166,7 +166,11 @@ namespace Net.XpFramework.Runner
             // Spawn runtime
             var proc = new Process();
             proc.StartInfo.FileName = executor;
-            proc.StartInfo.Arguments = argv + " \"" + entry + "\" " + tool;
+            proc.StartInfo.Arguments = argv + " \"" + entry + "\"";
+            if (!String.IsNullOrEmpty(tool)) 
+            {
+                proc.StartInfo.Arguments += " " + argument(tool);
+            }
             if (args.Length > 0)
             {
                 foreach (string arg in args) 
