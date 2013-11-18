@@ -50,21 +50,26 @@ namespace Net.XpFramework.Runner
         /// </summary>
         private static string Encode(string arg)
         {
+            var bytes = Encoding.UTF7.GetBytes(arg);
             var ret = new StringBuilder();
 
-            ret.Append("\"\"\"");
-            for (var i = 0; i < arg.Length; i++)
+            ret.Append('"');
+            for (var i = 0; i < bytes.Length; i++)
             {
-                if ('"' == arg[i] || '\\' == arg[i] || arg[i] < ' ' || arg[i] > '~')
+                if (34 == bytes[i])
                 {
-                    ret.Append("\\u").Append(((int)arg[i]).ToString("X4"));
+                    ret.Append("\"\"");     // Double-quote -> double double-quote
+                }
+                else if (92 == bytes[i])
+                {
+                    ret.Append("\\\\");     // Backslash -> double backslash
                 }
                 else
                 {
-                    ret.Append(arg[i]);
+                    ret.Append(Convert.ToString((char)bytes[i]));
                 }
             }
-            ret.Append("\"\"\"");
+            ret.Append('"');
 
             return ret.ToString();
         }
@@ -144,14 +149,14 @@ namespace Net.XpFramework.Runner
                 // the "wmain" configuration option must be set in the [runtime] section,
                 // and we'll leave the argument as-is; assuming PHP will internally convert 
                 // it to something useful (e.g. "utf-8") and indicate this to userland. 
-                if (!wmain)
+                if (wmain)
                 {
-                    argument = Encode;
-                    argv += " -dencoding=escaped,utf-8,utf-8";
+                    argv += " -dencoding=utf-8";
                 }
                 else
                 {
-                    argv += " -dencoding=utf-8,utf-8,utf-8";
+                    argument = Encode;
+                    argv += " -dencoding=utf-7";
                 }
             }
             else if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + ".php")))
