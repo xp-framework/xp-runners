@@ -202,7 +202,7 @@ namespace Net.XpFramework.Runner
             // shell, for example) and kill the spawned process, see also:
             // http://www.cygwin.com/ml/cygwin/2006-12/msg00151.html
             // http://www.mail-archive.com/cygwin@cygwin.com/msg74638.html
-            Console.CancelKeyPress += delegate {
+            Console.CancelKeyPress += (sender, e) => {
                 proc.Kill();
                 proc.WaitForExit();
             };
@@ -213,13 +213,11 @@ namespace Net.XpFramework.Runner
 
             // Route output through this command. This way, we prevent 
             // PHP garbling the output on a Windows console window.
-            proc.OutputDataReceived += new DataReceivedEventHandler(delegate(object sendingProcess, DataReceivedEventArgs outLine)
-            {
-                if (null != outLine.Data) Console.Out.WriteLine(outLine.Data);
+            proc.OutputDataReceived += new DataReceivedEventHandler((sender, e) => {
+                if (null != e.Data) Console.Out.WriteLine(e.Data);
             });
-            proc.ErrorDataReceived += new DataReceivedEventHandler(delegate(object sendingProcess, DataReceivedEventArgs outLine)
-            {
-                if (null != outLine.Data) Console.Error.WriteLine(outLine.Data);
+            proc.ErrorDataReceived += new DataReceivedEventHandler((sender, e) => {
+                if (null != e.Data) Console.Error.WriteLine(e.Data);
             });
 
             return proc;
