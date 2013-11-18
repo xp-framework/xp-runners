@@ -1,4 +1,4 @@
---3124:cgen:--
+--3172:cgen:--
 #!/bin/sh
 
 
@@ -79,6 +79,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -131,14 +132,14 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3123:doclet:--
+--3171:doclet:--
 #!/bin/sh
 
 
@@ -219,6 +220,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -271,14 +273,14 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3125:unittest:--
+--3173:unittest:--
 #!/bin/sh
 
 
@@ -359,6 +361,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -411,14 +414,14 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3120:xar:--
+--3168:xar:--
 #!/bin/sh
 
 
@@ -499,6 +502,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -551,14 +555,14 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3125:xcc:--
+--3173:xcc:--
 #!/bin/sh
 
 
@@ -639,6 +643,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -691,14 +696,14 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4253:xp:--
+--4301:xp:--
 #!/bin/sh
 
 
@@ -825,6 +830,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -877,14 +883,14 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3124:xpcli:--
+--3172:xpcli:--
 #!/bin/sh
 
 
@@ -965,6 +971,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -1017,14 +1024,14 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3124:xpi:--
+--3172:xpi:--
 #!/bin/sh
 
 
@@ -1105,6 +1112,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -1157,14 +1165,14 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4908:xpws:--
+--4956:xpws:--
 #!/bin/sh
 
 
@@ -1303,6 +1311,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -1355,7 +1364,7 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 fi

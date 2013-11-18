@@ -1,4 +1,4 @@
---3340:cgen:--
+--3371:cgen:--
 #!/bin/sh
 
 PATHSEP=';'
@@ -79,6 +79,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -131,22 +132,22 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 else
   _args=()
   IFS=" "
   for arg in "$@" ; do
-    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+    _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-diconv.input_encoding=utf-8"
+  args="$args${ifs}-dencoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3339:doclet:--
+--3370:doclet:--
 #!/bin/sh
 
 PATHSEP=';'
@@ -227,6 +228,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -279,22 +281,22 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 else
   _args=()
   IFS=" "
   for arg in "$@" ; do
-    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+    _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-diconv.input_encoding=utf-8"
+  args="$args${ifs}-dencoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3341:unittest:--
+--3372:unittest:--
 #!/bin/sh
 
 PATHSEP=';'
@@ -375,6 +377,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -427,22 +430,22 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 else
   _args=()
   IFS=" "
   for arg in "$@" ; do
-    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+    _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-diconv.input_encoding=utf-8"
+  args="$args${ifs}-dencoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3336:xar:--
+--3367:xar:--
 #!/bin/sh
 
 PATHSEP=';'
@@ -523,6 +526,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -575,22 +579,22 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 else
   _args=()
   IFS=" "
   for arg in "$@" ; do
-    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+    _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-diconv.input_encoding=utf-8"
+  args="$args${ifs}-dencoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3341:xcc:--
+--3372:xcc:--
 #!/bin/sh
 
 PATHSEP=';'
@@ -671,6 +675,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -723,22 +728,22 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 else
   _args=()
   IFS=" "
   for arg in "$@" ; do
-    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+    _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-diconv.input_encoding=utf-8"
+  args="$args${ifs}-dencoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4469:xp:--
+--4500:xp:--
 #!/bin/sh
 
 PATHSEP=';'
@@ -865,6 +870,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -917,22 +923,22 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 else
   _args=()
   IFS=" "
   for arg in "$@" ; do
-    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+    _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-diconv.input_encoding=utf-8"
+  args="$args${ifs}-dencoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3340:xpcli:--
+--3371:xpcli:--
 #!/bin/sh
 
 PATHSEP=';'
@@ -1013,6 +1019,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -1065,22 +1072,22 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 else
   _args=()
   IFS=" "
   for arg in "$@" ; do
-    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+    _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-diconv.input_encoding=utf-8"
+  args="$args${ifs}-dencoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3340:xpi:--
+--3371:xpi:--
 #!/bin/sh
 
 PATHSEP=';'
@@ -1161,6 +1168,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -1213,22 +1221,22 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 else
   _args=()
   IFS=" "
   for arg in "$@" ; do
-    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+    _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-diconv.input_encoding=utf-8"
+  args="$args${ifs}-dencoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5124:xpws:--
+--5155:xpws:--
 #!/bin/sh
 
 PATHSEP=';'
@@ -1367,6 +1375,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -1419,17 +1428,17 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 else
   _args=()
   IFS=" "
   for arg in "$@" ; do
-    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+    _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-diconv.input_encoding=utf-8"
+  args="$args${ifs}-dencoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
