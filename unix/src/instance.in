@@ -75,7 +75,7 @@ if [ "" = "$USE_XP" ] ; then
 fi
 
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/${RUNNER}-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 #ifdef __CYGWIN
@@ -83,10 +83,10 @@ else
   _args=()
   IFS=" "
   for arg in "$@" ; do
-    _args=("${_args[@]}" "$(echo $arg | iconv -f iso-8859-1 -t utf-8)")
+    _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-diconv.input_encoding=utf-8"
+  args="$args${ifs}-dencoding=utf-7"
 #endif
 fi
 #ifdef __BSD
