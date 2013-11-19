@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Net.XpFramework.Runner
 {
@@ -193,16 +195,16 @@ namespace Net.XpFramework.Runner
             proc.StartInfo.RedirectStandardOutput = true;
             proc.StartInfo.RedirectStandardError = true;
 
-            // Route output through this command. This way, we prevent 
-            // PHP garbling the output on a Windows console window.
-            proc.OutputDataReceived += new DataReceivedEventHandler((sender, e) => {
-                if (null != e.Data) Console.Out.WriteLine(e.Data);
-            });
-            proc.ErrorDataReceived += new DataReceivedEventHandler((sender, e) => {
-                if (null != e.Data) Console.Error.WriteLine(e.Data);
-            });
-
             return proc;
+        }
+
+        public static void Process(StreamReader reader, TextWriter writer)
+        {
+            int read;
+            while (-1 != (read = reader.Read()))
+            {
+                writer.Write((char)read);
+            }
         }
 
         /// <summary>
@@ -217,9 +219,15 @@ namespace Net.XpFramework.Runner
             try
             {
                 proc.Start();
-                proc.BeginOutputReadLine();
-                proc.BeginErrorReadLine();
-                proc.WaitForExit();
+
+                // Route output through this command. This way, we prevent 
+                // PHP garbling the output on a Windows console window.
+                Task.WaitAll(
+                    Task.Factory.StartNew(() => { proc.WaitForExit(); }),
+                    Task.Factory.StartNew(() => { Process(proc.StandardOutput, Console.Out); }),
+                    Task.Factory.StartNew(() => { Process(proc.StandardError, Console.Error); })
+                );
+
                 return proc.ExitCode;
             }
             catch (SystemException e) 
