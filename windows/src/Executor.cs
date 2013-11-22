@@ -139,30 +139,23 @@ namespace Net.XpFramework.Runner
             // Find entry point, which is either a file called [runner]-main.php, which
             // will receive the arguments in UTF-8, or a file called [runner].php, which
             // assumes the arguments come in in platform encoding.
-            string entry = null;
-            Argument argument = Pass;
+            //
+            // Windows encodes the command line arguments to platform encoding for PHP,
+            // which doesn't define a "wmain()", so we'll need to double-encode our 
+            // $argv in a "binary-safe" way in order to transport Unicode into PHP.
+            string entry;
+            bool redirect;
+            Argument argument;
             if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + "-main.php")))
             {
-
-                // Windows encodes the command line arguments to platform encoding for PHP,
-                // which doesn't define a "wmain()", so we'll need to double-encode our $argv
-                // here. In case this changes, and this is a very long shot at PHP's future,
-                // the "wmain" configuration option must be set in the [runtime] section,
-                // and we'll leave the argument as-is; assuming PHP will internally convert 
-                // it to something useful (e.g. "utf-8") and indicate this to userland. 
-                if (wmain)
-                {
-                    argv += " -dencoding=utf-8";
-                }
-                else
-                {
-                    argument = Encode;
-                    argv += " -dencoding=utf-7";
-                }
+                argument = Encode;
+                redirect = true;
+                argv += " -dencoding=utf-7";
             }
             else if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + ".php")))
             {
-                // Pass
+                argument = Pass;
+                redirect = false;
             }
             else
             {
@@ -171,6 +164,8 @@ namespace Net.XpFramework.Runner
 
             // Spawn runtime
             var proc = new Process();
+            proc.StartInfo.RedirectStandardOutput = redirect;
+            proc.StartInfo.RedirectStandardError = redirect;
             proc.StartInfo.FileName = executor;
             proc.StartInfo.Arguments = argv + " \"" + entry + "\" " + tool;
             if (args.Length > 0)
@@ -191,8 +186,6 @@ namespace Net.XpFramework.Runner
             };
             
             proc.StartInfo.UseShellExecute = false;
-            proc.StartInfo.RedirectStandardOutput = true;
-            proc.StartInfo.RedirectStandardError = true;
 
             return proc;
         }
@@ -219,19 +212,27 @@ namespace Net.XpFramework.Runner
             {
                 proc.Start();
 
-                // Route output through this command. This way, we prevent 
+                // Route output through this command in XP 6+. This way, we prevent 
                 // PHP garbling the output on a Windows console window.
-                Task.WaitAll(
-                    Task.Factory.StartNew(() => { proc.WaitForExit(); }),
-                    Task.Factory.StartNew(() => { Process(proc.StandardOutput, Console.Out); }),
-                    Task.Factory.StartNew(() => { Process(proc.StandardError, Console.Error); })
-                );
+                if (proc.StartInfo.RedirectStandardOutput)
+                {
+                    Task.WaitAll(
+                        Task.Factory.StartNew(() => { proc.WaitForExit(); }),
+                        Task.Factory.StartNew(() => { Process(proc.StandardOutput, Console.Out); }),
+                        Task.Factory.StartNew(() => { Process(proc.StandardError, Console.Error); })
+                    );
+                }
+                else
+                {
+                    proc.WaitForExit(); 
+                }
+
 
                 return proc.ExitCode;
             }
             catch (SystemException e) 
             {
-                throw new ExecutionEngineException(proc.StartInfo.FileName + ": " + e.Message, e);
+                throw new EntryPointNotFoundException(proc.StartInfo.FileName + ": " + e.Message, e);
             } 
             finally
             {
