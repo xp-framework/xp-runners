@@ -159,7 +159,7 @@ namespace Net.XpFramework.Runner
             }
             else
             {
-                throw new EntryPointNotFoundException("Cannot find tool in " + use_xp);
+                throw new EntryPointNotFoundException("Cannot find tool in " + String.Join(", ", new List<string>(use_xp).ToArray()));
             }
 
             // Spawn runtime
@@ -226,7 +226,6 @@ namespace Net.XpFramework.Runner
                 {
                     proc.WaitForExit(); 
                 }
-
 
                 return proc.ExitCode;
             }
