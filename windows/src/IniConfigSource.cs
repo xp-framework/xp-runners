@@ -55,17 +55,6 @@ namespace Net.XpFramework.Runner
         }
 
         /// <summary>
-        /// Returns whether PHP defines a "wmain()" entry point
-        /// </summary>
-        public bool? GetWMain(string runtime)
-        {
-            return -1 == Array.IndexOf(
-                new string[] { null, "", "no", "false", "off"},
-                this.ini.Get("runtime@" + runtime, "wmain") ?? this.ini.Get("runtime", "wmain")
-            );
-        }
-
-        /// <summary>
         /// Concatenates all given enumerables
         /// </summary>
         protected IEnumerable<T> Concat<T>(params IEnumerable<T>[] args)
@@ -102,7 +91,7 @@ namespace Net.XpFramework.Runner
             var empty= new string[] {};
             foreach (string key in this.ini.Keys(section, empty))
             {
-                if (!("default".Equals(key) || "wmain".Equals(key) || "extension".Equals(key)))
+                if (!("default".Equals(key) || "extension".Equals(key)))
                 {
                     yield return new KeyValuePair<string, IEnumerable<string>>(key, this.ini.GetAll(section, key, empty));
                 }

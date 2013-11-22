@@ -95,7 +95,6 @@ namespace Net.XpFramework.Runner
             IEnumerable<string> use_xp = configs.GetUse();
             string runtime = configs.GetRuntime();
             string executor = configs.GetExecutable(runtime) ?? "php";
-            bool wmain = configs.GetWMain(runtime) ?? false;
             
             if (null == use_xp)
             {
