@@ -12,6 +12,7 @@ for i in "." "$HOME/.xp" "$base" ; do
   if [ -e "$i/xp.ini" ] ; then
     section=default
     while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
           USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
@@ -74,7 +75,20 @@ if [ "" = "$USE_XP" ] ; then
 fi
 
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}"-main.php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+#ifdef __CYGWIN
+else
+  _args=()
+  IFS=" "
+  for arg in "$@" ; do
+    _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
+  done
+  set -- "${_args[@]}"
+  args="$args${ifs}-dencoding=utf-7"
+#endif
+fi
 #ifdef __BSD
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"

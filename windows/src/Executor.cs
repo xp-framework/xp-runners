@@ -3,22 +3,82 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Net.XpFramework.Runner
 {
+    delegate string Argument(string arg);
+
     class Executor
     {
         private static string PATH_SEPARATOR = new string(new char[] { Path.PathSeparator});
         private static List<string> EMPTY_LIST = new List<string>();
 
         /// <summary>
-        /// 
+        /// Encodes a given string for use in a command line argument. The returned
+        /// string is enclosed in double quotes. Double quotes and backslashes have
+        /// been escaped.
         /// </summary>
-        /// <param name="base_dir"></param>
-        /// <param name="runner"></param>
-        /// <param name="tool"></param>
-        /// <param name="includes"></param>
-        /// <param name="args"></param>
+        private static string Pass(string arg)
+        {
+            var ret = new StringBuilder();
+
+            ret.Append('"');
+            for (var i = 0; i < arg.Length; i++)
+            {
+                if ('"' == arg[i])
+                {
+                    ret.Append("\"\"");     // Double-quote -> double double-quote
+                }
+                else if ('\\' == arg[i])
+                {
+                    ret.Append("\\\\");     // Backslash -> double backslash
+                }
+                else
+                {
+                    ret.Append(arg[i]);
+                }
+            }
+            ret.Append('"');
+
+            return ret.ToString();
+        }
+
+        /// <summary>
+        /// Encodes a given string for use in a command line argument, using unicode
+        /// escape sequences. The returned string is enclosed in double quotes. Double
+        /// quotes and backslashes have been escaped.
+        /// </summary>
+        private static string Encode(string arg)
+        {
+            var bytes = Encoding.UTF7.GetBytes(arg);
+            var ret = new StringBuilder();
+
+            ret.Append('"');
+            for (var i = 0; i < bytes.Length; i++)
+            {
+                if (34 == bytes[i])
+                {
+                    ret.Append("\"\"");     // Double-quote -> double double-quote
+                }
+                else if (92 == bytes[i])
+                {
+                    ret.Append("\\\\");     // Backslash -> double backslash
+                }
+                else
+                {
+                    ret.Append(Convert.ToString((char)bytes[i]));
+                }
+            }
+            ret.Append('"');
+
+            return ret.ToString();
+        }
+
+        /// <summary>
+        /// Creates the executor process instance
+        /// </summary>
         public static Process Instance(string base_dir, string runner, string tool, string[] includes, string[] args)
         {
             string home = Environment.GetEnvironmentVariable("HOME");
@@ -36,7 +96,8 @@ namespace Net.XpFramework.Runner
             string runtime = configs.GetRuntime();
             string executor = configs.GetExecutable(runtime) ?? "php";
             
-            if (null == use_xp) {
+            if (null == use_xp)
+            {
                 throw new EntryPointNotFoundException("Cannot determine use_xp setting from " + configs);
             }
         
@@ -55,21 +116,6 @@ namespace Net.XpFramework.Runner
                 PATH_SEPARATOR,
                 String.Join(PATH_SEPARATOR, includes)
             );
-            
-            // If input or output encoding are not equal to default, also pass their
-            // names inside an LC_CONSOLE environment variable. Only do this inside
-            // real Windows console windows!
-            //
-            // See http://msdn.microsoft.com/en-us/library/system.text.encoding.headername.aspx
-            // and http://msdn.microsoft.com/en-us/library/system.text.encoding.aspx
-            if (null == Environment.GetEnvironmentVariable("TERM")) 
-            {
-                Encoding defaultEncoding = Encoding.Default;
-                if (!defaultEncoding.Equals(Console.InputEncoding) || !defaultEncoding.Equals(Console.OutputEncoding)) 
-                {
-                    Environment.SetEnvironmentVariable("LC_CONSOLE", Console.InputEncoding.HeaderName + "," + Console.OutputEncoding.HeaderName);
-                }
-            }
             
             // Look for PHP configuration
             foreach (KeyValuePair<string, IEnumerable<string>> kv in configs.GetArgs(runtime))
@@ -90,15 +136,43 @@ namespace Net.XpFramework.Runner
                 }
             }
 
+            // Find entry point, which is either a file called [runner]-main.php, which
+            // will receive the arguments in UTF-8, or a file called [runner].php, which
+            // assumes the arguments come in in platform encoding.
+            //
+            // Windows encodes the command line arguments to platform encoding for PHP,
+            // which doesn't define a "wmain()", so we'll need to double-encode our 
+            // $argv in a "binary-safe" way in order to transport Unicode into PHP.
+            string entry;
+            bool redirect;
+            Argument argument;
+            if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + "-main.php")))
+            {
+                argument = Encode;
+                redirect = true;
+                argv += " -dencoding=utf-7";
+            }
+            else if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + ".php")))
+            {
+                argument = Pass;
+                redirect = false;
+            }
+            else
+            {
+                throw new EntryPointNotFoundException("Cannot find tool in " + String.Join(", ", new List<string>(use_xp).ToArray()));
+            }
+
             // Spawn runtime
             var proc = new Process();
+            proc.StartInfo.RedirectStandardOutput = redirect;
+            proc.StartInfo.RedirectStandardError = redirect;
             proc.StartInfo.FileName = executor;
-            proc.StartInfo.Arguments = argv + " \"" + new List<string>(Paths.Locate(use_xp, "tools\\" + runner + ".php", true))[0] + "\" " + tool;
+            proc.StartInfo.Arguments = argv + " \"" + entry + "\" " + tool;
             if (args.Length > 0)
             {
                 foreach (string arg in args) 
                 {
-                    proc.StartInfo.Arguments +=  " \"" + arg.Replace("\"", "\"\"").Replace("\\\"\"", "\\\\\\\"") + "\"";
+                    proc.StartInfo.Arguments +=  " " + argument(arg);
                 }
             }
 
@@ -106,39 +180,62 @@ namespace Net.XpFramework.Runner
             // shell, for example) and kill the spawned process, see also:
             // http://www.cygwin.com/ml/cygwin/2006-12/msg00151.html
             // http://www.mail-archive.com/cygwin@cygwin.com/msg74638.html
-            Console.CancelKeyPress += delegate {
+            Console.CancelKeyPress += (sender, e) => {
                 proc.Kill();
                 proc.WaitForExit();
             };
             
             proc.StartInfo.UseShellExecute = false;
+
             return proc;
         }
 
+        public static void Process(StreamReader reader, TextWriter writer)
+        {
+            int read;
+            while (-1 != (read = reader.Read()))
+            {
+                writer.Write((char)read);
+            }
+        }
+
         /// <summary>
-        /// 
+        /// Creates and runs the executor instance. Returns the process' exitcode.
         /// </summary>
-        /// <param name="base_dir"></param>
-        /// <param name="runner"></param>
-        /// <param name="tool"></param>
-        /// <param name="includes"></param>
-        /// <param name="args"></param>
         public static int Execute(string base_dir, string runner, string tool, string[] includes, string[] args)
         {
+            var encoding = Console.OutputEncoding;
+            Console.OutputEncoding = Encoding.UTF8;
 
             var proc = Instance(base_dir, runner, tool, includes, args);
             try
             {
                 proc.Start();
-                proc.WaitForExit();
+
+                // Route output through this command in XP 6+. This way, we prevent 
+                // PHP garbling the output on a Windows console window.
+                if (proc.StartInfo.RedirectStandardOutput)
+                {
+                    Task.WaitAll(
+                        Task.Factory.StartNew(() => { proc.WaitForExit(); }),
+                        Task.Factory.StartNew(() => { Process(proc.StandardOutput, Console.Out); }),
+                        Task.Factory.StartNew(() => { Process(proc.StandardError, Console.Error); })
+                    );
+                }
+                else
+                {
+                    proc.WaitForExit(); 
+                }
+
                 return proc.ExitCode;
             }
             catch (SystemException e) 
             {
-                throw new ExecutionEngineException(proc.StartInfo.FileName + ": " + e.Message, e);
+                throw new EntryPointNotFoundException(proc.StartInfo.FileName + ": " + e.Message, e);
             } 
             finally
             {
+                Console.OutputEncoding = encoding;
                 proc.Close();
             }
         }

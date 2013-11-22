@@ -191,26 +191,47 @@ namespace Net.XpFramework.Runner
         /// looking up program names in $ENV{PATH}.
         /// </summary>
         /// <param name="bases"></param>
-        /// <param name="file"></param>
+        /// <param name="files"></param>
         /// <param name="expect">Whether we expect a non-empty list</param>
         /// <returns></returns>
-        public static IEnumerable<string> Locate(IEnumerable<string> bases, string file, bool expect)
+        public static IEnumerable<string> Locate(IEnumerable<string> bases, string[] files, bool expect)
         {
             bool found = false;
             foreach (string path in bases)
             {
-                string qualified = path.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar + file;
-                
-                if (File.Exists(qualified))
+                foreach (string file in files)
                 {
-                    found = true;
-                    yield return qualified;
+                    string qualified = path.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar + file;
+                    if (File.Exists(qualified))
+                    {
+                        found = true;
+                        yield return qualified;
+                    }
                 }
 
             }
             if (expect && !found)
             {
-                throw new FileNotFoundException("Cannot find " + file + " in [" + String.Join(", ", new List<string>(bases).ToArray()) + "]");
+                throw new FileNotFoundException("Cannot find [" + String.Join(", ", files) + "] in [" + String.Join(", ", new List<string>(bases).ToArray()) + "]");
+            }
+        }
+
+        /// <summary>
+        /// Find a file inside multiple base paths. See Locate().
+        /// </summary>
+        /// <param name="bases"></param>
+        /// <param name="file"></param>
+        /// <returns>the qualified file name or null if nothing can be found</returns>
+        public static string Find(IEnumerable<string> bases, string file)
+        {
+            var locator = Locate(bases, new string[] { file }, false).GetEnumerator();
+            if (locator.MoveNext())
+            {
+                return locator.Current;
+            }
+            else
+            {
+                return null;
             }
         }
         
@@ -276,8 +297,9 @@ namespace Net.XpFramework.Runner
         public static string Compose(params string[] components) 
         {
             var s = new StringBuilder();
-            foreach (string component in components) {
-                s.Append(component.TrimEnd(new char[] { Path.DirectorySeparatorChar })).Append(Path.DirectorySeparatorChar);
+            foreach (string component in components)
+            {
+                s.Append(component.TrimEnd(Path.DirectorySeparatorChar)).Append(Path.DirectorySeparatorChar);
             }
             s.Length--;           // Remove last directory separator
             return s.ToString();
