@@ -1,5 +1,7 @@
---3371:cgen:--
+--3373:cgen:--
 #!/bin/sh
+
+
 
 PATHSEP=';'
 DIRSEP='\'
@@ -147,8 +149,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3370:doclet:--
+--3372:doclet:--
 #!/bin/sh
+
+
 
 PATHSEP=';'
 DIRSEP='\'
@@ -296,8 +300,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3372:unittest:--
+--3374:unittest:--
 #!/bin/sh
+
+
 
 PATHSEP=';'
 DIRSEP='\'
@@ -445,8 +451,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3367:xar:--
+--3369:xar:--
 #!/bin/sh
+
+
 
 PATHSEP=';'
 DIRSEP='\'
@@ -594,8 +602,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3372:xcc:--
+--3374:xcc:--
 #!/bin/sh
+
+
 
 PATHSEP=';'
 DIRSEP='\'
@@ -743,8 +753,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4500:xp:--
+--4502:xp:--
 #!/bin/sh
+
+
 
 PATHSEP=';'
 DIRSEP='\'
@@ -938,8 +950,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3371:xpcli:--
+--3373:xpcli:--
 #!/bin/sh
+
+
 
 PATHSEP=';'
 DIRSEP='\'
@@ -1087,8 +1101,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3371:xpi:--
+--3373:xpi:--
 #!/bin/sh
+
+
 
 PATHSEP=';'
 DIRSEP='\'
@@ -1236,8 +1252,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5155:xpws:--
+--5157:xpws:--
 #!/bin/sh
+
+
 
 PATHSEP=';'
 DIRSEP='\'
