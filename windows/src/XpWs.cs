@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Net.XpFramework.Runner
 {
@@ -8,10 +9,17 @@ namespace Net.XpFramework.Runner
     {
         delegate int Execution(string profile, string server, string port, string web, string root, string config, string[] inc);
 
-        /// Delegate: Serve web
-        static int Serve(string profile, string server, string port, string web, string root, string config, string[] inc)
+        protected static string PidFile()
         {
-            var pid = System.Diagnostics.Process.GetCurrentProcess().Id;
+            return Paths.Compose(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ".xpws.pid");
+        }
+
+        protected static Process NewProcess(string profile, string server, string port, string web, string root, string config, string[] inc)
+        {
+            if (File.Exists(PidFile()))
+            {
+                throw new InvalidOperationException("xpws already running");
+            }
 
             // If no document root has been supplied, check for an existing "static"
             // subdirectory inside the web root; otherwise just use the web roor
@@ -34,24 +42,126 @@ namespace Net.XpFramework.Runner
                 proc.StartInfo.Arguments
             );
 
+            Environment.SetEnvironmentVariable("WEB_ROOT", web);
+            Environment.SetEnvironmentVariable("SERVER_PROFILE", profile);
+            Environment.SetEnvironmentVariable("DOCUMENT_ROOT", root);
+
+            return proc;
+        }
+
+        /// Delegate: Serve web
+        static int Serve(string profile, string server, string port, string web, string root, string config, string[] inc)
+        {
+            Process proc = null;
             try
             {
-                Environment.SetEnvironmentVariable("WEB_ROOT", web);
-                Environment.SetEnvironmentVariable("SERVER_PROFILE", profile);
-                Environment.SetEnvironmentVariable("DOCUMENT_ROOT", root);
-
+                proc = NewProcess(profile, server, port, web, root, config, inc);
                 proc.Start();
-                Console.Out.WriteLine("[xpws-{0}#{1}] running {2}:{3} @ {4} - Press <Enter> to exit", profile, pid, server, port, web);
+                Console.Out.WriteLine("[xpws-{0}#{1}] running {2}:{3} @ {4} - Press <Enter> to exit", profile, proc.Id, server, port, web);
                 Console.Read();
-                Console.Out.WriteLine("[xpws-{0}#{1}] shutting down...", profile, pid);
+                Console.Out.WriteLine("[xpws-{0}#{1}] shutting down...", profile, proc.Id);
                 proc.Kill();
                 proc.WaitForExit();
                 return proc.ExitCode;
+            }
+            catch (InvalidOperationException e)
+            {
+                Console.Error.WriteLine("*** " + e.Message);
+                return 0xFE;
             }
             catch (SystemException e)
             {
                 Console.Error.WriteLine("*** " + proc.StartInfo.FileName + ": " + e.Message);
                 return 0xFF;
+            }
+            finally
+            {
+                if (proc != null) proc.Close();
+            }
+        }
+
+        /// Delegate: Start serving web
+        static int Start(string profile, string server, string port, string web, string root, string config, string[] inc)
+        {
+            Process proc = null;
+            try
+            {
+                proc = NewProcess(profile, server, port, web, root, config, inc);
+                proc.Start();
+
+                // Write PID file and exit
+                File.WriteAllText(PidFile(), profile + '#' + proc.Id);
+                Console.Out.WriteLine("[xpws-{0}#{1}] running {2}:{3} @ {4} - Use xpws stop to end", profile, proc.Id, server, port, web);
+                return 0;
+            }
+            catch (InvalidOperationException e)
+            {
+                Console.Error.WriteLine("*** " + e.Message);
+                return 0xFE;
+            }
+            catch (SystemException e)
+            {
+                Console.Error.WriteLine("*** " + proc.StartInfo.FileName + ": " + e.Message);
+                return 0xFF;
+            }
+            finally
+            {
+                if (proc != null) proc.Close();
+            }
+        }
+
+        /// Delegate: Stop serving web
+        static int Status(string profile, string server, string port, string web, string root, string config, string[] inc)
+        {
+            var pidFile = PidFile();
+
+            if (!File.Exists(pidFile))
+            {
+                Console.WriteLine("xpws not running");
+                return 1;
+            }
+            else
+            {
+                Console.WriteLine("[xpws-{0}] running {1}", File.ReadAllText(pidFile).Trim(), pidFile);
+                return 0;
+            }
+        }
+
+        /// Delegate: Stop serving web
+        static int Stop(string profile, string server, string port, string web, string root, string config, string[] inc)
+        {
+            var pidFile = PidFile();
+
+            if (!File.Exists(pidFile))
+            {
+                Console.Error.WriteLine("*** xpws not running");
+                return 0xFF;
+            }
+
+            // Parse pid file, then delete it
+            var spec = File.ReadAllText(pidFile).Trim().Split('#');
+            var running = spec[0];
+            var pid = Convert.ToInt32(spec[1]);
+            File.Delete(pidFile);
+
+            // Close process
+            Process proc = null;
+            try
+            {
+                proc = Process.GetProcessById(pid);
+            }
+            catch (ArgumentException e)
+            {
+                Console.Error.WriteLine("*** Cannot shut down xpws: " + e.Message);
+                return 0xFF;
+            }
+
+            try
+            {
+                Console.Out.WriteLine("[xpws-{0}#{1}] shutting down...", running, pid);
+                proc.Kill();
+                proc.WaitForExit();
+                return 0;
             }
             finally
             {
@@ -114,13 +224,29 @@ namespace Net.XpFramework.Runner
                         inc.Add(Paths.Resolve(args[++i]));
                         break;
 
-                    case "-i":
-                        action = Inspect;
-                        break;
-
                     case "-?":
                         Execute("class", "xp.scriptlet.Usage", inc.ToArray(), new string[] { "xpws.txt" });
                         return;
+
+                    case "info":
+                        action = Inspect;
+                        break;
+
+                    case "serve":
+                        action = Serve;
+                        break;
+
+                    case "start":
+                        action = Start;
+                        break;
+
+                    case "status":
+                        action = Status;
+                        break;
+
+                    case "stop":
+                        action = Stop;
+                        break;
 
                     default:
                         addr = args[i].Split(':');
