@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Net.XpFramework.Runner
 {
@@ -42,7 +44,22 @@ namespace Net.XpFramework.Runner
 
                 proc.Start();
                 Console.Out.WriteLine("[xpws-{0}#{1}] running {2}:{3} @ {4} - Press <Enter> to exit", profile, pid, server, port, web);
-                Console.Read();
+
+                // Route output through this command in XP 6+. This way, we prevent 
+                // PHP garbling the output on a Windows console window.
+                if (proc.StartInfo.RedirectStandardOutput)
+                {
+                    Task.WaitAll(
+                        Task.Factory.StartNew(() => { Console.Read(); }),
+                        Task.Factory.StartNew(() => { Executor.Process(proc.StandardOutput, Console.Out); }),
+                        Task.Factory.StartNew(() => { Executor.Process(proc.StandardError, Console.Error); })
+                    );
+                }
+                else
+                {
+                    Console.Read(); 
+                }
+
                 Console.Out.WriteLine("[xpws-{0}#{1}] shutting down...", profile, pid);
                 proc.Kill();
                 proc.WaitForExit();
