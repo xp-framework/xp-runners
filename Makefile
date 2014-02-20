@@ -4,23 +4,28 @@
 # $Id$
 
 .PHONY: unix windows
+INSTTARGET?=/usr/bin/
 
 all:
 	@echo "Makefile for XP runners"
 	@echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	@echo "$(MAKE) clean        - Cleanup"
-	@echo "$(MAKE) release      - Release runners @ xp-framework.net"
-	@echo "$(MAKE) ar           - Create archives for release"
+	@echo "$(MAKE) clean          - Cleanup"
+	@echo "$(MAKE) release        - Release runners @ xp-framework.net"
+	@echo "$(MAKE) ar             - Create archives for release"
 	@echo
-	@echo "$(MAKE) unix         - Creates Un*x runners (/bin/sh)"
-	@echo "$(MAKE) bsd          - Creates BSD runners (/bin/sh)"
-	@echo "$(MAKE) cygwin       - Creates Cygwin runners (/bin/sh)"
-	@echo "$(MAKE) windows      - Creates Windows runners (C#)"
+	@echo "$(MAKE) unix           - Creates Un*x runners (/bin/sh)"
+	@echo "$(MAKE) bsd            - Creates BSD runners (/bin/sh)"
+	@echo "$(MAKE) cygwin         - Creates Cygwin runners (/bin/sh)"
+	@echo "$(MAKE) windows        - Creates Windows runners (C#)"
 	@echo
-	@echo "$(MAKE) test.unix    - Tests Un*x runners"
-	@echo "$(MAKE) test.bsd     - Tests BSD runners"
-	@echo "$(MAKE) test.cygwin  - Tests Cygwin runners (/bin/sh)"
-	@echo "$(MAKE) test.windows - Tests Windows runners"
+	@echo "$(MAKE) unix.install   - Installs Un*x runners (to /usr/bin/ or INSTTARGET)"
+	@echo "$(MAKE) bsd.install    - Installs BSD runners (to /usr/bin/ or INSTTARGET)"
+	@echo "$(MAKE) cygwin.install - Installs Cygwin runners (to /usr/bin/ or INSTTARGET)"
+	@echo
+	@echo "$(MAKE) test.unix      - Tests Un*x runners"
+	@echo "$(MAKE) test.bsd       - Tests BSD runners"
+	@echo "$(MAKE) test.cygwin    - Tests Cygwin runners (/bin/sh)"
+	@echo "$(MAKE) test.windows   - Tests Windows runners"
 
 unix: unix/src/*
 	cd unix && $(MAKE) TARGET=default
@@ -29,6 +34,14 @@ unix.ar: unix unix/default/*
 	cat unix/src/xprt-update.sh.in | sed -e 's/@TYPE@/unix/g' > unix/xprt-update.sh
 	sh ar.sh unix.ar unix/default/* unix/xprt-update.sh
 
+generic.install:
+	@echo "===> Installing XP runners to $(INSTTARGET) ..."
+	@cp -v $(from)/* $(INSTTARGET)
+	@echo "---> Done."
+
+unix.install: unix
+	$(MAKE) generic.install from=unix/default INSTTARGET=$(INSTTARGET)
+
 bsd: unix/src/*
 	cd unix && $(MAKE) TARGET=bsd
 
@@ -36,12 +49,18 @@ bsd.ar: bsd unix/bsd/*
 	cat unix/src/xprt-update.sh.in | sed -e 's/@TYPE@/bsd/g' > unix/xprt-update.sh
 	sh ar.sh bsd.ar unix/bsd/* unix/xprt-update.sh
 
+bsd.install: bsd
+	$(MAKE) generic.install from=unix/bsd INSTTARGET=$(INSTTARGET)
+
 cygwin: unix/src/*
 	cd unix && $(MAKE) TARGET=cygwin
 
 cygwin.ar: cygwin unix/cygwin/* 
 	cat unix/src/xprt-update.sh.in | sed -e 's/@TYPE@/cygwin/g' > unix/xprt-update.sh
 	sh ar.sh cygwin.ar unix/cygwin/* unix/xprt-update.sh
+
+cygwin.install: cygwin
+	$(MAKE) generic.install from=unix/cygwin INSTTARGET=$(INSTTARGET)
 
 windows: windows/src/*
 	cd windows && $(MAKE)
