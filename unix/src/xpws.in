@@ -65,8 +65,7 @@ EXEC($RUNNER, $INCLUDE_PATH, $TOOL)
 #include <instance.in>
 
 if [ $WEB_CONFIG != "?" ] && [ ! -e "$WEB_CONFIG/web.ini" ] ; then
-  echo "*** Cannot find the web configuration web.ini in $WEB_CONFIG/, exiting." >&2
-  exit 3
+  echo "No configuration file in $WEB_CONFIG, using defaults"
 fi
 
 if [ $RUNNER = class ] ; then
