@@ -143,8 +143,7 @@ namespace Net.XpFramework.Runner
             // Verify we have a web.ini
             if (!File.Exists(Paths.Compose(config, "web.ini")))
             {
-                Console.Error.WriteLine("*** Cannot find the web configuration web.ini in {0}/, exiting.", config);
-                Environment.Exit(0x03);
+                Console.WriteLine("No configuration file in {0}, using defaults", config);
             }
 
             // Run
