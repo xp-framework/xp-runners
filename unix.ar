@@ -1,15 +1,7 @@
---3174:cgen:--
+--3157:cgen:--
 #!/bin/sh
-
-
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -31,18 +23,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -50,12 +35,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -141,18 +124,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3173:doclet:--
+--3156:doclet:--
 #!/bin/sh
-
-
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -174,18 +149,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -193,12 +161,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -284,18 +250,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3175:unittest:--
+--3158:unittest:--
 #!/bin/sh
-
-
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -317,18 +275,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -336,12 +287,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -427,18 +376,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3170:xar:--
+--3153:xar:--
 #!/bin/sh
-
-
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -460,18 +401,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -479,12 +413,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -570,18 +502,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3175:xcc:--
+--3158:xcc:--
 #!/bin/sh
-
-
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -603,18 +527,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -622,12 +539,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -713,18 +628,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4303:xp:--
+--4286:xp:--
 #!/bin/sh
-
-
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -746,18 +653,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -765,12 +665,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -902,18 +800,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3174:xpcli:--
+--3157:xpcli:--
 #!/bin/sh
-
-
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -935,18 +825,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -954,12 +837,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -1045,18 +926,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3174:xpi:--
+--3157:xpi:--
 #!/bin/sh
-
-
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -1078,18 +951,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -1097,12 +963,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -1188,18 +1052,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4958:xpws:--
+--4909:xpws:--
 #!/bin/sh
-
-
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -1221,18 +1077,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -1240,12 +1089,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -1389,8 +1236,7 @@ fi
 export XP_EXE
 IFS="|"
 if [ $WEB_CONFIG != "?" ] && [ ! -e "$WEB_CONFIG/web.ini" ] ; then
-  echo "*** Cannot find the web configuration web.ini in $WEB_CONFIG/, exiting." >&2
-  exit 3
+  echo "No configuration file in $WEB_CONFIG, using defaults"
 fi
 if [ $RUNNER = class ] ; then
   ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
