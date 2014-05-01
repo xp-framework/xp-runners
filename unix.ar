@@ -1052,7 +1052,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4909:xpws:--
+--5165:xpws:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -1106,6 +1106,7 @@ locate() {
 }
 RUNNER=web
 TOOL=
+START=
 INCLUDE_PATH="."
 SERVER_PROFILE=dev
 WEB_ROOT=.
@@ -1140,6 +1141,16 @@ while [ $# != 0 ]; do
       RUNNER=class
       TOOL='xp.scriptlet.Inspect|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}'
       shift 1
+      ;;
+    -m)
+      if [ "develop" = $2 ] ; then
+        RUNNER=web
+        START='-S${ifs}${ADDR}${ifs}-t${ifs}"${DOCUMENT_ROOT}"${ifs}-duser_dir="$WEB_CONFIG"${ifs}'
+      else
+        RUNNER=class
+        TOOL='xp.scriptlet.Server|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}|'$2
+      fi
+      shift 2
       ;;
     -?)
       RUNNER=class
@@ -1235,12 +1246,12 @@ if [ "" = "$tool" ] ; then
 fi
 export XP_EXE
 IFS="|"
-if [ $WEB_CONFIG != "?" ] && [ ! -e "$WEB_CONFIG/web.ini" ] ; then
-  echo "No configuration file in $WEB_CONFIG, using defaults"
-fi
-if [ $RUNNER = class ] ; then
+if [ $WEB_CONFIG = "?" ] ; then
   ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 else
+  if [ ! -e "$WEB_CONFIG/web.ini" ] ; then
+    echo "No configuration file in $WEB_CONFIG, using defaults"
+  fi
   if [ "" = "$DOCUMENT_ROOT" ] ; then
     if [ -d "$WEB_ROOT/static" ] ; then
       DOCUMENT_ROOT="$WEB_ROOT/static"
@@ -1253,7 +1264,8 @@ else
   export WEB_ROOT
   export SERVER_PROFILE
   export DOCUMENT_ROOT
-  ${XP_EXE}${ifs}-S${ifs}${ADDR}${ifs}-t${ifs}"${DOCUMENT_ROOT}"${ifs}-duser_dir="$WEB_CONFIG"${ifs}${args}${ifs}$tool ${ARGS} "$@" &
+  eval 'START="'$START'"'
+  ${XP_EXE}${ifs}${START}${args}${ifs}$tool ${ARGS} "$@" &
   PID=$!
   echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR @ $WEB_ROOT - Press <Enter> to exit"
   read enter
