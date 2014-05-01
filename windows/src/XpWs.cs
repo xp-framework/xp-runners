@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Net.XpFramework.Runner
 {
@@ -10,10 +11,9 @@ namespace Net.XpFramework.Runner
     {
         delegate int Execution(string profile, string server, string port, string web, string root, string config, string[] inc);
 
-        /// Delegate: Serve web
-        static int Serve(string profile, string server, string port, string web, string root, string config, string[] inc)
+        static int Service(string profile, string server, string port, string web, string root, Func<Process> NewProcess)
         {
-            var pid = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var pid = Process.GetCurrentProcess().Id;
 
             // If no document root has been supplied, check for an existing "static"
             // subdirectory inside the web root; otherwise just use the web roor
@@ -28,14 +28,7 @@ namespace Net.XpFramework.Runner
             }
 
             // Execute
-            var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", inc, new string[] { });
-            proc.StartInfo.Arguments = (
-                "-S " + server + ":" + port +
-                " -t \"" + root + "\"" +
-                " -duser_dir=\"" + config + "\" " +
-                proc.StartInfo.Arguments
-            );
-
+            var proc = NewProcess();
             try
             {
                 Environment.SetEnvironmentVariable("WEB_ROOT", web);
@@ -70,6 +63,21 @@ namespace Net.XpFramework.Runner
             }
         }
 
+        /// Delegate: Serve web with development webserver
+        static int Develop(string profile, string server, string port, string web, string root, string config, string[] inc)
+        {
+            return Service(profile, server, port, web, root, () => {
+                var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", inc, new string[] { });
+                proc.StartInfo.Arguments = (
+                    "-S " + server + ":" + port +
+                    " -t \"" + root + "\"" +
+                    " -duser_dir=\"" + config + "\" " +
+                    proc.StartInfo.Arguments
+                );
+                return proc;
+            });
+        }
+
         /// Delegate: Inspect web setup
         static int Inspect(string profile, string server, string port, string web, string root, string config, string[] inc)
         {
@@ -86,7 +94,7 @@ namespace Net.XpFramework.Runner
         /// Entry point
         static void Main(string[] args)
         {
-            Execution action = Serve;
+            Execution action = Develop;
             var addr = new string[] { "localhost" };
             var inc = new List<string>(new string[] { "." });
             var web = ".";
@@ -127,6 +135,29 @@ namespace Net.XpFramework.Runner
 
                     case "-i":
                         action = Inspect;
+                        break;
+
+                    case "-m":
+                        var mode = args[++i];
+                        if ("develop" == mode)
+                        {
+                            action = Develop;
+                        }
+                        else
+                        {
+                            action = (_profile, _server, _port, _web, _root, _config, _inc) =>
+                            {
+                                return Service(_profile, _server, _port, _web, _root, () => {
+                                    return Executor.Instance(Paths.DirName(Paths.Binary()), "class", "xp.scriptlet.Server", _inc, new string[] {
+                                        _web,
+                                        _config,
+                                        _profile,
+                                        _server + ":" + _port,
+                                        mode
+                                    });
+                                });
+                            };
+                        }
                         break;
 
                     case "-?":
