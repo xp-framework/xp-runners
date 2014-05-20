@@ -79,7 +79,7 @@ namespace Net.XpFramework.Runner
         /// <summary>
         /// Creates the executor process instance
         /// </summary>
-        public static Process Instance(string base_dir, string runner, string tool, string[] includes, string[] args)
+        public static Process Instance(string base_dir, string runner, string tool, string[] includes, string[] args, string[] uses)
         {
             string home = Environment.GetEnvironmentVariable("HOME");
 
@@ -101,22 +101,63 @@ namespace Net.XpFramework.Runner
                 throw new EntryPointNotFoundException("Cannot determine use_xp setting from " + configs);
             }
         
-            // Pass "USE_XP" and includes inside include_path separated by two path 
-            // separators. Prepend "." for the oddity that if the first element does
-            // not exist, PHP scraps all the others(!)
+            // Find entry point, which is either a file called [runner]-main.php, which
+            // will receive the arguments in UTF-8, or a file called [runner].php, which
+            // assumes the arguments come in in platform encoding.
             //
-            // E.g.: -dinclude_path=".;xp\5.7.0;..\dialog;;..\impl.xar;..\log.xar"
-            //                       ^ ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^
-            //                       | |                   include_path
-            //                       | USE_XP
-            //                       Dot
-            string argv = String.Format(
-                "-C -q -dinclude_path=\".{1}{0}{1}{1}{2}\" -dmagic_quotes_gpc=0",
-                String.Join(PATH_SEPARATOR, new List<string>(use_xp).ToArray()),
-                PATH_SEPARATOR,
-                String.Join(PATH_SEPARATOR, includes)
-            );
-            
+            // Windows encodes the command line arguments to platform encoding for PHP,
+            // which doesn't define a "wmain()", so we'll need to double-encode our 
+            // $argv in a "binary-safe" way in order to transport Unicode into PHP.
+            string argv;
+            string entry;
+            bool redirect;
+            Argument argument;
+            if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + "-main.php")))
+            {
+                argument = Encode;
+                redirect = true;
+
+                // Pass "USE_XP" in "use_xp", and include_path as designated. Ensure
+                // both paths start with a dot so PHP receives them correctly. The dot
+                // already is in includes as passed from the outside, so leave it as-is.
+                var use_dirs = new List<string>(use_xp);
+                foreach (var use in uses)
+                {
+                    use_dirs.Add(use);
+                }
+                argv = String.Format(
+                    "-C -q -dencoding=utf-7 -duse_xp=\".{2}{0}\" -dinclude_path=\"{1}\"",
+                    String.Join(PATH_SEPARATOR, use_dirs.ToArray()),
+                    String.Join(PATH_SEPARATOR, includes),
+                    PATH_SEPARATOR
+                );
+            }
+            else if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + ".php")))
+            {
+                argument = Pass;
+                redirect = false;
+
+                // Pass "USE_XP" and includes inside include_path separated by two path 
+                // separators. Prepend "." for the oddity that if the first element does
+                // not exist, PHP scraps all the others(!)
+                //
+                // E.g.: -dinclude_path=".;xp\5.7.0;..\dialog;;..\impl.xar;..\log.xar"
+                //                       ^ ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^
+                //                       | |                   include_path
+                //                       | USE_XP
+                //                       Dot
+                argv = String.Format(
+                    "-C -q -dinclude_path=\".{1}{0}{1}{1}{2}\" -dmagic_quotes_gpc=0",
+                    String.Join(PATH_SEPARATOR, new List<string>(use_xp).ToArray()),
+                    PATH_SEPARATOR,
+                    String.Join(PATH_SEPARATOR, includes)
+                );
+            }
+            else
+            {
+                throw new EntryPointNotFoundException("Cannot find tool in " + String.Join(", ", new List<string>(use_xp).ToArray()));
+            }
+
             // Look for PHP configuration
             foreach (KeyValuePair<string, IEnumerable<string>> kv in configs.GetArgs(runtime))
             {
@@ -134,32 +175,6 @@ namespace Net.XpFramework.Runner
                 {
                     argv += " -dextension=" + ext;
                 }
-            }
-
-            // Find entry point, which is either a file called [runner]-main.php, which
-            // will receive the arguments in UTF-8, or a file called [runner].php, which
-            // assumes the arguments come in in platform encoding.
-            //
-            // Windows encodes the command line arguments to platform encoding for PHP,
-            // which doesn't define a "wmain()", so we'll need to double-encode our 
-            // $argv in a "binary-safe" way in order to transport Unicode into PHP.
-            string entry;
-            bool redirect;
-            Argument argument;
-            if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + "-main.php")))
-            {
-                argument = Encode;
-                redirect = true;
-                argv += " -dencoding=utf-7";
-            }
-            else if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + ".php")))
-            {
-                argument = Pass;
-                redirect = false;
-            }
-            else
-            {
-                throw new EntryPointNotFoundException("Cannot find tool in " + String.Join(", ", new List<string>(use_xp).ToArray()));
             }
 
             // Spawn runtime
@@ -202,12 +217,12 @@ namespace Net.XpFramework.Runner
         /// <summary>
         /// Creates and runs the executor instance. Returns the process' exitcode.
         /// </summary>
-        public static int Execute(string base_dir, string runner, string tool, string[] includes, string[] args)
+        public static int Execute(string base_dir, string runner, string tool, string[] includes, string[] args, string[] uses)
         {
             var encoding = Console.OutputEncoding;
             Console.OutputEncoding = Encoding.UTF8;
 
-            var proc = Instance(base_dir, runner, tool, includes, args);
+            var proc = Instance(base_dir, runner, tool, includes, args, uses);
             try
             {
                 proc.Start();

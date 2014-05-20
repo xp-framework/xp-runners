@@ -67,7 +67,7 @@ namespace Net.XpFramework.Runner
         static int Develop(string profile, string server, string port, string web, string root, string config, string[] inc)
         {
             return Service(profile, server, port, web, root, () => {
-                var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", inc, new string[] { });
+                var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", inc, new string[] { }, new string[] { "." });
                 proc.StartInfo.Arguments = (
                     "-S " + server + ":" + port +
                     " -t \"" + root + "\"" +
@@ -81,13 +81,14 @@ namespace Net.XpFramework.Runner
         /// Delegate: Inspect web setup
         static int Inspect(string profile, string server, string port, string web, string root, string config, string[] inc)
         {
-            Execute("class", "xp.scriptlet.Inspect", inc, new string[]
+            var args = new string[]
             {
                 web,
                 config,
                 profile,
                 server + ":" + port
-            });
+            };
+            Execute("class", "xp.scriptlet.Inspect", inc, args, new string[] { "." });
             return 0;
         }
 
@@ -148,20 +149,21 @@ namespace Net.XpFramework.Runner
                             action = (_profile, _server, _port, _web, _root, _config, _inc) =>
                             {
                                 return Service(_profile, _server, _port, _web, _root, () => {
-                                    return Executor.Instance(Paths.DirName(Paths.Binary()), "class", "xp.scriptlet.Server", _inc, new string[] {
+                                    var _args = new string[] {
                                         _web,
                                         _config,
                                         _profile,
                                         _server + ":" + _port,
                                         mode
-                                    });
+                                    };
+                                    return Executor.Instance(Paths.DirName(Paths.Binary()), "class", "xp.scriptlet.Server", _inc, _args, new string[] { "." });
                                 });
                             };
                         }
                         break;
 
                     case "-?":
-                        Execute("class", "xp.scriptlet.Usage", inc.ToArray(), new string[] { "xpws.txt" });
+                        Execute("class", "xp.scriptlet.Usage", inc.ToArray(), new string[] { "xpws.txt" }, new string[] { "." });
                         return;
 
                     default:

@@ -9,6 +9,7 @@ namespace Net.XpFramework.Runner
         static void Main(string[] args)
         {
             string[] argv;
+            string[] uses = new string[] { "." };
             string tool = "";
             int shift = 0;
             var includes = new List<string>();
@@ -50,6 +51,10 @@ namespace Net.XpFramework.Runner
                             shift++; 
                             break;
 
+                        case "-np": 
+                            uses = new string[] { };
+                            break;
+
                         case "-cp":
                             includes.Add(args[++i]);
                             shift += 2;
@@ -75,7 +80,7 @@ namespace Net.XpFramework.Runner
             }
 
             // Execute
-            Execute("class", tool, includes.ToArray(), argv);
+            Execute("class", tool, includes.ToArray(), argv, uses);
         }
     }
 }
