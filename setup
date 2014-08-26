@@ -4,7 +4,7 @@
  * $Id$
  */
 
-  define('BASE_URL',   'http://xp-framework.net/downloads/releases/');
+  define('BASE_URL',   'https://github.com/xp-framework/xp-runners/releases/download/v5.0.0RC1/');
 
   // {{{ println(string* args)
   function println() {
@@ -16,45 +16,69 @@
   // {{{ ardl(string proxy, string url, string targetdir)
   function ardl($proxy, $url, $targetdir, $permissions= -1) {
     static $pw= 10;
+    static $headers= "User-Agent: xp-setup/5.0.0RC1\r\nAccept: */*\r\n\r\n";
 
-    if ($proxy) {
-      println('---> ', $url, ' via ', $proxy);
-      $u= parse_url($proxy);
-      $request= sprintf(
-        "GET %s HTTP/1.0\r\nHost: %s\r\n\r\n",
-        $url.'.ar',
-        $u['host']
-      );
-    } else {
-      println('---> ', $url);
-      $u= parse_url($url);
-      $request= sprintf(
-        "GET %s HTTP/1.0\r\nHost: %s\r\n\r\n",
-        $u['path'].'.ar',
-        $u['host']
-      );
-    }
-    $fd= fsockopen($u['host'], isset($u['port']) ? $u['port'] : 80, $errno, $errstr);
-    if (!$fd) {
-      println('*** Failed (#', $errno, ': ', $errstr, ' ***');
-      return FALSE;
-    }
-
-    // Send HTTP request
-    fputs($fd, $request);
-    
-    // Read HTTP response
-    $status= fgets($fd, 1024);
-    sscanf($status, "HTTP/1.%*d %d %[^\r]", $code, $message);
-    if (200 != $code) {
-      println('*** Failed (HTTP ', $code, ': ', $message, ' ***');
-      return FALSE;
-    }
     do {
-      if (FALSE === ($header= fgets($fd, 1024))) return FALSE;
-      if ('' === ($header= rtrim($header))) break;
-    } while ($header);
-    
+      if ($proxy) {
+        println('---> ', $url, ' via ', $proxy);
+        $u= parse_url($proxy);
+        $request= sprintf(
+          "GET %s%s HTTP/1.0\r\nHost: %s\r\n%s",
+          $url,
+          isset($u['query']) ? '?'.$u['query'] : '',
+          $u['host'],
+          $headers
+        );
+      } else {
+        println('---> ', $url);
+        $u= parse_url($url);
+        $request= sprintf(
+          "GET %s%s HTTP/1.0\r\nHost: %s\r\n%s",
+          $u['path'],
+          isset($u['query']) ? '?'.$u['query'] : '',
+          $u['host'],
+          $headers
+        );
+      }
+
+      if ('https' === $u['scheme']) {
+        $fd= fsockopen('ssl://'.$u['host'], isset($u['port']) ? $u['port'] : 443, $errno, $errstr);
+      } else {
+        $fd= fsockopen($u['host'], isset($u['port']) ? $u['port'] : 80, $errno, $errstr);
+      }
+      if (!$fd) {
+        println('*** Failed (#', $errno, ': ', $errstr, ' ***');
+        return FALSE;
+      }
+
+      // Send HTTP request
+      fputs($fd, $request);
+      
+      // Read HTTP response
+      $status= fgets($fd, 1024);
+      sscanf($status, "HTTP/1.%*d %d %[^\r]", $code, $message);
+
+      if (301 === $code || 302 === $code) {
+        do {
+          if (FALSE === ($header= fgets($fd, 1024))) return FALSE;
+          if (0 === strncasecmp($header, 'Location: ', 10)) {
+            $url= rtrim(substr($header, 10));
+            continue 2;
+          }
+        } while ($header);
+        println('*** Failed (Redirect without location, HTTP ', $code, ': ', $message, ' from ', $url, ') ***');
+        return FALSE;
+      } else if (200 === $code) {
+        do {
+          if (FALSE === ($header= fgets($fd, 1024))) return FALSE;
+          if ('' === ($header= rtrim($header))) break;
+        } while ($header);
+      } else {
+        println('*** Failed (HTTP ', $code, ': ', $message, ' from ', $url, ') ***');
+        return FALSE;
+      }
+    } while (200 !== $code);
+
     while ($line= fgets($fd, 0xFF)) {
       if (2 != sscanf($line, '--%d:%[^:]--', $length, $filename)) continue;
 
@@ -202,7 +226,7 @@
   }
   
   // Download runners
-  ardl($proxy, BASE_URL.'bin/'.$runners, $bin, 0700) || exit(3);
+  ardl($proxy, BASE_URL.$runners.'.ar', $bin, 0700) || exit(3);
   
   // Check for xp.ini
   $config= $bin.DIRECTORY_SEPARATOR.'xp.ini';
