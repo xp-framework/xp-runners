@@ -30,9 +30,9 @@ all:
 unix: unix/src/*
 	cd unix && $(MAKE) TARGET=default
 
-unix.ar: unix unix/default/*
+unix.ar: unix unix/default/* shared/src/*
 	cat unix/src/xprt-update.sh.in | sed -e 's/@TYPE@/unix/g' > unix/xprt-update.sh
-	sh ar.sh unix.ar unix/default/* unix/xprt-update.sh
+	sh ar.sh unix.ar unix/default/* unix/xprt-update.sh shared/src/*
 
 generic.install:
 	@echo "===> Installing XP runners to $(INSTTARGET) ..."
@@ -45,9 +45,9 @@ unix.install: unix
 bsd: unix/src/*
 	cd unix && $(MAKE) TARGET=bsd
 
-bsd.ar: bsd unix/bsd/*
+bsd.ar: bsd unix/bsd/* shared/src/*
 	cat unix/src/xprt-update.sh.in | sed -e 's/@TYPE@/bsd/g' > unix/xprt-update.sh
-	sh ar.sh bsd.ar unix/bsd/* unix/xprt-update.sh
+	sh ar.sh bsd.ar unix/bsd/* unix/xprt-update.sh shared/src/*
 
 bsd.install: bsd
 	$(MAKE) generic.install from=unix/bsd INSTTARGET=$(INSTTARGET)
@@ -55,9 +55,9 @@ bsd.install: bsd
 cygwin: unix/src/*
 	cd unix && $(MAKE) TARGET=cygwin
 
-cygwin.ar: cygwin unix/cygwin/* 
+cygwin.ar: cygwin unix/cygwin/* shared/src/*
 	cat unix/src/xprt-update.sh.in | sed -e 's/@TYPE@/cygwin/g' > unix/xprt-update.sh
-	sh ar.sh cygwin.ar unix/cygwin/* unix/xprt-update.sh
+	sh ar.sh cygwin.ar unix/cygwin/* unix/xprt-update.sh shared/src/*
 
 cygwin.install: cygwin
 	$(MAKE) generic.install from=unix/cygwin INSTTARGET=$(INSTTARGET)
@@ -65,8 +65,8 @@ cygwin.install: cygwin
 windows: windows/src/*
 	cd windows && $(MAKE)
 
-windows.ar: windows windows/*.exe windows/src/xprt-update.bat
-	sh ar.sh windows.ar windows/*.exe windows/src/xprt-update.bat windows/src/xpwin.bat
+windows.ar: windows windows/*.exe windows/src/xprt-update.bat shared/src/*
+	sh ar.sh windows.ar windows/*.exe windows/src/xprt-update.bat windows/src/xpwin.bat shared/src/*
 
 test.windows: windows
 	cd tests && $(MAKE) testrun on=windows
