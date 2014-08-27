@@ -166,8 +166,11 @@ do {
   foreach ($paths as $path) {
     if (DIRECTORY_SEPARATOR === $path{strlen($path) - 1}) {
       $f= $path.'__xp.php';
-    } else {
+    } else if (0 === substr_compare($path, '.xar', -4)) {
       $f= 'xar://'.$path.'?__xp.php';
+    } else {
+      require $path;
+      continue;
     }
 
     if (is_file($f)) {
