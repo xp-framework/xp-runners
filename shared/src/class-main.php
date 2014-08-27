@@ -161,26 +161,27 @@ stream_wrapper_register('xar', 'xp\xar');
 $home= getenv('HOME');
 $paths= scan(['.'], $home);
 $merged= false;
-$bootstrap= null;
+$bootstrap= [];
 do {
-  foreach ($paths as $path) {
+  foreach ($paths as $i => $path) {
     if (DIRECTORY_SEPARATOR === $path{strlen($path) - 1}) {
       $f= $path.'__xp.php';
     } else if (0 === substr_compare($path, '.xar', -4)) {
       $f= 'xar://'.$path.'?__xp.php';
     } else {
-      require $path;
+      $bootstrap[]= $path;
+      unset($paths[$i]);
       continue;
     }
 
     if (is_file($f)) {
       // DEBUG echo '-> '.$f, "\n";
-      $bootstrap= $f;
+      $bootstrap[]= $f;
       break;
     }
   }
 
-  if ($merged && null === $bootstrap) {
+  if ($merged && empty($bootstrap)) {
     trigger_error('[bootstrap] Cannot determine boot class path', E_USER_ERROR);
     exit(0x3d);
   } else if (!$merged) {
@@ -188,13 +189,15 @@ do {
     list($use, $inc)= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
     $paths= array_merge(
       $paths,
-      scan(array_unique(explode(PATH_SEPARATOR, $use)), $home),
+      scan(array_unique(explode(PATH_SEPARATOR, substr($use, 2))), $home),
       array_map('xp\path', explode(PATH_SEPARATOR, $inc))
     );
     $merged= true;
   }
-} while (null === $bootstrap);
-include $bootstrap;
+} while (empty($bootstrap));
+foreach ($bootstrap as $file) {
+  include $file;
+}
 
 // Set CLI specific handling
 if ('cgi' === PHP_SAPI || 'cgi-fcgi' === PHP_SAPI) {
