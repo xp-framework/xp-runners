@@ -1,7 +1,13 @@
---3238:cgen:--
+--3253:cgen:--
 #!/bin/sh
+
+
+
+
 PATHSEP=':'
 DIRSEP='/'
+
+
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -23,11 +29,18 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
+
+
+
+
   echo $path
+
 }
+
 translate_paths() {
   base="$1"
   path="$2"
+
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -35,10 +48,12 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
+
 locate() {
   path="$1"
   file="$2"
   expect=$3
+
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -117,9 +132,9 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "." ${RUNNER}"-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+  tool=$(locate "." ${RUNNER}"-main.php" 0)
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
@@ -128,10 +143,16 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3237:doclet:--
+--3252:doclet:--
 #!/bin/sh
+
+
+
+
 PATHSEP=':'
 DIRSEP='/'
+
+
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -153,11 +174,18 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
+
+
+
+
   echo $path
+
 }
+
 translate_paths() {
   base="$1"
   path="$2"
+
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -165,10 +193,12 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
+
 locate() {
   path="$1"
   file="$2"
   expect=$3
+
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -247,9 +277,9 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "." ${RUNNER}"-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+  tool=$(locate "." ${RUNNER}"-main.php" 0)
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
@@ -258,10 +288,16 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3239:unittest:--
+--3254:unittest:--
 #!/bin/sh
+
+
+
+
 PATHSEP=':'
 DIRSEP='/'
+
+
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -283,11 +319,18 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
+
+
+
+
   echo $path
+
 }
+
 translate_paths() {
   base="$1"
   path="$2"
+
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -295,10 +338,12 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
+
 locate() {
   path="$1"
   file="$2"
   expect=$3
+
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -377,9 +422,9 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "." ${RUNNER}"-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+  tool=$(locate "." ${RUNNER}"-main.php" 0)
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
@@ -388,10 +433,16 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3234:xar:--
+--3249:xar:--
 #!/bin/sh
+
+
+
+
 PATHSEP=':'
 DIRSEP='/'
+
+
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -413,11 +464,18 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
+
+
+
+
   echo $path
+
 }
+
 translate_paths() {
   base="$1"
   path="$2"
+
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -425,10 +483,12 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
+
 locate() {
   path="$1"
   file="$2"
   expect=$3
+
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -507,9 +567,9 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "." ${RUNNER}"-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+  tool=$(locate "." ${RUNNER}"-main.php" 0)
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
@@ -518,10 +578,16 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3239:xcc:--
+--3254:xcc:--
 #!/bin/sh
+
+
+
+
 PATHSEP=':'
 DIRSEP='/'
+
+
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -543,11 +609,18 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
+
+
+
+
   echo $path
+
 }
+
 translate_paths() {
   base="$1"
   path="$2"
+
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -555,10 +628,12 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
+
 locate() {
   path="$1"
   file="$2"
   expect=$3
+
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -637,9 +712,9 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "." ${RUNNER}"-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+  tool=$(locate "." ${RUNNER}"-main.php" 0)
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
@@ -648,10 +723,16 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4367:xp:--
+--4382:xp:--
 #!/bin/sh
+
+
+
+
 PATHSEP=':'
 DIRSEP='/'
+
+
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -673,11 +754,18 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
+
+
+
+
   echo $path
+
 }
+
 translate_paths() {
   base="$1"
   path="$2"
+
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -685,10 +773,12 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
+
 locate() {
   path="$1"
   file="$2"
   expect=$3
+
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -813,9 +903,9 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "." ${RUNNER}"-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+  tool=$(locate "." ${RUNNER}"-main.php" 0)
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
@@ -824,10 +914,16 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3238:xpcli:--
+--3253:xpcli:--
 #!/bin/sh
+
+
+
+
 PATHSEP=':'
 DIRSEP='/'
+
+
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -849,11 +945,18 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
+
+
+
+
   echo $path
+
 }
+
 translate_paths() {
   base="$1"
   path="$2"
+
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -861,10 +964,12 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
+
 locate() {
   path="$1"
   file="$2"
   expect=$3
+
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -943,9 +1048,9 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "." ${RUNNER}"-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+  tool=$(locate "." ${RUNNER}"-main.php" 0)
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
@@ -954,10 +1059,16 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3238:xpi:--
+--3253:xpi:--
 #!/bin/sh
+
+
+
+
 PATHSEP=':'
 DIRSEP='/'
+
+
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -979,11 +1090,18 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
+
+
+
+
   echo $path
+
 }
+
 translate_paths() {
   base="$1"
   path="$2"
+
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -991,10 +1109,12 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
+
 locate() {
   path="$1"
   file="$2"
   expect=$3
+
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -1073,9 +1193,9 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "." ${RUNNER}"-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+  tool=$(locate "." ${RUNNER}"-main.php" 0)
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
@@ -1084,10 +1204,16 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5246:xpws:--
+--5261:xpws:--
 #!/bin/sh
+
+
+
+
 PATHSEP=':'
 DIRSEP='/'
+
+
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -1109,11 +1235,18 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
+
+
+
+
   echo $path
+
 }
+
 translate_paths() {
   base="$1"
   path="$2"
+
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -1121,10 +1254,12 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
+
 locate() {
   path="$1"
   file="$2"
   expect=$3
+
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -1272,9 +1407,9 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "." ${RUNNER}"-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+  tool=$(locate "." ${RUNNER}"-main.php" 0)
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"

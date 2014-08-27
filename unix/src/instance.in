@@ -75,11 +75,10 @@ if [ "" = "$USE_XP" ] ; then
 fi
 
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
-tool=$(locate "." ${RUNNER}"-main.php" 0)
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+  tool=$(locate "." ${RUNNER}"-main.php" 0)
 #ifdef __CYGWIN
-else
   _args=()
   IFS=" "
   for arg in "$@" ; do
