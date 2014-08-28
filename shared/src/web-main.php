@@ -9,26 +9,26 @@ final class xar {
   // {{{ proto [:var] acquire(string archive)
   //     Archive instance handling pool function, opens an archive and reads header only once
   static function acquire($archive) {
-    static $archives= [];
-    static $unpack= [
+    static $archives= array();
+    static $unpack= array(
       1 => 'a80id/a80*filename/a80*path/V1size/V1offset/a*reserved',
       2 => 'a240id/V1size/V1offset/a*reserved'
-    ];
+    );
     
     if ('/' === $archive{0} && ':' === $archive{2}) {
       $archive= substr($archive, 1);    // Handle xar:///f:/archive.xar => f:/archive.xar
     }
 
     if (!isset($archives[$archive])) {
-      $current= ['handle' => fopen($archive, 'rb'), 'dev' => crc32($archive)];
+      $current= array('handle' => fopen($archive, 'rb'), 'dev' => crc32($archive));
       $header= unpack('a3id/c1version/V1indexsize/a*reserved', fread($current['handle'], 0x0100));
       if ('CCA' != $header['id']) \raise('lang.FormatException', 'Malformed archive '.$archive);
-      for ($current['index']= [], $i= 0; $i < $header['indexsize']; $i++) {
+      for ($current['index']= array(), $i= 0; $i < $header['indexsize']; $i++) {
         $entry= unpack(
           $unpack[$header['version']], 
           fread($current['handle'], 0x0100)
         );
-        $current['index'][rtrim($entry['id'], "\0")]= [$entry['size'], $entry['offset'], $i];
+        $current['index'][rtrim($entry['id'], "\0")]= array($entry['size'], $entry['offset'], $i);
       }
       $current['offset']= 0x0100 + $i * 0x0100;
       $archives[$archive]= $current;
@@ -70,11 +70,11 @@ final class xar {
   // {{{ proto [:int] stream_stat()
   //     Retrieve status of stream
   function stream_stat() {
-    return [
+    return array(
       'dev'   => $this->archive['dev'],
       'size'  => $this->archive['index'][$this->filename][0],
       'ino'   => $this->archive['index'][$this->filename][2]
-    ];
+    );
   }
   // }}}
 
@@ -102,12 +102,12 @@ final class xar {
   function url_stat($path) {
     sscanf(strtr($path, ';', '?'), 'xar://%[^?]?%[^$]', $archive, $file);
     $current= self::acquire(urldecode($archive));
-    return isset($current['index'][$file]) ? [
+    return isset($current['index'][$file]) ? array(
       'dev'   => $current['dev'],
       'mode'  => 0100644,
       'size'  => $current['index'][$file][0],
       'ino'   => $current['index'][$file][2]
-    ] : false;
+    ) : false;
   }
   // }}}
 }
@@ -157,12 +157,11 @@ function scan($paths, $home= '.') {
 }
 
 // Bootstrap
-// Bootstrap
 stream_wrapper_register('xar', 'xp\xar');
 $home= getenv('HOME');
-$paths= scan(['.'], $home);
+$paths= scan(array('.'), $home);
 $merged= false;
-$bootstrap= [];
+$bootstrap= array();
 do {
   foreach ($paths as $i => $path) {
     if (DIRECTORY_SEPARATOR === $path{strlen($path) - 1}) {
@@ -222,6 +221,7 @@ if ('cgi' === PHP_SAPI) {
 } else {
   header('HTTP/1.0 516 Unrecoverable Error');
 }
+
 ini_set('error_prepend_string', '<xmp>');
 ini_set('error_append_string', '</xmp>');
 ini_set('html_errors', 0);
