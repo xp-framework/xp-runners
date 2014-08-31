@@ -1,13 +1,7 @@
---3253:cgen:--
+--3238:cgen:--
 #!/bin/sh
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -29,18 +23,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -48,12 +35,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -143,16 +128,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3252:doclet:--
+--3237:doclet:--
 #!/bin/sh
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -174,18 +153,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -193,12 +165,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -288,16 +258,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3254:unittest:--
+--3239:unittest:--
 #!/bin/sh
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -319,18 +283,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -338,12 +295,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -433,16 +388,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3249:xar:--
+--3234:xar:--
 #!/bin/sh
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -464,18 +413,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -483,12 +425,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -578,16 +518,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3254:xcc:--
+--3239:xcc:--
 #!/bin/sh
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -609,18 +543,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -628,12 +555,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -723,16 +648,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4382:xp:--
+--4367:xp:--
 #!/bin/sh
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -754,18 +673,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -773,12 +685,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -914,16 +824,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3253:xpcli:--
+--3238:xpcli:--
 #!/bin/sh
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -945,18 +849,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -964,12 +861,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -1059,16 +954,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3253:xpi:--
+--3238:xpi:--
 #!/bin/sh
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -1090,18 +979,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -1109,12 +991,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -1204,16 +1084,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5261:xpws:--
+--5246:xpws:--
 #!/bin/sh
-
-
-
-
 PATHSEP=':'
 DIRSEP='/'
-
-
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
@@ -1235,18 +1109,11 @@ translate_path() {
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
-
-
-
-
   echo $path
-
 }
-
 translate_paths() {
   base="$1"
   path="$2"
-
   translated=""
   IFS="$PATHSEP"
   for i in $path ; do
@@ -1254,12 +1121,10 @@ translate_paths() {
   done
   echo "${translated#$PATHSEP}"
 }
-
 locate() {
   path="$1"
   file="$2"
   expect=$3
-
   IFS="$PATHSEP"
   for i in $path ; do
     qualified="$i/$file"
@@ -1472,7 +1337,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---7547:class-main.php:--
+--7597:class-main.php:--
 <?php namespace xp;
 
 final class xar {
@@ -1484,26 +1349,26 @@ final class xar {
   // {{{ proto [:var] acquire(string archive)
   //     Archive instance handling pool function, opens an archive and reads header only once
   static function acquire($archive) {
-    static $archives= [];
-    static $unpack= [
+    static $archives= array();
+    static $unpack= array(
       1 => 'a80id/a80*filename/a80*path/V1size/V1offset/a*reserved',
       2 => 'a240id/V1size/V1offset/a*reserved'
-    ];
+    );
     
     if ('/' === $archive{0} && ':' === $archive{2}) {
       $archive= substr($archive, 1);    // Handle xar:///f:/archive.xar => f:/archive.xar
     }
 
     if (!isset($archives[$archive])) {
-      $current= ['handle' => fopen($archive, 'rb'), 'dev' => crc32($archive)];
+      $current= array('handle' => fopen($archive, 'rb'), 'dev' => crc32($archive));
       $header= unpack('a3id/c1version/V1indexsize/a*reserved', fread($current['handle'], 0x0100));
       if ('CCA' != $header['id']) \raise('lang.FormatException', 'Malformed archive '.$archive);
-      for ($current['index']= [], $i= 0; $i < $header['indexsize']; $i++) {
+      for ($current['index']= array(), $i= 0; $i < $header['indexsize']; $i++) {
         $entry= unpack(
           $unpack[$header['version']], 
           fread($current['handle'], 0x0100)
         );
-        $current['index'][rtrim($entry['id'], "\0")]= [$entry['size'], $entry['offset'], $i];
+        $current['index'][rtrim($entry['id'], "\0")]= array($entry['size'], $entry['offset'], $i);
       }
       $current['offset']= 0x0100 + $i * 0x0100;
       $archives[$archive]= $current;
@@ -1545,11 +1410,11 @@ final class xar {
   // {{{ proto [:int] stream_stat()
   //     Retrieve status of stream
   function stream_stat() {
-    return [
+    return array(
       'dev'   => $this->archive['dev'],
       'size'  => $this->archive['index'][$this->filename][0],
       'ino'   => $this->archive['index'][$this->filename][2]
-    ];
+    );
   }
   // }}}
 
@@ -1577,12 +1442,12 @@ final class xar {
   function url_stat($path) {
     sscanf(strtr($path, ';', '?'), 'xar://%[^?]?%[^$]', $archive, $file);
     $current= self::acquire(urldecode($archive));
-    return isset($current['index'][$file]) ? [
+    return isset($current['index'][$file]) ? array(
       'dev'   => $current['dev'],
       'mode'  => 0100644,
       'size'  => $current['index'][$file][0],
       'ino'   => $current['index'][$file][2]
-    ] : false;
+    ) : false;
   }
   // }}}
 }
@@ -1634,9 +1499,9 @@ function scan($paths, $home= '.') {
 // Bootstrap
 stream_wrapper_register('xar', 'xp\xar');
 $home= getenv('HOME');
-$paths= scan(['.'], $home);
+$paths= scan(array('.'), $home);
 $merged= false;
-$bootstrap= [];
+$bootstrap= array();
 do {
   foreach ($paths as $i => $path) {
     if (DIRECTORY_SEPARATOR === $path{strlen($path) - 1}) {
@@ -1717,12 +1582,12 @@ if ($encoding) {
 }
 
 try {
-  exit(\lang\XPClass::forName($argv[0])->getMethod('main')->invoke(null, [array_slice($argv, 1)]));
+  exit(\lang\XPClass::forName($argv[0])->getMethod('main')->invoke(null, array(array_slice($argv, 1))));
 } catch (\lang\SystemExit $e) {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---7196:web-main.php:--
+--7229:web-main.php:--
 <?php namespace xp;
 
 final class xar {
@@ -1734,26 +1599,26 @@ final class xar {
   // {{{ proto [:var] acquire(string archive)
   //     Archive instance handling pool function, opens an archive and reads header only once
   static function acquire($archive) {
-    static $archives= [];
-    static $unpack= [
+    static $archives= array();
+    static $unpack= array(
       1 => 'a80id/a80*filename/a80*path/V1size/V1offset/a*reserved',
       2 => 'a240id/V1size/V1offset/a*reserved'
-    ];
+    );
     
     if ('/' === $archive{0} && ':' === $archive{2}) {
       $archive= substr($archive, 1);    // Handle xar:///f:/archive.xar => f:/archive.xar
     }
 
     if (!isset($archives[$archive])) {
-      $current= ['handle' => fopen($archive, 'rb'), 'dev' => crc32($archive)];
+      $current= array('handle' => fopen($archive, 'rb'), 'dev' => crc32($archive));
       $header= unpack('a3id/c1version/V1indexsize/a*reserved', fread($current['handle'], 0x0100));
       if ('CCA' != $header['id']) \raise('lang.FormatException', 'Malformed archive '.$archive);
-      for ($current['index']= [], $i= 0; $i < $header['indexsize']; $i++) {
+      for ($current['index']= array(), $i= 0; $i < $header['indexsize']; $i++) {
         $entry= unpack(
           $unpack[$header['version']], 
           fread($current['handle'], 0x0100)
         );
-        $current['index'][rtrim($entry['id'], "\0")]= [$entry['size'], $entry['offset'], $i];
+        $current['index'][rtrim($entry['id'], "\0")]= array($entry['size'], $entry['offset'], $i);
       }
       $current['offset']= 0x0100 + $i * 0x0100;
       $archives[$archive]= $current;
@@ -1795,11 +1660,11 @@ final class xar {
   // {{{ proto [:int] stream_stat()
   //     Retrieve status of stream
   function stream_stat() {
-    return [
+    return array(
       'dev'   => $this->archive['dev'],
       'size'  => $this->archive['index'][$this->filename][0],
       'ino'   => $this->archive['index'][$this->filename][2]
-    ];
+    );
   }
   // }}}
 
@@ -1827,12 +1692,12 @@ final class xar {
   function url_stat($path) {
     sscanf(strtr($path, ';', '?'), 'xar://%[^?]?%[^$]', $archive, $file);
     $current= self::acquire(urldecode($archive));
-    return isset($current['index'][$file]) ? [
+    return isset($current['index'][$file]) ? array(
       'dev'   => $current['dev'],
       'mode'  => 0100644,
       'size'  => $current['index'][$file][0],
       'ino'   => $current['index'][$file][2]
-    ] : false;
+    ) : false;
   }
   // }}}
 }
@@ -1882,12 +1747,11 @@ function scan($paths, $home= '.') {
 }
 
 // Bootstrap
-// Bootstrap
 stream_wrapper_register('xar', 'xp\xar');
 $home= getenv('HOME');
-$paths= scan(['.'], $home);
+$paths= scan(array('.'), $home);
 $merged= false;
-$bootstrap= [];
+$bootstrap= array();
 do {
   foreach ($paths as $i => $path) {
     if (DIRECTORY_SEPARATOR === $path{strlen($path) - 1}) {
@@ -1947,6 +1811,7 @@ if ('cgi' === PHP_SAPI) {
 } else {
   header('HTTP/1.0 516 Unrecoverable Error');
 }
+
 ini_set('error_prepend_string', '<xmp>');
 ini_set('error_append_string', '</xmp>');
 ini_set('html_errors', 0);
