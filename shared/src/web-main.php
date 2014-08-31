@@ -1,8 +1,8 @@
 <?php namespace xp;
 
 // Set WEB specific handling
-$configd= ini_get('user_dir') ?: $home.'/etc';
 $home= getenv('WEB_ROOT') ?: $_SERVER['DOCUMENT_ROOT'].'/..';
+$config= ini_get('user_dir') ?: $home.'/etc';
 
 require 'xar-support.php';
 require 'scan-path.php';
@@ -31,7 +31,7 @@ ini_set('error_append_string', '</xmp>');
 ini_set('html_errors', 0);
 
 try {
-  exit(\xp\scriptlet\Runner::main(array($home, $configd, $_SERVER['SERVER_PROFILE'], $_SERVER['SCRIPT_URL'])));
+  exit(\xp\scriptlet\Runner::main(array($home, $config, $_SERVER['SERVER_PROFILE'], $_SERVER['SCRIPT_URL'])));
 } catch (\lang\SystemExit $e) {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
