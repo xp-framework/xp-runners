@@ -203,6 +203,8 @@ foreach ($bootstrap as $file) {
 $webroot= getenv('WEB_ROOT') ?: $_SERVER['DOCUMENT_ROOT'].'/..';
 $configd= ini_get('user_dir') ?: $webroot.'/etc';
 
+// Set error status to 516 by default - if a fatal error occurs,
+// this guarantees to at least send an error code.
 if ('cgi' === PHP_SAPI) {
   header('Status: 516 Unrecoverable Error');
 } else if ('cli-server' === PHP_SAPI) {
@@ -222,7 +224,6 @@ if ('cgi' === PHP_SAPI) {
 ini_set('error_prepend_string', '<xmp>');
 ini_set('error_append_string', '</xmp>');
 ini_set('html_errors', 0);
-
 
 try {
   exit(\xp\scriptlet\Runner::main(array($webroot, $configd, $_SERVER['SERVER_PROFILE'], $_SERVER['SCRIPT_URL'])));
