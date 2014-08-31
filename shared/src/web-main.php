@@ -158,8 +158,8 @@ function scan($paths, $home= '.') {
 
 // Bootstrap
 stream_wrapper_register('xar', 'xp\xar');
-$home= getenv('HOME');
-$paths= scan(array('.'), $home);
+$webroot= getenv('WEB_ROOT') ?: $_SERVER['DOCUMENT_ROOT'].'/..';
+$paths= scan(array('.'), $webroot);
 $merged= false;
 $bootstrap= array();
 do {
@@ -189,7 +189,7 @@ do {
     list($use, $inc)= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
     $paths= array_merge(
       $paths,
-      scan(array_unique(explode(PATH_SEPARATOR, substr($use, 2))), $home),
+      scan(array_unique(explode(PATH_SEPARATOR, substr($use, 2))), $webroot),
       array_map('xp\path', explode(PATH_SEPARATOR, $inc))
     );
     $merged= true;
@@ -200,7 +200,6 @@ foreach ($bootstrap as $file) {
 }
 
 // Set WEB specific handling
-$webroot= getenv('WEB_ROOT') ?: $_SERVER['DOCUMENT_ROOT'].'/..';
 $configd= ini_get('user_dir') ?: $webroot.'/etc';
 
 // Set error status to 516 by default - if a fatal error occurs,
