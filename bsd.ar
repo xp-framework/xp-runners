@@ -1337,8 +1337,11 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---7597:class-main.php:--
+--7587:class-main.php:--
 <?php namespace xp;
+
+// Set CLI specific handling
+$home= getenv('HOME');
 
 final class xar {
   public
@@ -1452,6 +1455,8 @@ final class xar {
   // }}}
 }
 
+stream_wrapper_register('xar', 'xp\xar');
+
 function path($in) {
   $qn= realpath($in);
   if (false === $qn) {
@@ -1496,9 +1501,6 @@ function scan($paths, $home= '.') {
   return $include;
 }
 
-// Bootstrap
-stream_wrapper_register('xar', 'xp\xar');
-$home= getenv('HOME');
 $paths= scan(array('.'), $home);
 $merged= false;
 $bootstrap= array();
@@ -1539,7 +1541,7 @@ foreach ($bootstrap as $file) {
   include $file;
 }
 
-// Set CLI specific handling
+
 if ('cgi' === PHP_SAPI || 'cgi-fcgi' === PHP_SAPI) {
   ini_set('html_errors', 0);
   define('STDIN', fopen('php://stdin', 'rb'));
@@ -1587,8 +1589,12 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---7330:web-main.php:--
+--7304:web-main.php:--
 <?php namespace xp;
+
+// Set WEB specific handling
+$configd= ini_get('user_dir') ?: $home.'/etc';
+$home= getenv('WEB_ROOT') ?: $_SERVER['DOCUMENT_ROOT'].'/..';
 
 final class xar {
   public
@@ -1702,6 +1708,8 @@ final class xar {
   // }}}
 }
 
+stream_wrapper_register('xar', 'xp\xar');
+
 function path($in) {
   $qn= realpath($in);
   if (false === $qn) {
@@ -1746,10 +1754,7 @@ function scan($paths, $home= '.') {
   return $include;
 }
 
-// Bootstrap
-stream_wrapper_register('xar', 'xp\xar');
-$webroot= getenv('WEB_ROOT') ?: $_SERVER['DOCUMENT_ROOT'].'/..';
-$paths= scan(array('.'), $webroot);
+$paths= scan(array('.'), $home);
 $merged= false;
 $bootstrap= array();
 do {
@@ -1779,7 +1784,7 @@ do {
     list($use, $inc)= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
     $paths= array_merge(
       $paths,
-      scan(array_unique(explode(PATH_SEPARATOR, substr($use, 2))), $webroot),
+      scan(array_unique(explode(PATH_SEPARATOR, substr($use, 2))), $home),
       array_map('xp\path', explode(PATH_SEPARATOR, $inc))
     );
     $merged= true;
@@ -1789,8 +1794,6 @@ foreach ($bootstrap as $file) {
   include $file;
 }
 
-// Set WEB specific handling
-$configd= ini_get('user_dir') ?: $webroot.'/etc';
 
 // Set error status to 516 by default - if a fatal error occurs,
 // this guarantees to at least send an error code.
@@ -1815,7 +1818,7 @@ ini_set('error_append_string', '</xmp>');
 ini_set('html_errors', 0);
 
 try {
-  exit(\xp\scriptlet\Runner::main(array($webroot, $configd, $_SERVER['SERVER_PROFILE'], $_SERVER['SCRIPT_URL'])));
+  exit(\xp\scriptlet\Runner::main(array($home, $configd, $_SERVER['SERVER_PROFILE'], $_SERVER['SCRIPT_URL'])));
 } catch (\lang\SystemExit $e) {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
