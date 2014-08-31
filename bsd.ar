@@ -1337,7 +1337,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---7587:class-main.php:--
+--7623:class-main.php:--
 <?php namespace xp;
 
 // Set CLI specific handling
@@ -1557,6 +1557,7 @@ set_exception_handler(function($e) {
   exit(0xff);
 });
 
+ini_set('display_errors', 'false');
 register_shutdown_function(function() {
   static $types= array(
     E_ERROR         => 'Fatal error',

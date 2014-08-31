@@ -22,6 +22,7 @@ set_exception_handler(function($e) {
   exit(0xff);
 });
 
+ini_set('display_errors', 'false');
 register_shutdown_function(function() {
   static $types= array(
     E_ERROR         => 'Fatal error',
