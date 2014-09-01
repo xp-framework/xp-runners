@@ -146,16 +146,16 @@ namespace Net.XpFramework.Runner
             string entry;
             bool redirect;
             Argument argument;
-            if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + "-main.php")))
+            if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + ".php")))
+            {
+                argument = Pass;
+                redirect = false;
+            } 
+            else if (null != (entry = Paths.Find(new string[] { base_dir }, runner + "-main.php")))
             {
                 argument = Encode;
                 redirect = true;
                 argv += " -dencoding=utf-7";
-            }
-            else if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + ".php")))
-            {
-                argument = Pass;
-                redirect = false;
             }
             else
             {
