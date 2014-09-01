@@ -1,7 +1,9 @@
 XP Runners ChangeLog
 ========================================================================
 
-## 5.0.0 / ????-??-??
+## ?.?.? / ????-??-??
+
+## 5.0.0 / 2014-09-01
 
 * Initial release: XP runners now bundle `[class|web]-main.php` and decouple
   it from the framework. See xp-framework/rfc#287
