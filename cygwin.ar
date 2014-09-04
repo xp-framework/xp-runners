@@ -1,4 +1,4 @@
---3338:cgen:--
+--3345:cgen:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -119,7 +119,7 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "." ${RUNNER}"-main.php" 1)
+  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
   _args=()
   IFS=" "
   for arg in "$@" ; do
@@ -131,7 +131,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3337:doclet:--
+--3344:doclet:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -252,7 +252,7 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "." ${RUNNER}"-main.php" 1)
+  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
   _args=()
   IFS=" "
   for arg in "$@" ; do
@@ -264,7 +264,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3339:unittest:--
+--3346:unittest:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -385,7 +385,7 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "." ${RUNNER}"-main.php" 1)
+  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
   _args=()
   IFS=" "
   for arg in "$@" ; do
@@ -397,7 +397,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3334:xar:--
+--3341:xar:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -518,7 +518,7 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "." ${RUNNER}"-main.php" 1)
+  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
   _args=()
   IFS=" "
   for arg in "$@" ; do
@@ -530,7 +530,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3339:xcc:--
+--3346:xcc:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -651,7 +651,7 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "." ${RUNNER}"-main.php" 1)
+  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
   _args=()
   IFS=" "
   for arg in "$@" ; do
@@ -663,7 +663,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4467:xp:--
+--4474:xp:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -830,7 +830,7 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "." ${RUNNER}"-main.php" 1)
+  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
   _args=()
   IFS=" "
   for arg in "$@" ; do
@@ -842,7 +842,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3338:xpcli:--
+--3345:xpcli:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -963,7 +963,7 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "." ${RUNNER}"-main.php" 1)
+  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
   _args=()
   IFS=" "
   for arg in "$@" ; do
@@ -975,7 +975,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3338:xpi:--
+--3345:xpi:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1096,7 +1096,7 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "." ${RUNNER}"-main.php" 1)
+  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
   _args=()
   IFS=" "
   for arg in "$@" ; do
@@ -1108,7 +1108,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5346:xpws:--
+--5353:xpws:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1298,7 +1298,7 @@ fi
 args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "." ${RUNNER}"-main.php" 1)
+  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
   _args=()
   IFS=" "
   for arg in "$@" ; do
