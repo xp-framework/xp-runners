@@ -3,6 +3,14 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.0.1 / 2014-09-09
+
+* Fix runners requiring .NET 4.5 (again)
+  (@thekid)
+* Fix Un*x runners to look for  `[class|web]-main.php` alongside runner,
+  not in current directory
+  (@thekid)
+
 ## 5.0.0 / 2014-09-01
 
 * Initial release: XP runners now bundle `[class|web]-main.php` and decouple
