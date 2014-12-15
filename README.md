@@ -28,8 +28,10 @@ We recommend creating Debian `.deb` files using the `checkinstall` utility:
   --type=debian \
   --pkgname=xp-runners \
   --pkgversion=1.0.0 \
+  --pkggroup=devel \
   --pkglicense=BSD \
   --pkgarch all -y \
+  --requires=php5-cli,realpath \
   --backup=no \
   --install=no \
   --nodoc \
