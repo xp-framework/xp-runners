@@ -3,6 +3,17 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.1.0 / 2014-12-31
+
+* Added support to bootstrap by including the path to __xp.php in a path
+  file. This will allow greater composer interoperability.
+  (@thekid)
+* Changed startup errors to exceptions. Eases testability.
+  (@thekid)
+* Added test suite for shared code, verifying bootstrapping process, XAR
+  file support and path file processing.
+  (@thekid)
+
 ## 5.0.1 / 2014-09-09
 
 * Fix runners requiring .NET 4.5 (again)
