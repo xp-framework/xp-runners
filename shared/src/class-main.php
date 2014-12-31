@@ -14,8 +14,7 @@ if ('cgi' === PHP_SAPI || 'cgi-fcgi' === PHP_SAPI) {
   define('STDOUT', fopen('php://stdout', 'wb'));
   define('STDERR', fopen('php://stderr', 'wb'));
 } else if ('cli' !== PHP_SAPI) {
-  trigger_error('[bootstrap] Cannot be run under '.PHP_SAPI.' SAPI', E_USER_ERROR);
-  exit(0x3d);
+  throw new \Exception('[bootstrap] Cannot be run under '.PHP_SAPI.' SAPI');
 }
 
 set_exception_handler(function($e) {
