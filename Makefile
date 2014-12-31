@@ -5,6 +5,7 @@
 
 .PHONY: unix windows
 INSTTARGET?=/usr/bin/
+PHP?=php
 
 all:
 	@echo "Makefile for XP runners"
@@ -22,6 +23,7 @@ all:
 	@echo "$(MAKE) bsd.install    - Installs BSD runners (to /usr/bin/ or INSTTARGET)"
 	@echo "$(MAKE) cygwin.install - Installs Cygwin runners (to /usr/bin/ or INSTTARGET)"
 	@echo
+	@echo "$(MAKE) test.shared    - Tests shared code"
 	@echo "$(MAKE) test.unix      - Tests Un*x runners"
 	@echo "$(MAKE) test.bsd       - Tests BSD runners"
 	@echo "$(MAKE) test.cygwin    - Tests Cygwin runners (/bin/sh)"
@@ -70,6 +72,9 @@ windows: windows/src/*
 
 windows.ar: windows windows/*.exe windows/src/xprt-update.bat shared/class-main.php shared/web-main.php
 	sh ar.sh windows.ar windows/*.exe windows/src/xprt-update.bat windows/src/xpwin.bat shared/class-main.php shared/web-main.php
+
+test.shared: shared
+	$(PHP) shared/test/*-test.php
 
 test.windows: windows
 	cd tests && $(MAKE) testrun on=windows

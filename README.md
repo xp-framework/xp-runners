@@ -15,6 +15,10 @@ Runners need to be compiled for the respective target platform. On Unix, BSD, Cy
 
 See `make all` output for the compilation targets.
 
+## Tests
+
+Run `make test.shared [PHP=/path/to/php/binary]` to test the shared code.
+
 ## Installation
 
 For Unix, BSD, Cygwin install targets exist that do install the final scripts into /usr/bin (or a given different directory).
