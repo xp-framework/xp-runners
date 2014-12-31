@@ -30,7 +30,17 @@ $test->run([
     rmdir($this->classpath);
   },
 
+  // File handling
   'scan empty directory' => function() {
+    $this->assertEquals(
+      [],
+      \xp\scan([$this->classpath], $this->home)
+    );
+  },
+
+  'scan directory without path files' => function() {
+    touch(path($this->classpath, 'README.md'));
+    touch(path($this->classpath, 'code.php'));
     $this->assertEquals(
       [],
       \xp\scan([$this->classpath], $this->home)

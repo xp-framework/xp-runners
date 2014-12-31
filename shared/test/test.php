@@ -76,7 +76,6 @@ class Test {
 
   public function run($tests) {
     echo '[';
-    $this->process($tests, '@before');
     $failed= $ignored= [];
     $run= 0;
 
@@ -96,6 +95,8 @@ class Test {
         continue;
       }
 
+      $this->process($tests, '@before');
+
       try {
         $closure->bindTo($this)->__invoke();
         echo '.';
@@ -106,13 +107,14 @@ class Test {
         echo 'E';
         $failed[$name]= $e;
       }
+
+      $this->process($tests, '@after');
       $run++;
     }
 
     $stop= microtime(true);
     restore_error_handler();
 
-    $this->process($tests, '@after');
     echo "]\n\n";
 
     $this->summarize($run, $stop - $start, $ignored, $failed);
