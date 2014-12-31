@@ -2,7 +2,7 @@
 
 $test= require 'test.php';
 $path= require 'path.php';
-$scan= require __DIR__.'/../src/xar-support.php';
+$xars= require __DIR__.'/../src/xar-support.php';
 
 $test->run([
   '@before' => function() use($path) {
