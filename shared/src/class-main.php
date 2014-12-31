@@ -6,6 +6,7 @@ $home= getenv('HOME');
 require 'xar-support.php';
 require 'scan-path.php';
 require 'bootstrap.php';
+require 'class-path.php';
 
 if ('cgi' === PHP_SAPI || 'cgi-fcgi' === PHP_SAPI) {
   ini_set('html_errors', 0);

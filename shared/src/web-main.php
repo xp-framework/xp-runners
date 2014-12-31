@@ -7,6 +7,7 @@ $config= ini_get('user_dir') ?: $home.'/etc';
 require 'xar-support.php';
 require 'scan-path.php';
 require 'bootstrap.php';
+require 'class-path.php';
 
 // Set error status to 516 by default - if a fatal error occurs,
 // this guarantees to at least send an error code.

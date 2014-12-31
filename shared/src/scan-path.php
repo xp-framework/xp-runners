@@ -3,8 +3,7 @@
 function path($in) {
   $qn= realpath($in);
   if (false === $qn) {
-    trigger_error('[bootstrap] Classpath element ['.$in.'] not found', E_USER_ERROR);
-    exit(0x3d);
+    throw new \Exception('[bootstrap] Classpath element ['.$in.'] not found', E_USER_ERROR);
   } else {
     return is_dir($qn) ? $qn.DIRECTORY_SEPARATOR : $qn;
   }
