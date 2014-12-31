@@ -1,21 +1,12 @@
 <?php namespace xp\test;
 
 $test= require 'test.php';
+$path= require 'path.php';
 $scan= require __DIR__.'/../src/xar-support.php';
 
-function path() {
-  return strtr(
-    implode(DIRECTORY_SEPARATOR, array_map(
-      function($in) { return strtr($in, '/', DIRECTORY_SEPARATOR); },
-      func_get_args()
-    )),
-    [DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR => DIRECTORY_SEPARATOR]
-  );
-}
-
 $test->run([
-  '@before' => function() {
-    $this->lib= path(__DIR__, '/lib');
+  '@before' => function() use($path) {
+    $this->lib= $path->compose(__DIR__, '/lib');
   },
 
   'registers xar wrapper' => function() {
@@ -25,17 +16,17 @@ $test->run([
     );
   },
 
-  'can handle v1 archives' => function() {
+  'can handle v1 archives' => function() use($path) {
     $this->assertEquals(
       ['contained.txt' => [38, 0, 0]],
-      \xp\xar::acquire(path($this->lib, 'v1.xar'))['index']
+      \xp\xar::acquire($path->compose($this->lib, 'v1.xar'))['index']
     );
   },
 
-  'can handle v2 archives' => function() {
+  'can handle v2 archives' => function() use($path) {
     $this->assertEquals(
       ['contained.txt' => [38, 0, 0]],
-      \xp\xar::acquire(path($this->lib, 'v2.xar'))['index']
+      \xp\xar::acquire($path->compose($this->lib, 'v2.xar'))['index']
     );
   }
 ]);

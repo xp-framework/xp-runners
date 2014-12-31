@@ -1,112 +1,103 @@
 <?php namespace xp\test;
 
 $test= require 'test.php';
+$path= require 'path.php';
 $xars= require __DIR__.'/../src/xar-support.php';
 $boot= require __DIR__.'/../src/bootstrap.php';
 
-function path() {
-  return strtr(
-    implode(DIRECTORY_SEPARATOR, array_map(
-      function($in) { return strtr($in, '/', DIRECTORY_SEPARATOR); },
-      func_get_args()
-    )),
-    [DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR => DIRECTORY_SEPARATOR]
-  );
-}
-
 $test->run([
-  '@before' => function() {
-    $this->cwd= path(__DIR__, '/');
-    $this->dir= path(__DIR__, 'core/src/main/php/');
-    $this->xar= path(__DIR__, 'core.xar');
+  '@before' => function() use($path) {
+    $this->cwd= $path->compose(__DIR__, '/');
+    $this->dir= $path->compose(__DIR__, 'core/src/main/php/');
+    $this->xar= $path->compose(__DIR__, 'core.xar');
     $this->lib= [
       'one' => [
-        'dir' => path(__DIR__, 'lib/src/main/php/'),
-        'xar' => path(__DIR__, 'lib/one.xar')
+        'dir' => $path->compose(__DIR__, 'lib/src/main/php/'),
+        'xar' => $path->compose(__DIR__, 'lib/one.xar')
       ]
     ];
   },
 
   // Bootstrapping from directory
-  'bootstrap from dir' => function() {
+  'bootstrap from dir' => function() use($path) {
     $this->assertEquals(
-      [[path($this->dir, '__xp.php')], [$this->dir]],
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir]],
       \xp\bootstrap([$this->dir], null)
     );
   },
 
-  'bootstrap from directory before current path' => function() {
+  'bootstrap from directory before current path' => function() use($path) {
     $this->assertEquals(
-      [[path($this->dir, '__xp.php')], [$this->dir, $this->cwd]],
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir, $this->cwd]],
       \xp\bootstrap([$this->dir, $this->cwd], null)
     );
   },
 
-  'bootstrap from directory after current path' => function() {
+  'bootstrap from directory after current path' => function() use($path) {
     $this->assertEquals(
-      [[path($this->dir, '__xp.php')], [$this->cwd, $this->dir]],
+      [[$path->compose($this->dir, '__xp.php')], [$this->cwd, $this->dir]],
       \xp\bootstrap([$this->cwd, $this->dir], null)
     );
   },
 
-  'bootstrap from directory after merging' => function() {
+  'bootstrap from directory after merging' => function() use($path) {
     $this->assertEquals(
-      [[path($this->dir, '__xp.php')], [$this->dir]],
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir]],
       \xp\bootstrap([], function() { return [$this->dir]; })
     );
   },
 
-  'bootstrap from directory after merging after current path' => function() {
+  'bootstrap from directory after merging after current path' => function() use($path) {
     $this->assertEquals(
-      [[path($this->dir, '__xp.php')], [$this->cwd, $this->dir]],
+      [[$path->compose($this->dir, '__xp.php')], [$this->cwd, $this->dir]],
       \xp\bootstrap([$this->cwd], function() { return [$this->dir]; })
     );
   },
 
-  'bootstrap from directory after merging before current path' => function() {
+  'bootstrap from directory after merging before current path' => function() use($path) {
     $this->assertEquals(
-      [[path($this->dir, '__xp.php')], [$this->dir, $this->cwd]],
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir, $this->cwd]],
       \xp\bootstrap([], function() { return [$this->dir, $this->cwd]; })
     );
   },
 
-  'bootstrap from directory before xar' => function() {
+  'bootstrap from directory before xar' => function() use($path) {
     $this->assertEquals(
-      [[path($this->dir, '__xp.php')], [$this->dir, $this->xar]],
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir, $this->xar]],
       \xp\bootstrap([$this->dir, $this->xar], null)
     );
   },
 
-  'bootstrap from directory before file' => function() {
+  'bootstrap from directory before file' => function() use($path) {
     $this->assertEquals(
-      [[path($this->dir, '__xp.php')], [$this->dir, $this->dir]],
-      \xp\bootstrap([$this->dir, path($this->dir, '__xp.php')], null)
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir, $this->dir]],
+      \xp\bootstrap([$this->dir, $path->compose($this->dir, '__xp.php')], null)
     );
   },
 
   // Bootstrapping from xar
-  'bootstrap from xar' => function() {
+  'bootstrap from xar' => function() use($path) {
     $this->assertEquals(
       [['xar://'.$this->xar.'?__xp.php'], [$this->xar]],
       \xp\bootstrap([$this->xar], null)
     );
   },
 
-  'bootstrap from xar before current path' => function() {
+  'bootstrap from xar before current path' => function() use($path) {
     $this->assertEquals(
       [['xar://'.$this->xar.'?__xp.php'], [$this->xar, $this->cwd]],
       \xp\bootstrap([$this->xar, $this->cwd], null)
     );
   },
 
-  'bootstrap from xar after current path' => function() {
+  'bootstrap from xar after current path' => function() use($path) {
     $this->assertEquals(
       [['xar://'.$this->xar.'?__xp.php'], [$this->cwd, $this->xar]],
       \xp\bootstrap([$this->cwd, $this->xar], null)
     );
   },
 
-  'bootstrap from xar before dir' => function() {
+  'bootstrap from xar before dir' => function() use($path) {
     $this->assertEquals(
       [['xar://'.$this->xar.'?__xp.php'], [$this->xar, $this->dir]],
       \xp\bootstrap([$this->xar, $this->dir], null)
@@ -114,82 +105,82 @@ $test->run([
   },
 
   // Bootstrapping from file
-  'bootstrap from file' => function() {
+  'bootstrap from file' => function() use($path) {
     $this->assertEquals(
-      [[path($this->dir, '__xp.php')], [$this->dir]],
-      \xp\bootstrap([path($this->dir, '__xp.php')], null)
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir]],
+      \xp\bootstrap([$path->compose($this->dir, '__xp.php')], null)
     );
   },
 
-  'bootstrap from file before current path' => function() {
+  'bootstrap from file before current path' => function() use($path) {
     $this->assertEquals(
-      [[path($this->dir, '__xp.php')], [$this->dir, $this->cwd]],
-      \xp\bootstrap([path($this->dir, '__xp.php'), $this->cwd], null)
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir, $this->cwd]],
+      \xp\bootstrap([$path->compose($this->dir, '__xp.php'), $this->cwd], null)
     );
   },
 
-  'bootstrap from file after current path' => function() {
+  'bootstrap from file after current path' => function() use($path) {
     $this->assertEquals(
-      [[path($this->dir, '__xp.php')], [$this->cwd, $this->dir]],
-      \xp\bootstrap([$this->cwd, path($this->dir, '__xp.php')], null)
+      [[$path->compose($this->dir, '__xp.php')], [$this->cwd, $this->dir]],
+      \xp\bootstrap([$this->cwd, $path->compose($this->dir, '__xp.php')], null)
     );
   },
 
   // Library loading
-  'library from directory' => function() {
+  'library from directory' => function() use($path) {
     $this->assertEquals(
-      [[path($this->dir, '__xp.php')], [$this->dir, $this->lib['one']['dir']]],
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir, $this->lib['one']['dir']]],
       \xp\bootstrap([$this->dir, $this->lib['one']['dir']], null)
     );
   },
 
-  'library from directory before bootstrap from merge path' => function() {
+  'library from directory before bootstrap from merge path' => function() use($path) {
     $this->assertEquals(
-      [[path($this->dir, '__xp.php')], [$this->lib['one']['dir'], $this->dir]],
+      [[$path->compose($this->dir, '__xp.php')], [$this->lib['one']['dir'], $this->dir]],
       \xp\bootstrap([$this->lib['one']['dir']], function() { return [$this->dir]; })
     );
   },
 
-  'library from xar' => function() {
+  'library from xar' => function() use($path) {
     $this->assertEquals(
-      [[path($this->dir, '__xp.php')], [$this->dir, $this->lib['one']['xar']]],
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir, $this->lib['one']['xar']]],
       \xp\bootstrap([$this->dir, $this->lib['one']['xar']], null)
     );
   },
 
-  'library from xar before bootstrap from merge path' => function() {
+  'library from xar before bootstrap from merge path' => function() use($path) {
     $this->assertEquals(
-      [[path($this->dir, '__xp.php')], [$this->lib['one']['xar'], $this->dir]],
+      [[$path->compose($this->dir, '__xp.php')], [$this->lib['one']['xar'], $this->dir]],
       \xp\bootstrap([$this->lib['one']['xar']], function() { return [$this->dir]; })
     );
   },
 
-  'library from file' => function() {
-    $autoload= path($this->lib['one']['dir'], 'autoload.php');
+  'library from file' => function() use($path) {
+    $autoload= $path->compose($this->lib['one']['dir'], 'autoload.php');
     $this->assertEquals(
-      [[path($this->dir, '__xp.php'), $autoload], [$this->dir]],
+      [[$path->compose($this->dir, '__xp.php'), $autoload], [$this->dir]],
       \xp\bootstrap([$this->dir, $autoload], null)
     );
   },
 
-  'library from file before bootstrap' => function() {
-    $autoload= path($this->lib['one']['dir'], 'autoload.php');
+  'library from file before bootstrap' => function() use($path) {
+    $autoload= $path->compose($this->lib['one']['dir'], 'autoload.php');
     $this->assertEquals(
-      [[path($this->dir, '__xp.php'), $autoload], [$this->dir]],
+      [[$path->compose($this->dir, '__xp.php'), $autoload], [$this->dir]],
       \xp\bootstrap([$autoload, $this->dir], null)
     );
   },
 
-  'library from file before bootstrap from merge path' => function() {
-    $autoload= path($this->lib['one']['dir'], 'autoload.php');
+  'library from file before bootstrap from merge path' => function() use($path) {
+    $autoload= $path->compose($this->lib['one']['dir'], 'autoload.php');
     $this->assertEquals(
-      [[path($this->dir, '__xp.php'), $autoload], [$this->dir]],
+      [[$path->compose($this->dir, '__xp.php'), $autoload], [$this->dir]],
       \xp\bootstrap([$autoload], function() { return [$this->dir]; })
     );
   },
 
   // Negative tests
-  'empty local and merge paths' => function() {
+  'empty local and merge paths' => function() use($path) {
     $this->assertException(
       'Exception',
       '/Cannot determine boot class path/',
@@ -197,7 +188,7 @@ $test->run([
     );
   },
 
-  'only library in local path' => function() {
+  'only library in local path' => function() use($path) {
     $this->assertException(
       'Exception',
       '/Cannot determine boot class path/',
@@ -205,7 +196,7 @@ $test->run([
     );
   },
 
-  'only library in merge path' => function() {
+  'only library in merge path' => function() use($path) {
     $this->assertException(
       'Exception',
       '/Cannot determine boot class path/',
