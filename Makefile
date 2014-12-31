@@ -29,7 +29,7 @@ all:
 	@echo "$(MAKE) test.cygwin    - Tests Cygwin runners (/bin/sh)"
 	@echo "$(MAKE) test.windows   - Tests Windows runners"
 
-shared/%.php: shared/src/%.php
+shared/%.php: shared/src/%.php shared/src/class-path.php shared/src/scan-path.php shared/src/bootstrap.php shared/src/xar-support.php
 	perl -pe 's^require .(.+).;^open F, "shared/src/$$1" or die("$$1: $$!"); <F> for 1..2; join "", <F>;^ge' < $< > $@
 
 unix: unix/src/*
