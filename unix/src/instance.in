@@ -79,6 +79,7 @@ tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
 #ifdef __CYGWIN
+  tool=$(cygpath -m "$tool")
   _args=()
   IFS=" "
   for arg in "$@" ; do
