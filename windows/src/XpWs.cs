@@ -120,6 +120,20 @@ namespace Net.XpFramework.Runner
 
                     case "-c":
                         config = args[++i];
+                        if ("-" == config)
+                        {
+                            // No configuration, serve static content
+                        }
+                        else if (File.Exists(Paths.Compose(config, "web.ini")))
+                        {
+                            // Web layout comes from $config/web.ini
+                            config = Paths.Resolve(config);
+                        }
+                        else
+                        {
+                            // Web layout comes from class $config
+                            config = ":" + config;
+                        }
                         break;
 
                     case "-cp":
@@ -164,19 +178,12 @@ namespace Net.XpFramework.Runner
                 i++;
             }
 
-            // Verify we have an application to run or a config to read it from
-            var dir = String.IsNullOrEmpty(config) ? "etc" : config;
-            if (File.Exists(Paths.Compose(dir, "web.ini")))
+            // If no "-c" argument given, try checking ./etc for a web.ini, fall back to
+            // "no configuration"
+            if (String.IsNullOrEmpty(config))
             {
-                config = Paths.Resolve(dir);
-            }
-            else if ("" == config || "-" == config)
-            {
-                config = "-";
-            }
-            else
-            {
-                config = ":" + config;
+                var etc = Paths.Compose(".", "etc");
+                config = File.Exists(Paths.Compose(etc, "web.ini")) ? etc : "-";
             }
 
             // If no document root has been supplied, check for an existing "static"

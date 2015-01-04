@@ -3,6 +3,14 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Added support for class names and empty args in xpws' configuration:
+  . `xpws` will check "./etc/web.ini" and pass "./etc" or "-" if not found.
+  . `xpws -c -` will always be passed as "-", indicating *no configuration*
+  . `xpws -c $arg` will check the $arg directory for a web.ini, and pass
+    $arg if found, or ":$arg", indicating a class name, otherwise.
+  See https://github.com/xp-framework/scriptlet/pull/4
+  (@thekid)
+
 ## 5.1.0 / 2014-12-31
 
 * Added support to bootstrap by including the path to __xp.php in a path

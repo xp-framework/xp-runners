@@ -6,6 +6,7 @@ START='-S${ifs}${ADDR}${ifs}-t${ifs}"${DOCUMENT_ROOT}"${ifs}-duser_dir="$WEB_CON
 INCLUDE_PATH="."
 SERVER_PROFILE=dev
 WEB_ROOT=.
+WEB_CONFIG=
 
 while [ $# != 0 ]; do
   case $1 in
@@ -22,7 +23,13 @@ while [ $# != 0 ]; do
       shift 2
       ;;
     -c)
-      WEB_CONFIG=$2
+      if [ "-" = "$2" ] ; then
+        WEB_CONFIG=-
+      elif [ -e "$2/web.ini" ] ; then
+        WEB_CONFIG="$2/web.ini"
+      else
+        WEB_CONFIG=":$2"
+      fi
       shift 2
       ;;
     -w)
@@ -67,13 +74,12 @@ while [ $# != 0 ]; do
   esac
 done
 
-dir=${WEB_CONFIG-etc}
-if [ -e "$dir/web.ini" ] ; then
-  WEB_CONFIG="$dir"
-elif [ "" = "$WEB_CONFIG" ] || [ "-" = "$WEB_CONFIG" ] ; then
-  WEB_CONFIG="-"
-else
-  WEB_CONFIG=":${WEB_CONFIG}"
+if [ "" = "$WEB_CONFIG" ] ; then
+  if [ -e ./etc/web.ini ] ; then
+    WEB_CONFIG=./etc
+  else
+    WEB_CONFIG=-
+  fi
 fi
 
 ADDR=${server-localhost}:${port-8080}
