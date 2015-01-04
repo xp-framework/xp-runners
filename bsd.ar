@@ -1084,7 +1084,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5253:xpws:--
+--5443:xpws:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -1138,11 +1138,10 @@ locate() {
 }
 RUNNER=web
 TOOL=
-START=
+START='-S${ifs}${ADDR}${ifs}-t${ifs}"${DOCUMENT_ROOT}"${ifs}-duser_dir="$WEB_CONFIG"${ifs}'
 INCLUDE_PATH="."
 SERVER_PROFILE=dev
 WEB_ROOT=.
-WEB_CONFIG=etc
 while [ $# != 0 ]; do
   case $1 in
     -p)
@@ -1171,38 +1170,45 @@ while [ $# != 0 ]; do
       ;;
     -i)
       RUNNER=class
+      START=@immediate
       TOOL='xp.scriptlet.Inspect|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}'
       shift 1
       ;;
     -m)
       if [ "develop" = $2 ] ; then
         RUNNER=web
-        START='-S${ifs}${ADDR}${ifs}-t${ifs}"${DOCUMENT_ROOT}"${ifs}-duser_dir="$WEB_CONFIG"${ifs}'
       else
         RUNNER=class
+        START=
         TOOL='xp.scriptlet.Server|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}|'$2
       fi
       shift 2
       ;;
     -?)
       RUNNER=class
+      START=@immediate
       TOOL="xp.scriptlet.Usage|xpws.txt"
-      WEB_CONFIG=?
       break
       ;;
     *:*)
       server=${1%:*}
       port=${1#*:}
       shift 1
-      break
       ;;
     *)
       server=$1
       shift 1
-      break
       ;;
   esac
 done
+dir=${WEB_CONFIG-etc}
+if [ -e "$dir/web.ini" ] ; then
+  WEB_CONFIG="$dir"
+elif [ "" = "$WEB_CONFIG" ] || [ "-" = "$WEB_CONFIG" ] ; then
+  WEB_CONFIG="-"
+else
+  WEB_CONFIG=":${WEB_CONFIG}"
+fi
 ADDR=${server-localhost}:${port-8080}
 eval 'TOOL="'$TOOL'"'
 base="$DIRNAME" RUNNER=$RUNNER INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
@@ -1282,12 +1288,9 @@ if [ ! -d /proc/1 ] ; then
 fi
 export XP_EXE
 IFS="|"
-if [ $WEB_CONFIG = "?" ] ; then
+if [ $START = "@immediate" ] ; then
   ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 else
-  if [ ! -e "$WEB_CONFIG/web.ini" ] ; then
-    echo "No configuration file in $WEB_CONFIG, using defaults"
-  fi
   if [ "" = "$DOCUMENT_ROOT" ] ; then
     if [ -d "$WEB_ROOT/static" ] ; then
       DOCUMENT_ROOT="$WEB_ROOT/static"
@@ -1296,6 +1299,9 @@ else
     fi
   else
     DOCUMENT_ROOT=${DOCUMENT_ROOT%/}
+  fi
+  if [ "-" = "$WEB_CONFIG" ] ; then
+    echo "No configuration given, serving static content from $DOCUMENT_ROOT"
   fi
   export WEB_ROOT
   export SERVER_PROFILE

@@ -11,20 +11,13 @@ namespace Net.XpFramework.Runner
     {
         delegate int Execution(string profile, string server, string port, string web, string root, string config, string[] inc);
 
-        static int Service(string profile, string server, string port, string web, string root, Func<Process> NewProcess)
+        static int Service(string profile, string server, string port, string web, string root, string config, Func<Process> NewProcess)
         {
             var pid = Process.GetCurrentProcess().Id;
 
-            // If no document root has been supplied, check for an existing "static"
-            // subdirectory inside the web root; otherwise just use the web roor
-            if (String.IsNullOrEmpty(root))
+            if ("-" == config) 
             {
-                var path = Paths.Compose(Paths.Resolve(web), "static");
-                root = Directory.Exists(path) ? path : web;
-            }
-            else
-            {
-                root = Paths.Resolve(root);
+                Console.WriteLine("No configuration given, serving static content from {0}", root);
             }
 
             // Execute
@@ -66,7 +59,7 @@ namespace Net.XpFramework.Runner
         /// Delegate: Serve web with development webserver
         static int Develop(string profile, string server, string port, string web, string root, string config, string[] inc)
         {
-            return Service(profile, server, port, web, root, () => {
+            return Service(profile, server, port, web, root, config, () => {
                 var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", inc, new string[] { });
                 proc.StartInfo.Arguments = (
                     "-S " + server + ":" + port +
@@ -99,7 +92,7 @@ namespace Net.XpFramework.Runner
             var inc = new List<string>(new string[] { "." });
             var web = ".";
             var root = "";
-            var config = "etc";
+            var config = "";
             var profile = "dev";
 
             // Parse arguments
@@ -147,7 +140,7 @@ namespace Net.XpFramework.Runner
                         {
                             action = (_profile, _server, _port, _web, _root, _config, _inc) =>
                             {
-                                return Service(_profile, _server, _port, _web, _root, () => {
+                                return Service(_profile, _server, _port, _web, _root, _config, () => {
                                     return Executor.Instance(Paths.DirName(Paths.Binary()), "class", "xp.scriptlet.Server", _inc, new string[] {
                                         _web,
                                         _config,
@@ -171,10 +164,32 @@ namespace Net.XpFramework.Runner
                 i++;
             }
 
-            // Verify we have a web.ini
-            if (!File.Exists(Paths.Compose(config, "web.ini")))
+            // Verify we have an application to run or a config to read it from
+            var dir = String.IsNullOrEmpty(config) ? "etc" : config;
+            if (File.Exists(Paths.Compose(dir, "web.ini")))
             {
-                Console.WriteLine("No configuration file in {0}, using defaults", config);
+                config = Paths.Resolve(dir);
+            }
+            else if ("" == config || "-" == config)
+            {
+                config = "-";
+            }
+            else
+            {
+                config = ":" + config;
+            }
+
+            // If no document root has been supplied, check for an existing "static"
+            // subdirectory inside the web root; otherwise just use the web root
+            web = Paths.Resolve(web);
+            if (String.IsNullOrEmpty(root))
+            {
+                var path = Paths.Compose(web, "static");
+                root = Directory.Exists(path) ? path : web;
+            }
+            else
+            {
+                root = Paths.Resolve(root);
             }
 
             // Run
@@ -182,9 +197,9 @@ namespace Net.XpFramework.Runner
                 profile,
                 addr[0],
                 addr.Length > 1 ? addr[1] : "8080",
-                Paths.Resolve(web),
+                web,
                 root,
-                Paths.Resolve(config),
+                config,
                 inc.ToArray()
             ));
         }
