@@ -2,7 +2,7 @@
 
 RUNNER=web
 TOOL=
-START=
+START='-S${ifs}${ADDR}${ifs}-t${ifs}"${DOCUMENT_ROOT}"${ifs}-duser_dir="$WEB_CONFIG"${ifs}'
 INCLUDE_PATH="."
 SERVER_PROFILE=dev
 WEB_ROOT=.
@@ -42,9 +42,9 @@ while [ $# != 0 ]; do
     -m)
       if [ "develop" = $2 ] ; then
         RUNNER=web
-        START='-S${ifs}${ADDR}${ifs}-t${ifs}"${DOCUMENT_ROOT}"${ifs}-duser_dir="$WEB_CONFIG"${ifs}'
       else
         RUNNER=class
+        START=
         TOOL='xp.scriptlet.Server|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}|'$2
       fi
       shift 2
