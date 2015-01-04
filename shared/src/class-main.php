@@ -2,6 +2,7 @@
 
 // Set CLI specific handling
 $home= getenv('HOME');
+$cwd= '.';
 
 require 'xar-support.php';
 require 'scan-path.php';

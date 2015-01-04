@@ -1313,11 +1313,12 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---7875:class-main.php:--
+--7887:class-main.php:--
 <?php namespace xp;
 
 // Set CLI specific handling
 $home= getenv('HOME');
+$cwd= '.';
 
 final class xar {
   public
@@ -1512,7 +1513,7 @@ function bootstrap($paths, $merge) {
   return array(array_merge($bootstrap, $include), array_values($paths));
 }
 
-list($bootstrap, $paths)= bootstrap(scan(array('.'), $home), function() {
+list($bootstrap, $paths)= bootstrap(scan(array($cwd), $home), function() {
   list($use, $inc)= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
   return array_merge(
     scan(array_unique(explode(PATH_SEPARATOR, substr($use, 2))), $home),
@@ -1572,12 +1573,13 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---7575:web-main.php:--
+--7589:web-main.php:--
 <?php namespace xp;
 
 // Set WEB specific handling
 $home= getenv('WEB_ROOT') ?: $_SERVER['DOCUMENT_ROOT'].'/..';
 $config= ini_get('user_dir') ?: $home.'/etc';
+$cwd= $home;
 
 final class xar {
   public
@@ -1772,7 +1774,7 @@ function bootstrap($paths, $merge) {
   return array(array_merge($bootstrap, $include), array_values($paths));
 }
 
-list($bootstrap, $paths)= bootstrap(scan(array('.'), $home), function() {
+list($bootstrap, $paths)= bootstrap(scan(array($cwd), $home), function() {
   list($use, $inc)= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
   return array_merge(
     scan(array_unique(explode(PATH_SEPARATOR, substr($use, 2))), $home),
