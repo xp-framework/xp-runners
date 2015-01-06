@@ -1,7 +1,6 @@
 <?php namespace xp\io;
 
 class Proc {
-  private static $opt= ['bypass_shell' => true];
 
   public function execute($exe, array $args, array $env= []) {
     $descriptors= [
@@ -10,7 +9,7 @@ class Proc {
       2 => STDERR
     ];
 
-    $p= proc_open($exe.' '.implode(' ', $args), $descriptors, $pipes, getcwd(), $env, self::$opt);
+    $p= proc_open($exe.' '.implode(' ', $args), $descriptors, $pipes, getcwd(), $env);
     fclose($pipes[0]);
     $out= explode("\n", trim(stream_get_contents($pipes[1])));
     fclose($pipes[1]);
