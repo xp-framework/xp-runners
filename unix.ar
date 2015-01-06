@@ -1313,7 +1313,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---7887:class-main.php:--
+--7882:class-main.php:--
 <?php namespace xp;
 
 // Set CLI specific handling
@@ -1478,39 +1478,43 @@ function scan($paths, $home= '.') {
 }
 
 function bootstrap($paths, $merge) {
-  $bootstrap= null;
-  $merged= false;
+  $bootstrap= array(null);
   $include= array();
+  $merged= false;
   do {
-    foreach ($paths as $i => $path) {
+    foreach ($paths as $path) {
       if (DIRECTORY_SEPARATOR === $path{strlen($path) - 1}) {
         $f= $path.'__xp.php';
       } else if (0 === substr_compare($path, '.xar', -4)) {
         $f= 'xar://'.$path.'?__xp.php';
       } else if (0 === substr_compare($path, '__xp.php', -8)) {
         $f= $path;
-        $paths[$i]= substr($path, 0, -8);
+        $path= substr($path, 0, -8);
       } else {
-        $include[]= $path;
-        unset($paths[$i]);
+        $bootstrap[]= $path;
         continue;
       }
 
-      if (null === $bootstrap && is_file($f)) {
-        $bootstrap= array($f);
+      if (is_file($f)) {
+        if (null === $bootstrap[0]) {
+          $bootstrap[0]= $f;
+          $include[]= $path;
+        }
+      } else {
+        $include[]= $path;
       }
     }
 
-    if (null === $bootstrap) {
-      if ($merged) {
+    if ($merged) {
+      if (null === $bootstrap[0]) {
         throw new \Exception('[bootstrap] Cannot determine boot class path');
-      } else {
-        $paths= array_merge($paths, $merge());
-        $merged= true;
       }
+      return array($bootstrap, $include);
+    } else {
+      $paths= $merge();
+      $merged= true;
     }
-  } while (null === $bootstrap);
-  return array(array_merge($bootstrap, $include), array_values($paths));
+  } while (true);
 }
 
 list($bootstrap, $paths)= bootstrap(scan(array($cwd), $home), function() {
@@ -1573,7 +1577,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---7589:web-main.php:--
+--7584:web-main.php:--
 <?php namespace xp;
 
 // Set WEB specific handling
@@ -1739,39 +1743,43 @@ function scan($paths, $home= '.') {
 }
 
 function bootstrap($paths, $merge) {
-  $bootstrap= null;
-  $merged= false;
+  $bootstrap= array(null);
   $include= array();
+  $merged= false;
   do {
-    foreach ($paths as $i => $path) {
+    foreach ($paths as $path) {
       if (DIRECTORY_SEPARATOR === $path{strlen($path) - 1}) {
         $f= $path.'__xp.php';
       } else if (0 === substr_compare($path, '.xar', -4)) {
         $f= 'xar://'.$path.'?__xp.php';
       } else if (0 === substr_compare($path, '__xp.php', -8)) {
         $f= $path;
-        $paths[$i]= substr($path, 0, -8);
+        $path= substr($path, 0, -8);
       } else {
-        $include[]= $path;
-        unset($paths[$i]);
+        $bootstrap[]= $path;
         continue;
       }
 
-      if (null === $bootstrap && is_file($f)) {
-        $bootstrap= array($f);
+      if (is_file($f)) {
+        if (null === $bootstrap[0]) {
+          $bootstrap[0]= $f;
+          $include[]= $path;
+        }
+      } else {
+        $include[]= $path;
       }
     }
 
-    if (null === $bootstrap) {
-      if ($merged) {
+    if ($merged) {
+      if (null === $bootstrap[0]) {
         throw new \Exception('[bootstrap] Cannot determine boot class path');
-      } else {
-        $paths= array_merge($paths, $merge());
-        $merged= true;
       }
+      return array($bootstrap, $include);
+    } else {
+      $paths= $merge();
+      $merged= true;
     }
-  } while (null === $bootstrap);
-  return array(array_merge($bootstrap, $include), array_values($paths));
+  } while (true);
 }
 
 list($bootstrap, $paths)= bootstrap(scan(array($cwd), $home), function() {

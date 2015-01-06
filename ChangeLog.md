@@ -3,6 +3,7 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Ensured bootstrapping is only performed once - (@thekid)
 * Added support for class names and empty args in xpws' configuration:
   . `xpws` will check "./etc/web.ini" and pass "./etc" or "-" if not found.
   . `xpws -c -` will always be passed as "-", indicating *no configuration*

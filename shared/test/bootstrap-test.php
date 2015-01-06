@@ -61,20 +61,6 @@ $test->run([
     );
   },
 
-  'bootstrap from directory before xar' => function() use($path) {
-    $this->assertEquals(
-      [[$path->compose($this->dir, '__xp.php')], [$this->dir, $this->xar]],
-      \xp\bootstrap([$this->dir, $this->xar], function() { return []; })
-    );
-  },
-
-  'bootstrap from directory before file' => function() use($path) {
-    $this->assertEquals(
-      [[$path->compose($this->dir, '__xp.php')], [$this->dir, $this->dir]],
-      \xp\bootstrap([$this->dir, $path->compose($this->dir, '__xp.php')], function() { return []; })
-    );
-  },
-
   // Bootstrapping from xar
   'bootstrap from xar' => function() use($path) {
     $this->assertEquals(
@@ -99,7 +85,7 @@ $test->run([
 
   'bootstrap from xar before dir' => function() use($path) {
     $this->assertEquals(
-      [['xar://'.$this->xar.'?__xp.php'], [$this->xar, $this->dir]],
+      [['xar://'.$this->xar.'?__xp.php'], [$this->xar]],
       \xp\bootstrap([$this->xar, $this->dir], function() { return []; })
     );
   },
@@ -123,6 +109,70 @@ $test->run([
     $this->assertEquals(
       [[$path->compose($this->dir, '__xp.php')], [$this->cwd, $this->dir]],
       \xp\bootstrap([$this->cwd, $path->compose($this->dir, '__xp.php')], function() { return []; })
+    );
+  },
+
+  // Assert bootstrapping is not done more than once
+  'both bootstrap directory and bootstrap xar in local path' => function() use($path) {
+    $this->assertEquals(
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir]],
+      \xp\bootstrap([$this->dir, $this->xar], function() { return []; })
+    );
+  },
+
+  'both bootstrap directory and bootstrap file in local path' => function() use($path) {
+    $this->assertEquals(
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir]],
+      \xp\bootstrap([$this->dir, $path->compose($this->dir, '__xp.php')], function() { return []; })
+    );
+  },
+
+  'both bootstrap directory and bootstrap xar in global path' => function() use($path) {
+    $this->assertEquals(
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir]],
+      \xp\bootstrap([], function() { return [$this->dir, $this->xar]; })
+    );
+  },
+
+  'both bootstrap directory and bootstrap file in global path' => function() use($path) {
+    $this->assertEquals(
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir]],
+      \xp\bootstrap([], function() use($path) { return [$this->dir, $path->compose($this->dir, '__xp.php')]; })
+    );
+  },
+
+  'bootstrap directory in local and in global path' => function() use($path) {
+    $this->assertEquals(
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir]],
+      \xp\bootstrap([$this->dir], function() { return [$this->dir]; })
+    );
+  },
+
+  'bootstrap directory in local and xar in global path' => function() use($path) {
+    $this->assertEquals(
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir]],
+      \xp\bootstrap([$this->dir], function() { return [$this->xar]; })
+    );
+  },
+
+  'bootstrap directory in local and file in global path' => function() use($path) {
+    $this->assertEquals(
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir]],
+      \xp\bootstrap([$this->dir], function() use($path) { return [$path->compose($this->dir, '__xp.php')]; })
+    );
+  },
+
+  'bootstrap directory twice in local path' => function() use($path) {
+    $this->assertEquals(
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir]],
+      \xp\bootstrap([$this->dir, $this->dir], function() { return []; })
+    );
+  },
+
+  'bootstrap directory twice in global path' => function() use($path) {
+    $this->assertEquals(
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir]],
+      \xp\bootstrap([], function() { return [$this->dir, $this->dir]; })
     );
   },
 
