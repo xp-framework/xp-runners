@@ -24,13 +24,13 @@ function bootstrap($paths, $merge) {
       }
     }
 
-    if (null === $bootstrap) {
-      if ($merged) {
+    if ($merged) {
+      if (null === $bootstrap) {
         throw new \Exception('[bootstrap] Cannot determine boot class path');
-      } else {
-        $paths= array_merge($paths, $merge());
-        $merged= true;
       }
+    } else {
+      $paths= array_merge($paths, $merge());
+      $merged= true;
     }
   } while (null === $bootstrap);
   return array(array_merge($bootstrap, $include), array_values($paths));

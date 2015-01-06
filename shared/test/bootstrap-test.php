@@ -179,6 +179,20 @@ $test->run([
     );
   },
 
+  'library loading via dir in global include path' => function() use($path) {
+    $this->assertEquals(
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir, $this->lib['one']['dir']]],
+      \xp\bootstrap([$this->dir], function() { return [$this->lib['one']['dir']]; })
+    );
+  },
+
+  'library loading via xar in global include path' => function() use($path) {
+    $this->assertEquals(
+      [[$path->compose($this->dir, '__xp.php')], [$this->dir, $this->lib['one']['xar']]],
+      \xp\bootstrap([$this->dir], function() { return [$this->lib['one']['xar']]; })
+    );
+  },
+
   // Negative tests
   'empty local and merge paths' => function() use($path) {
     $this->assertException(
