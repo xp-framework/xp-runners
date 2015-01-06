@@ -22,21 +22,21 @@ $test->run([
   'bootstrap from dir' => function() use($path) {
     $this->assertEquals(
       [[$path->compose($this->dir, '__xp.php')], [$this->dir]],
-      \xp\bootstrap([$this->dir], null)
+      \xp\bootstrap([$this->dir], function() { return []; })
     );
   },
 
   'bootstrap from directory before current path' => function() use($path) {
     $this->assertEquals(
       [[$path->compose($this->dir, '__xp.php')], [$this->dir, $this->cwd]],
-      \xp\bootstrap([$this->dir, $this->cwd], null)
+      \xp\bootstrap([$this->dir, $this->cwd], function() { return []; })
     );
   },
 
   'bootstrap from directory after current path' => function() use($path) {
     $this->assertEquals(
       [[$path->compose($this->dir, '__xp.php')], [$this->cwd, $this->dir]],
-      \xp\bootstrap([$this->cwd, $this->dir], null)
+      \xp\bootstrap([$this->cwd, $this->dir], function() { return []; })
     );
   },
 
@@ -64,14 +64,14 @@ $test->run([
   'bootstrap from directory before xar' => function() use($path) {
     $this->assertEquals(
       [[$path->compose($this->dir, '__xp.php')], [$this->dir, $this->xar]],
-      \xp\bootstrap([$this->dir, $this->xar], null)
+      \xp\bootstrap([$this->dir, $this->xar], function() { return []; })
     );
   },
 
   'bootstrap from directory before file' => function() use($path) {
     $this->assertEquals(
       [[$path->compose($this->dir, '__xp.php')], [$this->dir, $this->dir]],
-      \xp\bootstrap([$this->dir, $path->compose($this->dir, '__xp.php')], null)
+      \xp\bootstrap([$this->dir, $path->compose($this->dir, '__xp.php')], function() { return []; })
     );
   },
 
@@ -79,28 +79,28 @@ $test->run([
   'bootstrap from xar' => function() use($path) {
     $this->assertEquals(
       [['xar://'.$this->xar.'?__xp.php'], [$this->xar]],
-      \xp\bootstrap([$this->xar], null)
+      \xp\bootstrap([$this->xar], function() { return []; })
     );
   },
 
   'bootstrap from xar before current path' => function() use($path) {
     $this->assertEquals(
       [['xar://'.$this->xar.'?__xp.php'], [$this->xar, $this->cwd]],
-      \xp\bootstrap([$this->xar, $this->cwd], null)
+      \xp\bootstrap([$this->xar, $this->cwd], function() { return []; })
     );
   },
 
   'bootstrap from xar after current path' => function() use($path) {
     $this->assertEquals(
       [['xar://'.$this->xar.'?__xp.php'], [$this->cwd, $this->xar]],
-      \xp\bootstrap([$this->cwd, $this->xar], null)
+      \xp\bootstrap([$this->cwd, $this->xar], function() { return []; })
     );
   },
 
   'bootstrap from xar before dir' => function() use($path) {
     $this->assertEquals(
       [['xar://'.$this->xar.'?__xp.php'], [$this->xar, $this->dir]],
-      \xp\bootstrap([$this->xar, $this->dir], null)
+      \xp\bootstrap([$this->xar, $this->dir], function() { return []; })
     );
   },
 
@@ -108,21 +108,21 @@ $test->run([
   'bootstrap from file' => function() use($path) {
     $this->assertEquals(
       [[$path->compose($this->dir, '__xp.php')], [$this->dir]],
-      \xp\bootstrap([$path->compose($this->dir, '__xp.php')], null)
+      \xp\bootstrap([$path->compose($this->dir, '__xp.php')], function() { return []; })
     );
   },
 
   'bootstrap from file before current path' => function() use($path) {
     $this->assertEquals(
       [[$path->compose($this->dir, '__xp.php')], [$this->dir, $this->cwd]],
-      \xp\bootstrap([$path->compose($this->dir, '__xp.php'), $this->cwd], null)
+      \xp\bootstrap([$path->compose($this->dir, '__xp.php'), $this->cwd], function() { return []; })
     );
   },
 
   'bootstrap from file after current path' => function() use($path) {
     $this->assertEquals(
       [[$path->compose($this->dir, '__xp.php')], [$this->cwd, $this->dir]],
-      \xp\bootstrap([$this->cwd, $path->compose($this->dir, '__xp.php')], null)
+      \xp\bootstrap([$this->cwd, $path->compose($this->dir, '__xp.php')], function() { return []; })
     );
   },
 
@@ -130,7 +130,7 @@ $test->run([
   'library from directory' => function() use($path) {
     $this->assertEquals(
       [[$path->compose($this->dir, '__xp.php')], [$this->dir, $this->lib['one']['dir']]],
-      \xp\bootstrap([$this->dir, $this->lib['one']['dir']], null)
+      \xp\bootstrap([$this->dir, $this->lib['one']['dir']], function() { return []; })
     );
   },
 
@@ -144,7 +144,7 @@ $test->run([
   'library from xar' => function() use($path) {
     $this->assertEquals(
       [[$path->compose($this->dir, '__xp.php')], [$this->dir, $this->lib['one']['xar']]],
-      \xp\bootstrap([$this->dir, $this->lib['one']['xar']], null)
+      \xp\bootstrap([$this->dir, $this->lib['one']['xar']], function() { return []; })
     );
   },
 
@@ -159,7 +159,7 @@ $test->run([
     $autoload= $path->compose($this->lib['one']['dir'], 'autoload.php');
     $this->assertEquals(
       [[$path->compose($this->dir, '__xp.php'), $autoload], [$this->dir]],
-      \xp\bootstrap([$this->dir, $autoload], null)
+      \xp\bootstrap([$this->dir, $autoload], function() { return []; })
     );
   },
 
@@ -167,7 +167,7 @@ $test->run([
     $autoload= $path->compose($this->lib['one']['dir'], 'autoload.php');
     $this->assertEquals(
       [[$path->compose($this->dir, '__xp.php'), $autoload], [$this->dir]],
-      \xp\bootstrap([$autoload, $this->dir], null)
+      \xp\bootstrap([$autoload, $this->dir], function() { return []; })
     );
   },
 
