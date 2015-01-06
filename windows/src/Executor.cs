@@ -111,7 +111,7 @@ namespace Net.XpFramework.Runner
             //                       | USE_XP
             //                       Dot
             string argv = String.Format(
-                "-C -q -dinclude_path=\".{1}{0}{1}{1}{2}\" -dmagic_quotes_gpc=0",
+                "-C -q -d include_path=\".{1}{0}{1}{1}{2}\" -d magic_quotes_gpc=0",
                 String.Join(PATH_SEPARATOR, new List<string>(use_xp).ToArray()),
                 PATH_SEPARATOR,
                 String.Join(PATH_SEPARATOR, includes)
@@ -122,7 +122,7 @@ namespace Net.XpFramework.Runner
             {
                 foreach (string value in kv.Value)
                 {
-                    argv += " -d" + kv.Key + "=\"" + value + "\"";
+                    argv += " -d " + kv.Key + "=\"" + value + "\"";
                 }
             }
 
@@ -132,7 +132,7 @@ namespace Net.XpFramework.Runner
             {
                 foreach (var ext in extensions)
                 {
-                    argv += " -dextension=" + ext;
+                    argv += " -d extension=" + ext;
                 }
             }
 
@@ -155,7 +155,7 @@ namespace Net.XpFramework.Runner
             {
                 argument = Encode;
                 redirect = true;
-                argv += " -dencoding=utf-7";
+                argv += " -d encoding=utf-7";
             }
             else
             {

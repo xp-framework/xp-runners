@@ -31,7 +31,7 @@ for i in "." "$HOME/.xp" "$base" ; do
         ;;
 
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
         ;;
 
         runtime.*=*)
@@ -63,7 +63,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
@@ -74,7 +74,7 @@ if [ "" = "$USE_XP" ] ; then
   exit 255
 fi
 
-args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
@@ -86,7 +86,7 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-dencoding=utf-7"
+  args="$args${ifs}-d${ifs}encoding=utf-7"
 #endif
 fi
 #ifdef __BSD

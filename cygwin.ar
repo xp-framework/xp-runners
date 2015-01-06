@@ -1,4 +1,4 @@
---3374:cgen:--
+--3404:cgen:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -79,7 +79,7 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
         ;;
         runtime.*=*)
           key=${line%=*}
@@ -107,7 +107,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
@@ -116,7 +116,7 @@ if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
-args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
@@ -127,12 +127,12 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-dencoding=utf-7"
+  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3373:doclet:--
+--3403:doclet:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -213,7 +213,7 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
         ;;
         runtime.*=*)
           key=${line%=*}
@@ -241,7 +241,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
@@ -250,7 +250,7 @@ if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
-args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
@@ -261,12 +261,12 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-dencoding=utf-7"
+  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3375:unittest:--
+--3405:unittest:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -347,7 +347,7 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
         ;;
         runtime.*=*)
           key=${line%=*}
@@ -375,7 +375,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
@@ -384,7 +384,7 @@ if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
-args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
@@ -395,12 +395,12 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-dencoding=utf-7"
+  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3370:xar:--
+--3400:xar:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -481,7 +481,7 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
         ;;
         runtime.*=*)
           key=${line%=*}
@@ -509,7 +509,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
@@ -518,7 +518,7 @@ if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
-args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
@@ -529,12 +529,12 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-dencoding=utf-7"
+  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3375:xcc:--
+--3405:xcc:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -615,7 +615,7 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
         ;;
         runtime.*=*)
           key=${line%=*}
@@ -643,7 +643,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
@@ -652,7 +652,7 @@ if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
-args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
@@ -663,12 +663,12 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-dencoding=utf-7"
+  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4503:xp:--
+--4533:xp:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -795,7 +795,7 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
         ;;
         runtime.*=*)
           key=${line%=*}
@@ -823,7 +823,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
@@ -832,7 +832,7 @@ if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
-args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
@@ -843,12 +843,12 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-dencoding=utf-7"
+  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3374:xpcli:--
+--3404:xpcli:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -929,7 +929,7 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
         ;;
         runtime.*=*)
           key=${line%=*}
@@ -957,7 +957,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
@@ -966,7 +966,7 @@ if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
-args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
@@ -977,12 +977,12 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-dencoding=utf-7"
+  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3374:xpi:--
+--3404:xpi:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1063,7 +1063,7 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
         ;;
         runtime.*=*)
           key=${line%=*}
@@ -1091,7 +1091,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
@@ -1100,7 +1100,7 @@ if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
-args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
@@ -1111,12 +1111,12 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-dencoding=utf-7"
+  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5659:xpws:--
+--5689:xpws:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1278,7 +1278,7 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-dextension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
         ;;
         runtime.*=*)
           key=${line%=*}
@@ -1306,7 +1306,7 @@ for k in $dkeys ; do
     if [ default = $k ] ; then
       XP_EXE=${XP_EXE-$v}
     else
-      RT_ARG="$RT_ARG${ifs}-d$(echo $k | sed 's/__/./g')=\"$v\""
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
     fi
   fi
 done
@@ -1315,7 +1315,7 @@ if [ "" = "$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
 fi
-args="-C${ifs}-q${ifs}-dinclude_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-dmagic_quotes_gpc=0$RT_ARG"
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
@@ -1326,7 +1326,7 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-dencoding=utf-7"
+  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
