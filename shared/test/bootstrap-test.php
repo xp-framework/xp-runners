@@ -5,7 +5,7 @@ $path= require 'path.php';
 $xars= require __DIR__.'/../src/xar-support.php';
 $boot= require __DIR__.'/../src/bootstrap.php';
 
-$test->run([
+exit($test->run([
   '@before' => function() use($path) {
     $this->cwd= $path->compose(__DIR__, '/');
     $this->dir= $path->compose(__DIR__, 'core/src/main/php/');
@@ -267,4 +267,4 @@ $test->run([
       function() { \xp\bootstrap([], function() { return [$this->lib['one']['dir']]; }); }
     );
   },
-]);
+]));

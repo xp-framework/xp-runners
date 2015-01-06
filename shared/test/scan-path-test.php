@@ -4,7 +4,7 @@ $test= require 'test.php';
 $path= require 'path.php';
 $scan= require __DIR__.'/../src/scan-path.php';
 
-$test->run([
+exit($test->run([
   '@before' => function() use($path) {
     $this->classpath= $path->compose(__DIR__, '/scan-path-test-tmp/');
     mkdir($this->classpath);
@@ -172,4 +172,4 @@ $test->run([
       function() { \xp\scan([$this->classpath], $this->home); }
     );
   },
-]);
+]));

@@ -4,7 +4,7 @@ $test= require 'test.php';
 $path= require 'path.php';
 $xars= require __DIR__.'/../src/xar-support.php';
 
-$test->run([
+exit($test->run([
   '@before' => function() use($path) {
     $this->lib= $path->compose(__DIR__, '/lib');
   },
@@ -45,4 +45,4 @@ $test->run([
       file_get_contents('xar://'.$path->compose($this->lib, 'v2.xar').'?contained.txt')
     );
   },
-]);
+]));

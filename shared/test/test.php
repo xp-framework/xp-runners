@@ -118,6 +118,7 @@ class Test {
     echo "]\n\n";
 
     $this->summarize($run, $stop - $start, $ignored, $failed);
+    return $failed ? 255 : 0;
   }
 }
 
