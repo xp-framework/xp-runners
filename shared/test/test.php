@@ -16,7 +16,7 @@ class Test {
     }
   }
 
-  private function summarize($run, $elapsed, $iignored, $failed) {
+  private function summarize($run, $elapsed, $ignored, $failed) {
     if ($ignored) {
       foreach ($ignored as $name => $reason) {
         printf("- %s: Ignored, %s\n", $name, $reason);
