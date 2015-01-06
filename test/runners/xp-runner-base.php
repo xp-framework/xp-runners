@@ -11,6 +11,7 @@ return [
     } else {
       $ar->extract($path->compose(__DIR__, '../../unix.ar'), 'xp', $this->tmp);
       $this->exe= $path->compose($this->tmp, 'xp');
+      chmod($this->exe, 0700);
     }
 
     $this->boot= $path->compose($this->tmp, 'boot.pth');
