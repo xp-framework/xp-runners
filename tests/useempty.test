@@ -1,5 +1,0 @@
-ENV.USE_XP=
-ENV.HOME=.
-CMD=xp -v
-ERR.EXPECT=Cannot determine use_xp setting
-EXIT.EXPECT=255

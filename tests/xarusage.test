@@ -1,2 +1,0 @@
-CMD=xar
-ERR.EXPECT=Usage

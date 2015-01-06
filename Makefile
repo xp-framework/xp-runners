@@ -3,7 +3,7 @@
 #
 # $Id$
 
-.PHONY: unix windows
+.PHONY: unix windows test
 INSTTARGET?=/usr/bin/
 PHP?=php
 
@@ -23,11 +23,7 @@ all:
 	@echo "$(MAKE) bsd.install    - Installs BSD runners (to /usr/bin/ or INSTTARGET)"
 	@echo "$(MAKE) cygwin.install - Installs Cygwin runners (to /usr/bin/ or INSTTARGET)"
 	@echo
-	@echo "$(MAKE) test.shared    - Tests shared code"
-	@echo "$(MAKE) test.unix      - Tests Un*x runners"
-	@echo "$(MAKE) test.bsd       - Tests BSD runners"
-	@echo "$(MAKE) test.cygwin    - Tests Cygwin runners (/bin/sh)"
-	@echo "$(MAKE) test.windows   - Tests Windows runners"
+	@echo "$(MAKE) test           - Run tests"
 
 shared/%.php: shared/src/%.php shared/src/class-path.php shared/src/scan-path.php shared/src/bootstrap.php shared/src/xar-support.php
 	perl -pe 's^require .(.+).;^open F, "shared/src/$$1" or die("$$1: $$!"); <F> for 1..2; join "", <F>;^ge' < $< > $@
@@ -73,20 +69,8 @@ windows: windows/src/*
 windows.ar: windows windows/*.exe windows/src/xprt-update.bat shared/class-main.php shared/web-main.php
 	sh ar.sh windows.ar windows/*.exe windows/src/xprt-update.bat windows/src/xpwin.bat shared/class-main.php shared/web-main.php
 
-test.shared: shared
-	@(e=0 ; for i in `ls -1 shared/test/*-test.php` ; do echo -n "$$i: " ; $(PHP) $$i ; r=$$? ; if [ $$r -ne 0 ] ; then e=$$r ; fi ; echo ; done ; exit $$e)
-
-test.windows: windows
-	cd tests && $(MAKE) testrun on=windows
-
-test.unix: unix
-	cd tests && $(MAKE) testrun on=unix/default
-
-test.bsd: bsd
-	cd tests && $(MAKE) testrun on=unix/bsd
-
-test.cygwin: cygwin
-	cd tests && $(MAKE) testrun on=unix/cygwin
+test: shared
+	@(e=0 ; for i in `find test -name '*-test.php'` ; do echo -n "$$i: " ; $(PHP) -dinclude_path=test $$i ; r=$$? ; if [ $$r -ne 0 ] ; then e=$$r ; fi ; echo ; done ; exit $$e)
 
 ar: windows.ar unix.ar bsd.ar cygwin.ar
 	

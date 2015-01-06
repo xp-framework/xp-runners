@@ -1,5 +1,0 @@
-INI=withnonexistantruntime
-ENV.USE_XP=
-CMD=xp -v
-ERR.EXPECT=/non/existant/php-exe
-!!! This should yield a nice and unified message

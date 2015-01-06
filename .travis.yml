@@ -11,4 +11,4 @@ matrix:
     - php: hhvm
 
 script:
-  make test.shared
+  make test

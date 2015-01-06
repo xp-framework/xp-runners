@@ -1,4 +1,0 @@
-INI=unknownsection
-ENV.USE_XP=
-CMD=xp -e 'var_dump(TRUE);'
-OUT.EXPECT=bool\\(true\\)

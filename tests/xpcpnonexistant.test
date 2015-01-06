@@ -1,3 +1,0 @@
-CMD=xp -cp does-no-exist
-OUT.EXPECT=Fatal error: \\[bootstrap\\] Classpath element \\[does-no-exist\\] not found
-!!! This should be on stderr

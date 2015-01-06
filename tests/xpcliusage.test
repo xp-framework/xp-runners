@@ -1,3 +1,0 @@
-CMD=xpcli
-ERR.EXPECT=Runs util.cmd.Command subclasses on the command line
-ERR.EXPECT=Usage

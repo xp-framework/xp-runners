@@ -1,2 +1,0 @@
-CMD=xp -cp lib/hello-class.xar Hello Class
-OUT.EXPECT=Hello Class

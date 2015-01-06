@@ -1,3 +1,0 @@
-CMD=doclet
-ERR.EXPECT=Command line doclet runner
-ERR.EXPECT=Usage:

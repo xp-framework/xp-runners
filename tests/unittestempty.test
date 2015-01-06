@@ -1,2 +1,0 @@
-CMD=unittest -cp src EmptyTest
-OUT.EXPECT=No tests found in EmptyTest

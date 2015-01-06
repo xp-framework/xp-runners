@@ -1,2 +1,0 @@
-CMD=xpcli -cp src HelloCommand World
-OUT.EXPECT=Hello World

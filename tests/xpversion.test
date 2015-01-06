@@ -1,3 +1,0 @@
-CMD=xp -v
-OUT.EXPECT=XP [0-9.]+ { PHP [0-9devRCalphabeta.-]+ & ZE [0-9.]+ } @ .+
-OUT.EXPECT=Copyright .+ the XP group

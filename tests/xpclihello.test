@@ -1,2 +1,0 @@
-CMD=xpcli HelloCommand World
-ERR.EXPECT=No classloader provides class "HelloCommand"

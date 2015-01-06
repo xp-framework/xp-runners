@@ -1,4 +1,0 @@
-CMD=xp
-ERR.EXPECT=XP runtime
-ERR.EXPECT=Usage
-EXIT.EXPECT=255

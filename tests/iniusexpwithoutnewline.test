@@ -1,4 +1,0 @@
-INI=usewithoutnewline
-ENV.USE_XP=
-CMD=xp -v
-OUT.EXPECT=FileSystemClassLoader.+tests.[0-9\\.]+
