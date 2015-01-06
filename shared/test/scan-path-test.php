@@ -12,13 +12,9 @@ exit($test->run([
   },
 
   '@after' => function() use($path) {
-    $d= opendir($this->classpath);
-    while ($entry= readdir($d)) {
-      $f= $path->compose($this->classpath, $entry);
-      is_file($f) && unlink($f);
+    if (is_dir($this->classpath)) {
+      $path->remove($this->classpath);
     }
-    closedir($d);
-    rmdir($this->classpath);
   },
 
   // File handling
