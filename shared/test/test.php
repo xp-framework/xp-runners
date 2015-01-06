@@ -85,7 +85,7 @@ class Test {
   }
 }
 
-class Run extends Test {
+class Run {
   private $definition, $closure;
 
   public function __construct($definition, $closure) {
@@ -96,7 +96,7 @@ class Run extends Test {
   public function process($key, $args= []) {
     $key= '@'.$key;
     if (isset($this->definition[$key])) {
-      call_user_func_array($this->definition[$key]->bindTo($this), $args);
+      return call_user_func_array($this->definition[$key]->bindTo($this), $args);
     }
   }
 
@@ -105,7 +105,7 @@ class Run extends Test {
   }
 
   public function __call($name, $args) {
-    $this->process($name, $args);
+    return $this->process($name, $args);
   }
 
   private final function equals($a, $b) {
