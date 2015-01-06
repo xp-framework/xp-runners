@@ -19,7 +19,7 @@ return [
     }
 
     $this->boot= $path->compose($this->tmp, 'boot.pth');
-    var_dump($_ENV);
+    var_dump($_SERVER);
     $this->env= array_merge($_ENV, ['USE_XP' => $this->tmp, 'PATH' => $_ENV['PATH'].PATH_SEPARATOR.dirname(PHP_BINARY)]);
     $this->prepare();
   },
