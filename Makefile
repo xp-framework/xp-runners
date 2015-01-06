@@ -70,7 +70,7 @@ windows.ar: windows windows/*.exe windows/src/xprt-update.bat shared/class-main.
 	sh ar.sh windows.ar windows/*.exe windows/src/xprt-update.bat windows/src/xpwin.bat shared/class-main.php shared/web-main.php
 
 test: shared
-	@(e=0 ; for i in `find test -name '*-test.php'` ; do echo -n "$$i: " ; $(PHP) -dinclude_path=test $$i ; r=$$? ; if [ $$r -ne 0 ] ; then e=$$r ; fi ; echo ; done ; exit $$e)
+	@(e=0 ; cd test ; for i in `find . -name '*-test.php'` ; do echo -n "$$i: " ; $(PHP) $$i ; r=$$? ; if [ $$r -ne 0 ] ; then e=$$r ; fi ; echo ; done ; exit $$e)
 
 ar: windows.ar unix.ar bsd.ar cygwin.ar
 	

@@ -11,5 +11,4 @@ matrix:
     - php: hhvm
 
 script:
-  - echo 'include_path=test' > php.ini # For HHVM
-  - make test
+  make test
