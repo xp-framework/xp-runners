@@ -3,9 +3,12 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.2.0 / 2015-01-06
+
 * Added [HHVM](http://hhvm.com/) support by using long command line options
   See https://github.com/facebook/hhvm/issues/1200
   (@thekid)
+* Added test suite for ruinners, verifying XP5 and XP6 - (@thekid)
 * Ensured bootstrapping is only performed once - (@thekid)
 * Added support for class names and empty args in xpws' configuration:
   . `xpws` will check "./etc/web.ini" and pass "./etc" or "-" if not found.
