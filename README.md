@@ -14,13 +14,13 @@ The XP runners are bash scripts (on Unix-like systems) or C# programs (Windows) 
 
 ## Compilation
 
-Runners need to be compiled for the respective target platform. On Unix, BSD, Cygwin platform the compilation step consists of solely a `m4` preprocessing step. For Windows, C# files have to be compiled. You need the .NET Runtime 4.0 installed on your system.
+Runners need to be compiled for the respective target platform. On Unix, BSD, Cygwin platform the compilation step consists of solely a C preprocessor invocation. For Windows, C# files have to be compiled. You need the .NET Runtime 4.0 installed on your system.
 
 See `make all` output for the compilation targets.
 
 ## Tests
 
-Run `make test.shared [PHP=/path/to/php/binary]` to test the shared code.
+Run `make test [PHP=/path/to/php/binary]` to test runners and the shared code.
 
 ## Installation
 
