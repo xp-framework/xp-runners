@@ -10,12 +10,6 @@ class Error extends \Exception {
 
 class Test {
 
-  private function process($map, $key) {
-    if (isset($map[$key])) {
-      $map[$key]->bindTo($this)->__invoke();
-    }
-  }
-
   private function summarize($run, $elapsed, $ignored, $failed) {
     if ($ignored) {
       foreach ($ignored as $name => $reason) {
@@ -42,7 +36,79 @@ class Test {
     printf("%.3f seconds taken, %.2f kB peak memory usage\n", $elapsed, memory_get_peak_usage() / 1024);
   }
 
-  private function equals($a, $b) {
+  public function run($tests) {
+    echo '[';
+    $failed= $ignored= [];
+    $total= 0;
+
+    $start= microtime(true);
+    set_error_handler(function($code, $msg, $file, $line) {
+      if (0 !== error_reporting()) {
+        throw new Error($msg.' @ '.$file.':'.$line);
+      }
+    });
+
+    foreach ($tests as $name => $closure) {
+      if ('@' === $name{0}) continue;
+
+      if ('#' === $name{0}) {
+        echo 'I';
+        $ignored[substr($name, 1)]= 'prefixed with #';
+        continue;
+      }
+
+      $run= new Run($tests, $closure);
+      $run->process('before');
+
+      try {
+        $run->invoke();
+        echo '.';
+      } catch (Failed $e) {
+        echo 'F';
+        $failed[$name]= $e;
+      } catch (Error $e) {
+        echo 'E';
+        $failed[$name]= $e;
+      }
+
+      $run->process('after');
+      $total++;
+    }
+
+    $stop= microtime(true);
+    restore_error_handler();
+
+    echo "]\n\n";
+
+    $this->summarize($total, $stop - $start, $ignored, $failed);
+    return $failed ? 255 : 0;
+  }
+}
+
+class Run extends Test {
+  private $definition, $closure;
+
+  public function __construct($definition, $closure) {
+    $this->definition= $definition;
+    $this->closure= $closure;
+  }
+
+  public function process($key, $args= []) {
+    $key= '@'.$key;
+    if (isset($this->definition[$key])) {
+      call_user_func_array($this->definition[$key]->bindTo($this), $args);
+    }
+  }
+
+  public function invoke() {
+    $this->closure->bindTo($this)->__invoke();
+  }
+
+  public function __call($name, $args) {
+    $this->process($name, $args);
+  }
+
+  private final function equals($a, $b) {
     if (is_array($a)) {
       if (sizeof($a) !== sizeof($b)) return false;
       foreach ($a as $key => $val) {
@@ -72,53 +138,6 @@ class Test {
         throw new Failed('expected message '.$message.' but have '.$e->getMessage());
       }
     }
-  }
-
-  public function run($tests) {
-    echo '[';
-    $failed= $ignored= [];
-    $run= 0;
-
-    $start= microtime(true);
-    set_error_handler(function($code, $msg, $file, $line) {
-      if (0 !== error_reporting()) {
-        throw new Error($msg.' @ '.$file.':'.$line);
-      }
-    });
-
-    foreach ($tests as $name => $closure) {
-      if ('@' === $name{0}) continue;
-
-      if ('#' === $name{0}) {
-        echo 'I';
-        $ignored[substr($name, 1)]= 'prefixed with #';
-        continue;
-      }
-
-      $this->process($tests, '@before');
-
-      try {
-        $closure->bindTo($this)->__invoke();
-        echo '.';
-      } catch (Failed $e) {
-        echo 'F';
-        $failed[$name]= $e;
-      } catch (Error $e) {
-        echo 'E';
-        $failed[$name]= $e;
-      }
-
-      $this->process($tests, '@after');
-      $run++;
-    }
-
-    $stop= microtime(true);
-    restore_error_handler();
-
-    echo "]\n\n";
-
-    $this->summarize($run, $stop - $start, $ignored, $failed);
-    return $failed ? 255 : 0;
   }
 }
 
