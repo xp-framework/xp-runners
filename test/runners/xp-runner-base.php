@@ -19,7 +19,7 @@ return [
     }
 
     $this->boot= $path->compose($this->tmp, 'boot.pth');
-    putenv('USE_XP='.$this->tmp);
+    $this->env= array_merge($_ENV, ['USE_XP' => $this->tmp, 'PATH' => dirname(PHP_BINARY)]);
     $this->prepare();
   },
 
@@ -40,7 +40,7 @@ return [
   'write version' => function() use($path, $proc) {
     $this->assertEquals(
       [0 => [$this->version()]],
-      $proc->execute($this->exe, ['-w', '"rtrim(ClassLoader::getDefault()->getResource(\"VERSION\"))"']
-    ));
+      $proc->execute($this->exe, ['-w', '"rtrim(ClassLoader::getDefault()->getResource(\"VERSION\"))"'], $this->env)
+    );
   },
 ];
