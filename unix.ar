@@ -1313,7 +1313,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---7893:class-main.php:--
+--7965:class-main.php:--
 <?php namespace xp;
 
 // Set CLI specific handling
@@ -1446,6 +1446,10 @@ function path($in) {
 function scan($paths, $home= '.') {
   $include= array();
   foreach ($paths as $path) {
+    if ('~' === $path{0}) {
+      $path= $home.substr($path, 1);
+    }
+
     if (!($d= @opendir($path))) continue;
     while ($e= readdir($d)) {
       if ('.pth' !== substr($e, -4)) continue;
@@ -1577,7 +1581,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---7595:web-main.php:--
+--7667:web-main.php:--
 <?php namespace xp;
 
 // Set WEB specific handling
@@ -1711,6 +1715,10 @@ function path($in) {
 function scan($paths, $home= '.') {
   $include= array();
   foreach ($paths as $path) {
+    if ('~' === $path{0}) {
+      $path= $home.substr($path, 1);
+    }
+
     if (!($d= @opendir($path))) continue;
     while ($e= readdir($d)) {
       if ('.pth' !== substr($e, -4)) continue;
