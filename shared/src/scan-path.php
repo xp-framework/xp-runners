@@ -12,6 +12,10 @@ function path($in) {
 function scan($paths, $home= '.') {
   $include= array();
   foreach ($paths as $path) {
+    if ('~' === $path{0}) {
+      $path= $home.substr($path, 1);
+    }
+
     if (!($d= @opendir($path))) continue;
     while ($e= readdir($d)) {
       if ('.pth' !== substr($e, -4)) continue;
