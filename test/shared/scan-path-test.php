@@ -168,4 +168,13 @@ exit($test->run([
       function() { \xp\scan([$this->classpath], $this->home); }
     );
   },
+
+  'supports ~ in include path' => function() use($path) {
+    $xar= $path->compose($this->home, 'core.xar');
+    file_put_contents($path->compose($this->classpath, 'class.pth'), $xar);
+    $this->assertEquals(
+      [$xar],
+      \xp\scan(['~'], $this->classpath)
+    );
+  },
 ]));
