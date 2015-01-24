@@ -22,6 +22,8 @@ return [
     unset($_SERVER['argc'], $_SERVER['argv']);
     $this->env= array_merge($_SERVER, ['USE_XP' => $this->tmp, 'PATH' => $_SERVER['PATH'].PATH_SEPARATOR.dirname(PHP_BINARY)]);
     $this->prepare();
+
+    file_put_contents($path->compose($this->tmp, 'xp.ini'), "[runtime]\ndate.timezone=Europe/Berlin");
   },
 
   '@after' => function() use($path) {
@@ -41,7 +43,7 @@ return [
   'write version' => function() use($path, $proc) {
     $this->assertEquals(
       [0 => [$this->version()]],
-      $proc->execute($this->exe, ['-w', '"rtrim(ClassLoader::getDefault()->getResource(\"VERSION\"))"'], $this->env)
+      $proc->execute($this->exe, ['-w', '"rtrim(ClassLoader::getDefault()->getResource(\"VERSION\"))"'], $this->env, $this->tmp)
     );
   },
 ];
