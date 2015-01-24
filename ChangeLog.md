@@ -3,6 +3,17 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.2.1 / 2015-01-24
+
+* Added HHVM nightly builds to the Travis-CI suite - (@thekid)
+* Fixed issue #21: Warnings during startup with empty `use` directive
+  (@thekid)
+* Merged PR #20: Translate '~' into $home
+  (@kiesel)
+* Try fixing exes compiled on a box with .NET v4.5 not working on boxes
+  with v4.0 installed.
+  (@thekid)
+
 ## 5.2.0 / 2015-01-06
 
 * Added [HHVM](http://hhvm.com/) support by using long command line options
