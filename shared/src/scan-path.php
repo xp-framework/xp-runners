@@ -12,7 +12,9 @@ function path($in) {
 function scan($paths, $home= '.') {
   $include= array();
   foreach ($paths as $path) {
-    if ('~' === $path{0}) {
+    if ('' === $path) {
+      continue;
+    } else if ('~' === $path{0}) {
       $path= $home.substr($path, 1);
     }
 

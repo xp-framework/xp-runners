@@ -177,4 +177,12 @@ exit($test->run([
       \xp\scan(['~'], $this->classpath)
     );
   },
+
+  // Issue #21
+  'empty use path does not raise warnings' => function() use($path) {
+    $this->assertEquals(
+      [],
+      \xp\scan([''], $this->home)
+    );
+  }
 ]));
