@@ -34,7 +34,7 @@ We recommend creating Debian `.deb` files using the `checkinstall` utility:
 % xp-runners$ sudo checkinstall \
   --type=debian \
   --pkgname=xp-runners \
-  --pkgversion=1.0.0 \
+  --pkgversion=5.2.1 \
   --pkggroup=devel \
   --pkglicense=BSD \
   --pkgarch all -y \
@@ -42,5 +42,6 @@ We recommend creating Debian `.deb` files using the `checkinstall` utility:
   --backup=no \
   --install=no \
   --nodoc \
+  --reset-uids=yes \
   make unix.install
 ```
