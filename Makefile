@@ -37,7 +37,8 @@ unix.ar: unix unix/default/* shared/class-main.php shared/web-main.php
 
 generic.install:
 	@echo "===> Installing XP runners to $(INSTTARGET) ..."
-	@cp -v $(from)/* $(INSTTARGET)
+	@chmod a+x $(from)/*
+	@cp -pv $(from)/* $(INSTTARGET)
 	@echo "---> Done."
 
 unix.install: unix
