@@ -3,6 +3,8 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.2.2 / 2015-03-01
+
 * Fixed bootstrapping via Composer if a global XP Framework is installed.
   In this case, `__xp.php` is loaded via `vendor/autoload.php`. The old
   code simply checked for the file itself, which is not enough: Instead,
