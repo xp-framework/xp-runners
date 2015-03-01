@@ -50,6 +50,10 @@ if ($encoding) {
   }
 }
 
+foreach ($include as $path => $_) {
+  \lang\ClassLoader::registerPath($path);
+}
+
 try {
   exit(\lang\XPClass::forName($argv[0])->getMethod('main')->invoke(null, array(array_slice($argv, 1))));
 } catch (\lang\SystemExit $e) {

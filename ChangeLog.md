@@ -3,6 +3,13 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed bootstrapping via Composer if a global XP Framework is installed.
+  In this case, `__xp.php` is loaded via `vendor/autoload.php`. The old
+  code simply checked for the file itself, which is not enough: Instead,
+  the current context needs to be tested for the existance of a class
+  called *xp*. This indicates the XP Framework has bootstrapped correctly.
+  (@thekid)
+
 ## 5.2.1 / 2015-01-24
 
 * Added HHVM nightly builds to the Travis-CI suite - (@thekid)

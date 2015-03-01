@@ -1313,7 +1313,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---8012:class-main.php:--
+--8057:class-main.php:--
 <?php namespace xp;
 
 // Set CLI specific handling
@@ -1484,7 +1484,7 @@ function scan($paths, $home= '.') {
 }
 
 function bootstrap($paths, $merge) {
-  $bootstrap= array(null);
+  $bootstrap= array();
   $include= array();
   $merged= false;
   do {
@@ -1497,24 +1497,15 @@ function bootstrap($paths, $merge) {
         $f= $path;
         $path= substr($path, 0, -8);
       } else {
-        $bootstrap[]= $path;
+        $bootstrap[$path]= false;
         continue;
       }
 
-      if (is_file($f)) {
-        if (null === $bootstrap[0]) {
-          $bootstrap[0]= $f;
-          $include[]= $path;
-        }
-      } else {
-        $include[]= $path;
-      }
+      $include[$path]= true;
+      if (is_file($f)) $bootstrap[$f]= true;
     }
 
     if ($merged) {
-      if (null === $bootstrap[0]) {
-        throw new \Exception('[bootstrap] Cannot determine boot class path');
-      }
       return array($bootstrap, $include);
     } else {
       $paths= $merge();
@@ -1523,7 +1514,7 @@ function bootstrap($paths, $merge) {
   } while (true);
 }
 
-list($bootstrap, $paths)= bootstrap(scan(array($cwd), $home), function() use($home) {
+list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($home) {
   list($use, $inc)= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
   return array_merge(
     scan(array_unique(explode(PATH_SEPARATOR, substr($use, 2))), $home),
@@ -1531,10 +1522,14 @@ list($bootstrap, $paths)= bootstrap(scan(array($cwd), $home), function() use($ho
   );
 });
 
-foreach ($bootstrap as $file) {
+foreach ($bootstrap as $file => $xp) {
+  if ($xp && class_exists('xp', false)) continue;
   include $file;
 }
 
+if (!class_exists('xp', false)) {
+  throw new \Exception('[bootstrap] Cannot determine boot class path from '.get_include_path());
+}
 
 if ('cgi' === PHP_SAPI || 'cgi-fcgi' === PHP_SAPI) {
   ini_set('html_errors', 0);
@@ -1577,13 +1572,17 @@ if ($encoding) {
   }
 }
 
+foreach ($include as $path => $_) {
+  \lang\ClassLoader::registerPath($path);
+}
+
 try {
   exit(\lang\XPClass::forName($argv[0])->getMethod('main')->invoke(null, array(array_slice($argv, 1))));
 } catch (\lang\SystemExit $e) {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---7714:web-main.php:--
+--7759:web-main.php:--
 <?php namespace xp;
 
 // Set WEB specific handling
@@ -1755,7 +1754,7 @@ function scan($paths, $home= '.') {
 }
 
 function bootstrap($paths, $merge) {
-  $bootstrap= array(null);
+  $bootstrap= array();
   $include= array();
   $merged= false;
   do {
@@ -1768,24 +1767,15 @@ function bootstrap($paths, $merge) {
         $f= $path;
         $path= substr($path, 0, -8);
       } else {
-        $bootstrap[]= $path;
+        $bootstrap[$path]= false;
         continue;
       }
 
-      if (is_file($f)) {
-        if (null === $bootstrap[0]) {
-          $bootstrap[0]= $f;
-          $include[]= $path;
-        }
-      } else {
-        $include[]= $path;
-      }
+      $include[$path]= true;
+      if (is_file($f)) $bootstrap[$f]= true;
     }
 
     if ($merged) {
-      if (null === $bootstrap[0]) {
-        throw new \Exception('[bootstrap] Cannot determine boot class path');
-      }
       return array($bootstrap, $include);
     } else {
       $paths= $merge();
@@ -1794,7 +1784,7 @@ function bootstrap($paths, $merge) {
   } while (true);
 }
 
-list($bootstrap, $paths)= bootstrap(scan(array($cwd), $home), function() use($home) {
+list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($home) {
   list($use, $inc)= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
   return array_merge(
     scan(array_unique(explode(PATH_SEPARATOR, substr($use, 2))), $home),
@@ -1802,10 +1792,14 @@ list($bootstrap, $paths)= bootstrap(scan(array($cwd), $home), function() use($ho
   );
 });
 
-foreach ($bootstrap as $file) {
+foreach ($bootstrap as $file => $xp) {
+  if ($xp && class_exists('xp', false)) continue;
   include $file;
 }
 
+if (!class_exists('xp', false)) {
+  throw new \Exception('[bootstrap] Cannot determine boot class path from '.get_include_path());
+}
 
 // Set error status to 516 by default - if a fatal error occurs,
 // this guarantees to at least send an error code.
@@ -1828,6 +1822,10 @@ if ('cgi' === PHP_SAPI) {
 ini_set('error_prepend_string', '<xmp>');
 ini_set('error_append_string', '</xmp>');
 ini_set('html_errors', 0);
+
+foreach ($include as $path => $_) {
+  \lang\ClassLoader::registerPath($path);
+}
 
 try {
   exit(\xp\scriptlet\Runner::main(array($home, $config, $_SERVER['SERVER_PROFILE'], $_SERVER['SCRIPT_URL'])));

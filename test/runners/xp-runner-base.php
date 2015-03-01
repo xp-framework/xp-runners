@@ -46,4 +46,11 @@ return [
       $proc->execute($this->exe, ['-w', '"rtrim(ClassLoader::getDefault()->getResource(\"VERSION\"))"'], $this->env, $this->tmp)
     );
   },
+
+  'cannot bootstrap when boot path does not contain framework core' => function() use($path, $proc) {
+    file_put_contents($this->boot, '');
+    $result= $proc->execute($this->exe, ['-w', '"Unreachable"'], $this->env, $this->tmp);
+    $this->assertEquals(255, key($result));
+    $this->assertEquals(true, (bool)preg_grep('/Cannot bootstrap|Cannot determine boot class path/', current($result)));
+  }
 ];

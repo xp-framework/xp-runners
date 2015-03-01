@@ -1,7 +1,7 @@
 <?php namespace xp;
 
 function bootstrap($paths, $merge) {
-  $bootstrap= array(null);
+  $bootstrap= array();
   $include= array();
   $merged= false;
   do {
@@ -14,24 +14,15 @@ function bootstrap($paths, $merge) {
         $f= $path;
         $path= substr($path, 0, -8);
       } else {
-        $bootstrap[]= $path;
+        $bootstrap[$path]= false;
         continue;
       }
 
-      if (is_file($f)) {
-        if (null === $bootstrap[0]) {
-          $bootstrap[0]= $f;
-          $include[]= $path;
-        }
-      } else {
-        $include[]= $path;
-      }
+      $include[$path]= true;
+      if (is_file($f)) $bootstrap[$f]= true;
     }
 
     if ($merged) {
-      if (null === $bootstrap[0]) {
-        throw new \Exception('[bootstrap] Cannot determine boot class path');
-      }
       return array($bootstrap, $include);
     } else {
       $paths= $merge();

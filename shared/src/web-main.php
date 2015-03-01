@@ -32,6 +32,10 @@ ini_set('error_prepend_string', '<xmp>');
 ini_set('error_append_string', '</xmp>');
 ini_set('html_errors', 0);
 
+foreach ($include as $path => $_) {
+  \lang\ClassLoader::registerPath($path);
+}
+
 try {
   exit(\xp\scriptlet\Runner::main(array($home, $config, $_SERVER['SERVER_PROFILE'], $_SERVER['SCRIPT_URL'])));
 } catch (\lang\SystemExit $e) {
