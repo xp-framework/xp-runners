@@ -3,6 +3,10 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #23: Fixed warning for the case, that there isn't a "::" in
+  the include path.
+  (@johannes85)
+
 ## 5.2.2 / 2015-03-01
 
 * Fixed bootstrapping via Composer if a global XP Framework is installed.
