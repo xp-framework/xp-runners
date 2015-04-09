@@ -3,6 +3,8 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.2.3 / 2015-04-09
+
 * Merged PR #23: Fixed warning for the case, that there isn't a "::" in
   the include path.
   (@johannes85)
