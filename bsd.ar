@@ -1349,7 +1349,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---8057:class-main.php:--
+--8131:class-main.php:--
 <?php namespace xp;
 
 // Set CLI specific handling
@@ -1550,12 +1550,13 @@ function bootstrap($paths, $merge) {
   } while (true);
 }
 
-list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($home) {
-  list($use, $inc)= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
-  return array_merge(
-    scan(array_unique(explode(PATH_SEPARATOR, substr($use, 2))), $home),
-    array_map('xp\path', explode(PATH_SEPARATOR, $inc))
-  );
+list($bootstrap, $paths)= bootstrap(scan(array($cwd), $home), function() use($home) {
+  $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
+  $paths= scan(array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))), $home);
+  if (isset($parts[1]) && $parts[1] != '') {
+    $paths= array_merge($paths, array_map('xp\path', explode(PATH_SEPARATOR, $parts[1])));
+  }
+  return $paths;
 });
 
 foreach ($bootstrap as $file => $xp) {
@@ -1566,6 +1567,7 @@ foreach ($bootstrap as $file => $xp) {
 if (!class_exists('xp', false)) {
   throw new \Exception('[bootstrap] Cannot determine boot class path from '.get_include_path());
 }
+
 
 if ('cgi' === PHP_SAPI || 'cgi-fcgi' === PHP_SAPI) {
   ini_set('html_errors', 0);
@@ -1618,7 +1620,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---7759:web-main.php:--
+--7833:web-main.php:--
 <?php namespace xp;
 
 // Set WEB specific handling
@@ -1820,12 +1822,13 @@ function bootstrap($paths, $merge) {
   } while (true);
 }
 
-list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($home) {
-  list($use, $inc)= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
-  return array_merge(
-    scan(array_unique(explode(PATH_SEPARATOR, substr($use, 2))), $home),
-    array_map('xp\path', explode(PATH_SEPARATOR, $inc))
-  );
+list($bootstrap, $paths)= bootstrap(scan(array($cwd), $home), function() use($home) {
+  $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
+  $paths= scan(array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))), $home);
+  if (isset($parts[1]) && $parts[1] != '') {
+    $paths= array_merge($paths, array_map('xp\path', explode(PATH_SEPARATOR, $parts[1])));
+  }
+  return $paths;
 });
 
 foreach ($bootstrap as $file => $xp) {
@@ -1836,6 +1839,7 @@ foreach ($bootstrap as $file => $xp) {
 if (!class_exists('xp', false)) {
   throw new \Exception('[bootstrap] Cannot determine boot class path from '.get_include_path());
 }
+
 
 // Set error status to 516 by default - if a fatal error occurs,
 // this guarantees to at least send an error code.
