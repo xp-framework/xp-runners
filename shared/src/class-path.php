@@ -1,6 +1,6 @@
 <?php namespace xp;
 
-list($bootstrap, $paths)= bootstrap(scan(array($cwd), $home), function() use($home) {
+list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($home) {
   $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
   $paths= scan(array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))), $home);
   if (isset($parts[1]) && $parts[1] != '') {
