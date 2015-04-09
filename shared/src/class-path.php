@@ -1,11 +1,12 @@
 <?php namespace xp;
 
-list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($home) {
-  list($use, $inc)= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
-  return array_merge(
-    scan(array_unique(explode(PATH_SEPARATOR, substr($use, 2))), $home),
-    array_map('xp\path', explode(PATH_SEPARATOR, $inc))
-  );
+list($bootstrap, $paths)= bootstrap(scan(array($cwd), $home), function() use($home) {
+  $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
+  $paths= scan(array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))), $home);
+  if (isset($parts[1]) && $parts[1] != '') {
+    $paths= array_merge($paths, array_map('xp\path', explode(PATH_SEPARATOR, $parts[1])));
+  }
+  return $paths;
 });
 
 foreach ($bootstrap as $file => $xp) {
