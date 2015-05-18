@@ -12,10 +12,10 @@ clean:
 	-rm $(TARGET)/* xprt-update.sh
 
 default/%: src/%.in src/common.in src/exec.in src/instance.in src/macros.h
-	(echo "#!/bin/sh" ; $(CC) -E -I. -I./src -x c -C -P -imacros src/macros.h $< ) > $@
+	(echo "#!/bin/sh" ; $(CC) -E -I. -I./src -x c -P -imacros src/macros.h $< ) > $@
 
 bsd/%: src/%.in src/common.in src/exec.in src/instance.in src/macros.h
-	(echo "#!/bin/sh" ; $(CC) -E -I. -I./src -x c -C -P -D__BSD=1 -imacros src/macros.h $< ) > $@
+	(echo "#!/bin/sh" ; $(CC) -E -I. -I./src -x c -P -D__BSD=1 -imacros src/macros.h $< ) > $@
 
 cygwin/%: src/%.in src/common.in src/exec.in src/instance.in src/macros.h
-	(echo "#!/bin/sh" ; $(CC) -E -I. -I./src -x c -C -P -D__CYGWIN=1 -imacros src/macros.h $< ) > $@
+	(echo "#!/bin/sh" ; $(CC) -E -I. -I./src -x c -P -D__CYGWIN=1 -imacros src/macros.h $< ) > $@
