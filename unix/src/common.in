@@ -9,7 +9,7 @@ DIRSEP='/'
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
-    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
+    [/]*) DIRNAME=$(dirname "$link") ;;               # Absolute
     *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
   esac
 else
@@ -23,7 +23,7 @@ translate_path() {
   case "$path" in
     ?:*) ;;                                # C:\xp
     \\*) ;;                                # \\filesrv\shares
-    /*) ;;                                 # /usr/local/lib */
+    [/]*) ;;                               # /usr/local/lib
     ~*) path=$HOME$DIRSEP${path#"~"} ;;    # ~/lib
     *) path=$base$DIRSEP$path ;;           # lib, ../lib, ./classes
   esac
