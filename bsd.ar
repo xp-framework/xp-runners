@@ -1,25 +1,23 @@
---3269:cgen:--
+--3155:cgen:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
-    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
+    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
   esac
 else
   DIRNAME=$(dirname "$0")
 fi
-
 translate_path() {
   base="$1"
   path="$2"
-  
   case "$path" in
-    ?:*) ;;                                # C:\xp
-    \\*) ;;                                # \\filesrv\shares
-    /*) ;;                                 # /usr/local/lib */
+    ?:*) ;; # C:\xp
+    \\*) ;; # \\filesrv\shares
+    [/]*) ;; # /usr/local/lib
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
@@ -128,28 +126,26 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3268:doclet:--
+--3154:doclet:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
-    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
+    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
   esac
 else
   DIRNAME=$(dirname "$0")
 fi
-
 translate_path() {
   base="$1"
   path="$2"
-  
   case "$path" in
-    ?:*) ;;                                # C:\xp
-    \\*) ;;                                # \\filesrv\shares
-    /*) ;;                                 # /usr/local/lib */
+    ?:*) ;; # C:\xp
+    \\*) ;; # \\filesrv\shares
+    [/]*) ;; # /usr/local/lib
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
@@ -258,28 +254,26 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3270:unittest:--
+--3466:unittest:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
-    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
+    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
   esac
 else
   DIRNAME=$(dirname "$0")
 fi
-
 translate_path() {
   base="$1"
   path="$2"
-  
   case "$path" in
-    ?:*) ;;                                # C:\xp
-    \\*) ;;                                # \\filesrv\shares
-    /*) ;;                                 # /usr/local/lib */
+    ?:*) ;; # C:\xp
+    \\*) ;; # \\filesrv\shares
+    [/]*) ;; # /usr/local/lib
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
@@ -387,29 +381,40 @@ if [ ! -d /proc/1 ] ; then
 fi
 export XP_EXE
 IFS="|"
-exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3265:xar:--
+if getopts :w: watch ; then
+  ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+  if [ $? = 2 ] ; then
+    exit 2
+  elif [ $? = 126 ] || [ $? = 127 ] ; then
+    exit 255
+  fi
+  inotifywait -q -e close_write -m -r $OPTARG | while read event
+  do
+    ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+  done
+else
+  exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+fi
+--3151:xar:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
-    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
+    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
   esac
 else
   DIRNAME=$(dirname "$0")
 fi
-
 translate_path() {
   base="$1"
   path="$2"
-  
   case "$path" in
-    ?:*) ;;                                # C:\xp
-    \\*) ;;                                # \\filesrv\shares
-    /*) ;;                                 # /usr/local/lib */
+    ?:*) ;; # C:\xp
+    \\*) ;; # \\filesrv\shares
+    [/]*) ;; # /usr/local/lib
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
@@ -518,28 +523,26 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3270:xcc:--
+--3156:xcc:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
-    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
+    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
   esac
 else
   DIRNAME=$(dirname "$0")
 fi
-
 translate_path() {
   base="$1"
   path="$2"
-  
   case "$path" in
-    ?:*) ;;                                # C:\xp
-    \\*) ;;                                # \\filesrv\shares
-    /*) ;;                                 # /usr/local/lib */
+    ?:*) ;; # C:\xp
+    \\*) ;; # \\filesrv\shares
+    [/]*) ;; # /usr/local/lib
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
@@ -648,28 +651,26 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4398:xp:--
+--4284:xp:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
-    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
+    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
   esac
 else
   DIRNAME=$(dirname "$0")
 fi
-
 translate_path() {
   base="$1"
   path="$2"
-  
   case "$path" in
-    ?:*) ;;                                # C:\xp
-    \\*) ;;                                # \\filesrv\shares
-    /*) ;;                                 # /usr/local/lib */
+    ?:*) ;; # C:\xp
+    \\*) ;; # \\filesrv\shares
+    [/]*) ;; # /usr/local/lib
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
@@ -824,28 +825,26 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3269:xpcli:--
+--3155:xpcli:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
-    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
+    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
   esac
 else
   DIRNAME=$(dirname "$0")
 fi
-
 translate_path() {
   base="$1"
   path="$2"
-  
   case "$path" in
-    ?:*) ;;                                # C:\xp
-    \\*) ;;                                # \\filesrv\shares
-    /*) ;;                                 # /usr/local/lib */
+    ?:*) ;; # C:\xp
+    \\*) ;; # \\filesrv\shares
+    [/]*) ;; # /usr/local/lib
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
@@ -954,28 +953,26 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3269:xpi:--
+--3155:xpi:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
-    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
+    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
   esac
 else
   DIRNAME=$(dirname "$0")
 fi
-
 translate_path() {
   base="$1"
   path="$2"
-  
   case "$path" in
-    ?:*) ;;                                # C:\xp
-    \\*) ;;                                # \\filesrv\shares
-    /*) ;;                                 # /usr/local/lib */
+    ?:*) ;; # C:\xp
+    \\*) ;; # \\filesrv\shares
+    [/]*) ;; # /usr/local/lib
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac
@@ -1084,28 +1081,26 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5554:xpws:--
+--5440:xpws:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
 if [ -L "$0" ] ; then
   link="$(readlink "$0")"
   case "$link" in
-    /*) DIRNAME=$(dirname "$link") ;;                 # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;;  # Relative
+    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
   esac
 else
   DIRNAME=$(dirname "$0")
 fi
-
 translate_path() {
   base="$1"
   path="$2"
-  
   case "$path" in
-    ?:*) ;;                                # C:\xp
-    \\*) ;;                                # \\filesrv\shares
-    /*) ;;                                 # /usr/local/lib */
+    ?:*) ;; # C:\xp
+    \\*) ;; # \\filesrv\shares
+    [/]*) ;; # /usr/local/lib
     ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
     *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
   esac

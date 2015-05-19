@@ -3,6 +3,11 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.3.0 / 2015-05-19
+
+* Merged PR #24: Unittest watcher, runs unittests indefinitely.
+  (@thekid)
+
 ## 5.2.3 / 2015-04-09
 
 * Merged PR #23: Fixed warning for the case, that there isn't a "::" in
