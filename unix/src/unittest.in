@@ -2,4 +2,21 @@
 
 EXEC("class", ".", xp.unittest.Runner)
 
-#include <exec.in> 
+#include <instance.in>
+
+if getopts :w: watch ; then
+  ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+
+  if [ $? = 2 ] ; then
+    exit 2
+  elif [ $? = 126 ] || [ $? = 127 ] ; then
+    exit 255
+  fi
+
+  inotifywait -q -e close_write -m -r $OPTARG | while read event
+  do
+    ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+  done
+else
+  exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+fi
