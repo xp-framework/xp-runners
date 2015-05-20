@@ -3,6 +3,10 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.3.1 / 2015-05-20
+
+* Fixed `AssemblyVersion` for Windows runners - @thekid
+
 ## 5.3.0 / 2015-05-19
 
 * Merged PR #24: Unittest watcher, runs unittests indefinitely.
