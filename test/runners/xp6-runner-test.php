@@ -14,5 +14,12 @@ exit($test->run(array_merge($base, [
 
   '@version' => function() {
     return '6.0.0';
+  },
+
+  'uncaught throwables' => function() use($path, $proc) {
+    $result= $proc->execute($this->exe, ['-e', '"throw new \lang\Error(\"Test\")"'], $this->env, $this->tmp);
+    $this->assertEquals(255, key($result));
+    $this->assertEquals(true, (bool)preg_grep('/Uncaught exception/', current($result)));
+    $this->assertEquals(true, (bool)preg_grep('/  at lang.reflect.Method::invoke/', current($result)));
   }
 ])));

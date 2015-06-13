@@ -47,6 +47,13 @@ return [
     );
   },
 
+  'uncaught exceptions' => function() use($path, $proc) {
+    $result= $proc->execute($this->exe, ['-e', '"throw new Exception(\"Test\")"'], $this->env, $this->tmp);
+    $this->assertEquals(255, key($result));
+    $this->assertEquals(true, (bool)preg_grep('/Uncaught exception/', current($result)));
+    $this->assertEquals(true, (bool)preg_grep('/  at lang.reflect.Method::invoke/', current($result)));
+  },
+
   'cannot bootstrap when boot path does not contain framework core' => function() use($path, $proc) {
     file_put_contents($this->boot, '');
     $result= $proc->execute($this->exe, ['-w', '"Unreachable"'], $this->env, $this->tmp);

@@ -6,11 +6,10 @@ class Proc {
   public function execute($exe, array $args, array $env= [], $wd= null) {
     $descriptors= [
       0 => ['pipe', 'r'],
-      1 => ['pipe', 'w'],
-      2 => STDERR
+      1 => ['pipe', 'w']
     ];
 
-    $p= proc_open($exe.' '.implode(' ', $args), $descriptors, $pipes, $wd ?: getcwd(), $env, self::$opt);
+    $p= proc_open($exe.' '.implode(' ', $args).' 2>&1', $descriptors, $pipes, $wd ?: getcwd(), $env, self::$opt);
     fclose($pipes[0]);
     $out= explode("\n", trim(stream_get_contents($pipes[1])));
     fclose($pipes[1]);
