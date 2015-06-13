@@ -6,8 +6,8 @@ $path= require 'path.php';
 $proc= require 'proc.php';
 $base= require 'xp-runner-base.php';
 
-if (PHP_VERSION >= '7.0.0')) {
-  echo "XP5.X is not compatible with PHP7\n";
+if (PHP_VERSION >= '7.0.0') {
+  echo "XP5.X is not compatible with PHP7, skipping...\n";
   exit(0);
 }
 
