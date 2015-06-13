@@ -6,6 +6,11 @@ $path= require 'path.php';
 $proc= require 'proc.php';
 $base= require 'xp-runner-base.php';
 
+if (PHP_VERSION >= '7.0.0')) {
+  echo "XP5.X is not compatible with PHP7\n";
+  exit(0);
+}
+
 exit($test->run(array_merge($base, [
   '@prepare' => function() use($path) {
     mkdir($path->compose($this->tmp, 'tools'));
