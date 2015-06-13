@@ -19,7 +19,22 @@ if ('cgi' === PHP_SAPI || 'cgi-fcgi' === PHP_SAPI) {
 }
 
 set_exception_handler(function($e) {
-  fputs(STDERR, 'Uncaught exception: '.\xp::stringOf($e));
+  if ($e instanceof \lang\Throwable) {
+    fputs(STDERR, 'Uncaught exception: '.$e->toString());
+  } else {
+    fputs(STDERR, 'Uncaught exception: Exception '.get_class($e).' ('.$e->getMessage().")\n");
+    foreach ($e->getTrace() as $trace) {
+      fprintf(STDERR,
+        "  at %s%s%s(%s) [line %d of %s]\n",
+        isset($trace['class']) ? strtr($trace['class'], '\\', '.') : '<main>',
+        isset($trace['type']) ? $trace['type'] : '::',
+        isset($trace['function']) ? $trace['function'] : '<main>',
+        isset($trace['args']) ? implode(', ', array_map(['xp', 'stringOf'], $trace['args'])) : '',
+        isset($trace['line']) ? $trace['line'] : 0,
+        isset($trace['file']) ? basename($trace['file']) : '(unknown)'
+      );
+    }
+  }
   exit(0xff);
 });
 

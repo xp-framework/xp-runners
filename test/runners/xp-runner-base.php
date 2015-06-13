@@ -20,7 +20,7 @@ return [
 
     $this->boot= $path->compose($this->tmp, 'boot.pth');
     unset($_SERVER['argc'], $_SERVER['argv']);
-    $this->env= array_merge($_SERVER, ['USE_XP' => $this->tmp, 'PATH' => $_SERVER['PATH'].PATH_SEPARATOR.dirname(PHP_BINARY)]);
+    $this->env= array_merge($_SERVER, ['USE_XP' => $this->tmp, 'PATH' => dirname(PHP_BINARY).PATH_SEPARATOR.$_SERVER['PATH']]);
     $this->prepare();
 
     file_put_contents($path->compose($this->tmp, 'xp.ini'), "[runtime]\ndate.timezone=Europe/Berlin");
