@@ -1308,7 +1308,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---8831:class-main.php:--
+--8853:class-main.php:--
 <?php namespace xp;
 
 // Set CLI specific handling
@@ -1457,7 +1457,7 @@ function scan($paths, $home= '.') {
           continue;
         } else if ('!' === $line{0}) {
           $pre= true;
-          $line= substr($line, 1);
+          $line= '!' === $line ? '.' : substr($line, 1);
         } else {
           $pre= false;
         }
@@ -1595,7 +1595,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---7835:web-main.php:--
+--7857:web-main.php:--
 <?php namespace xp;
 
 // Set WEB specific handling
@@ -1745,7 +1745,7 @@ function scan($paths, $home= '.') {
           continue;
         } else if ('!' === $line{0}) {
           $pre= true;
-          $line= substr($line, 1);
+          $line= '!' === $line ? '.' : substr($line, 1);
         } else {
           $pre= false;
         }

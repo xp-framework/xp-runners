@@ -28,7 +28,7 @@ function scan($paths, $home= '.') {
           continue;
         } else if ('!' === $line{0}) {
           $pre= true;
-          $line= substr($line, 1);
+          $line= '!' === $line ? '.' : substr($line, 1);
         } else {
           $pre= false;
         }
