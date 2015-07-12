@@ -50,7 +50,8 @@ register_shutdown_function(function() {
   $e= error_get_last();
   if (null !== $e && isset($types[$e['type']])) {
     __error($e['type'], $e['message'], $e['file'], $e['line']);
-    create(new \lang\Error($types[$e['type']]))->printStackTrace();
+    $e= new \lang\Error($types[$e['type']]);
+    $e->printStackTrace();
   }
 });
 
