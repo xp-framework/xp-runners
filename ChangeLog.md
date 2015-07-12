@@ -5,6 +5,9 @@ XP Runners ChangeLog
 
 ## 5.4.0 / 2015-07-12
 
+* Made test suite pass on current PHP 7 *(built: Jul 11 2015 19:11:20)*
+  See https://travis-ci.org/xp-framework/xp-runners/builds/70605263
+  (@thekid)
 * Implemented nice stacktraces for PHP exceptions. This will especially
   be of interest for PHP 7. See xp-framework/xp-runners#25
   (@thekid)
