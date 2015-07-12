@@ -26,9 +26,9 @@ exit($test->run(array_merge($base, [
   'uncaught PHP7 exceptions' => function() use($path, $proc) {
     if (PHP_VERSION < '7.0.0') return;
 
-    $result= $proc->execute($this->exe, ['-e', '"$n= null; $n->invoke()"'], $this->env, $this->tmp);
+    $result= $proc->execute($this->exe, ['-e', '"max([null])->invoke()"'], $this->env, $this->tmp);
     $this->assertEquals(255, key($result));
     $this->assertEquals(true, (bool)preg_grep('/Uncaught exception/', current($result)));
-    $this->assertEquals(true, (bool)preg_grep('/  at lang.reflect.Method::invoke/', current($result)));
+    $this->assertEquals(true, (bool)preg_grep('/  at lang.reflect.Method.+invoke/', current($result)));
   }
 ])));
