@@ -3,6 +3,12 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.4.0 / 2015-07-12
+
+* Implemented nice stacktraces for PHP exceptions. This will especially
+  be of interest for PHP 7. See xp-framework/xp-runners#25
+  (@thekid)
+
 ## 5.3.1 / 2015-05-20
 
 * Fixed `AssemblyVersion` for Windows runners - @thekid
