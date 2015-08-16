@@ -1344,7 +1344,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---8853:class-main.php:--
+--9195:class-main.php:--
 <?php namespace xp;
 
 // Set CLI specific handling
@@ -1605,8 +1605,16 @@ register_shutdown_function(function() {
   $e= error_get_last();
   if (null !== $e && isset($types[$e['type']])) {
     __error($e['type'], $e['message'], $e['file'], $e['line']);
-    $e= new \lang\Error($types[$e['type']]);
-    $e->printStackTrace();
+    fprintf(
+      STDERR,
+      "Uncaught error: %s (%s)\n  at <source> [line %d of %s]\n  at <main>(%s) [line 0 of %s]\n",
+      $types[$e['type']],
+      $e['message'],
+      $e['line'],
+      str_replace(getcwd(), '.', $e['file']),
+      implode(', ', array_map(['xp', 'stringOf'], array_slice($_SERVER['argv'], 1))),
+      str_replace('.', DIRECTORY_SEPARATOR, $_SERVER['argv'][0]).\xp::CLASS_FILE_EXT
+    );
   }
 });
 
