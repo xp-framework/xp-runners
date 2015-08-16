@@ -23,6 +23,13 @@ exit($test->run(array_merge($base, [
     $this->assertEquals(true, (bool)preg_grep('/  at lang.reflect.Method::invoke/', current($result)));
   },
 
+  'uncaught error' => function() use($path, $proc) {
+    $result= $proc->execute($this->exe, ['-e', '"non_existant_func()"'], $this->env, $this->tmp);
+    $this->assertEquals(255, key($result));
+    $this->assertEquals(true, (bool)preg_grep('/Uncaught error: Fatal error/', current($result)));
+    $this->assertEquals(true, (bool)preg_grep('/undefined function/', current($result)));
+  },
+
   'uncaught PHP7 exceptions' => function() use($path, $proc) {
     if (PHP_VERSION < '7.0.0') return;
 
