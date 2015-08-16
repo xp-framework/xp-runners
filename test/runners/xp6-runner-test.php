@@ -24,13 +24,17 @@ exit($test->run(array_merge($base, [
   },
 
   'uncaught fatal error' => function() use($path, $proc) {
-    $result= $proc->execute($this->exe, ['-e', '"non_existant_func()"'], $this->env, $this->tmp);
+    if (defined('HHVM_VERSION')) return;
+
+    $result= $proc->execute($this->exe, ['-e', '"[] + 0"'], $this->env, $this->tmp);
     $this->assertEquals(255, key($result));
     $this->assertEquals(true, (bool)preg_grep('/Uncaught error: Fatal error/', current($result)));
-    $this->assertEquals(true, (bool)preg_grep('/undefined function/', current($result)));
+    $this->assertEquals(true, (bool)preg_grep('/Unsupported operand types/', current($result)));
   },
 
   'uncaught core error' => function() use($path, $proc) {
+    if (defined('HHVM_VERSION')) return;
+
     $result= $proc->execute($this->exe, ['-e', '"class T implements \Traversable { }"'], $this->env, $this->tmp);
     $this->assertEquals(255, key($result));
     $this->assertEquals(true, (bool)preg_grep('/Uncaught error: Core error/', current($result)));
