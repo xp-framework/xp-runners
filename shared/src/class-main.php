@@ -43,6 +43,7 @@ register_shutdown_function(function() {
   static $types= array(
     E_ERROR         => 'Fatal error',
     E_USER_ERROR    => 'Fatal error',
+    E_CORE_ERROR    => 'Core error',
     E_PARSE         => 'Parse error',
     E_COMPILE_ERROR => 'Compile error'
   );

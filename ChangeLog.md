@@ -3,6 +3,8 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed isue #27: Core errors unhandled
+  (@thekid)
 * Merged PR #26: Rewrite fatal error handler, inlining error class
   (@thekid)
 
