@@ -3,6 +3,9 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #26: Rewrite fatal error handler, inlining error class
+  (@thekid)
+
 ## 5.4.0 / 2015-07-12
 
 * Made test suite pass on current PHP 7 *(built: Jul 11 2015 19:11:20)*
