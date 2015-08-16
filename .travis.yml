@@ -9,10 +9,5 @@ php:
   - hhvm
   - nightly
 
-matrix:
-  allow_failures:
-    - php: hhvm
-    - php: nightly
-
 script:
   make test
