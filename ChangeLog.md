@@ -3,6 +3,8 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.5.0 / 2015-08-16
+
 * Fixed isue #27: Core errors unhandled
   (@thekid)
 * Merged PR #26: Rewrite fatal error handler, inlining error class
