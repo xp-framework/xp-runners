@@ -1344,7 +1344,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---9195:class-main.php:--
+--9232:class-main.php:--
 <?php namespace xp;
 
 // Set CLI specific handling
@@ -1598,6 +1598,7 @@ register_shutdown_function(function() {
   static $types= array(
     E_ERROR         => 'Fatal error',
     E_USER_ERROR    => 'Fatal error',
+    E_CORE_ERROR    => 'Core error',
     E_PARSE         => 'Parse error',
     E_COMPILE_ERROR => 'Compile error'
   );
