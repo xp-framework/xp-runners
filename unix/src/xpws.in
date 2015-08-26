@@ -7,6 +7,9 @@ INCLUDE_PATH="."
 SERVER_PROFILE=dev
 WEB_ROOT=.
 WEB_CONFIG=
+ACTION=serve
+PIDFILE=".xpws.pid"
+LOGFILE="/dev/null"
 
 while [ $# != 0 ]; do
   case $1 in
@@ -55,6 +58,18 @@ while [ $# != 0 ]; do
         TOOL='xp.scriptlet.Server|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}|'$2
       fi
       shift 2
+      ;;
+    -P)
+      PIDFILE=$2
+      shift 2
+      ;;
+    -L)
+      LOGFILE=$2
+      shift 2
+      ;;
+    start|stop|status|serve)
+      ACTION=$1
+      shift 1
       ;;
     -?)
       RUNNER=class
@@ -110,10 +125,51 @@ else
   export DOCUMENT_ROOT
 
   eval 'START="'$START'"'
-  ${XP_EXE}${ifs}${START}${args}${ifs}$tool ${ARGS} "$@" &
-  PID=$!
-  echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR @ $WEB_ROOT - Press <Enter> to exit"
-  read enter
-  echo "[xpws-$SERVER_PROFILE#$PID] shutting down..."
-  kill -TERM $PID
+
+  case $ACTION in
+    serve)
+      ${XP_EXE}${ifs}${START}${args}${ifs}$tool ${ARGS} "$@" &
+      PID=$!
+
+      echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR @ $WEB_ROOT - Press <Enter> to exit"
+      read enter
+      echo "[xpws-$SERVER_PROFILE#$PID] shutting down..."
+      kill -TERM $PID
+      ;;
+
+    start)
+      if [ -f "$PIDFILE" ] ; then
+        echo "*** xpws already running"
+        exit 255
+      else
+        ${XP_EXE}${ifs}${START}${args}${ifs}$tool ${ARGS} "$@" 1>"$LOGFILE" 2>&1 &
+        PID=$!
+
+        echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR @ $WEB_ROOT - Use xpws stop to end"
+        echo $SERVER_PROFILE#$PID > "$PIDFILE"
+      fi
+      ;;
+
+    stop)
+      if [ -f "$PIDFILE" ] ; then
+        running=$(cat "$PIDFILE")
+        PID=${running#*'#'}
+        echo "[xpws-$running] shutting down..."
+        kill -TERM $PID
+        rm "$PIDFILE"
+      else
+        echo "*** xpws not running"
+        exit 255
+      fi
+      ;;
+
+    status)
+      if [ -f "$PIDFILE" ] ; then
+        running=$(cat "$PIDFILE")
+        echo "[xpws-$running] running - $PIDFILE"
+      else
+        echo "*** xpws not running"
+      fi
+      ;;
+  esac
 fi
