@@ -43,12 +43,6 @@ while [ $# != 0 ]; do
       INCLUDE_PATH=${INCLUDE_PATH}${PATHSEP}$2
       shift 2
       ;;
-    -i)
-      RUNNER=class
-      START=@immediate
-      TOOL='xp.scriptlet.Inspect|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}'
-      shift 1
-      ;;
     -m)
       if [ "develop" = $2 ] ; then
         RUNNER=web
@@ -69,6 +63,12 @@ while [ $# != 0 ]; do
       ;;
     start|stop|status|serve)
       ACTION=$1
+      shift 1
+      ;;
+    info|-i)
+      RUNNER=class
+      START=@immediate
+      TOOL='xp.scriptlet.Inspect|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}'
       shift 1
       ;;
     -?)
