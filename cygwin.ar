@@ -1663,7 +1663,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---6740:xpws:--
+--6736:xpws:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1947,7 +1947,7 @@ else
         running=$(cat "$PIDFILE")
         echo "[xpws-$running] running - $PIDFILE"
       else
-        echo "*** xpws not running"
+        echo "xpws not running"
       fi
       ;;
   esac

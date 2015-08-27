@@ -169,7 +169,7 @@ else
         running=$(cat "$PIDFILE")
         echo "[xpws-$running] running - $PIDFILE"
       else
-        echo "*** xpws not running"
+        echo "xpws not running"
       fi
       ;;
   esac
