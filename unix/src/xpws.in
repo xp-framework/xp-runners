@@ -59,6 +59,7 @@ while [ $# != 0 ]; do
       ;;
     -L)
       LOGFILE=$2
+      touch $LOGFILE || exit
       shift 2
       ;;
     start|stop|status|serve)

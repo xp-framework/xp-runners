@@ -130,6 +130,302 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--9232:class-main.php:--
+<?php namespace xp;
+
+// Set CLI specific handling
+$home= getenv('HOME');
+$cwd= '.';
+
+final class xar {
+  public
+    $position     = 0,
+    $archive      = null,
+    $filename     = '';
+    
+  // {{{ proto [:var] acquire(string archive)
+  //     Archive instance handling pool function, opens an archive and reads header only once
+  static function acquire($archive) {
+    static $archives= array();
+    static $unpack= array(
+      1 => 'a80id/a80*filename/a80*path/V1size/V1offset/a*reserved',
+      2 => 'a240id/V1size/V1offset/a*reserved'
+    );
+    
+    if ('/' === $archive{0} && ':' === $archive{2}) {
+      $archive= substr($archive, 1);    // Handle xar:///f:/archive.xar => f:/archive.xar
+    }
+
+    if (!isset($archives[$archive])) {
+      $current= array('handle' => fopen($archive, 'rb'), 'dev' => crc32($archive));
+      $header= unpack('a3id/c1version/V1indexsize/a*reserved', fread($current['handle'], 0x0100));
+      if ('CCA' != $header['id']) \raise('lang.FormatException', 'Malformed archive '.$archive);
+      for ($current['index']= array(), $i= 0; $i < $header['indexsize']; $i++) {
+        $entry= unpack(
+          $unpack[$header['version']], 
+          fread($current['handle'], 0x0100)
+        );
+        $current['index'][rtrim($entry['id'], "\0")]= array($entry['size'], $entry['offset'], $i);
+      }
+      $current['offset']= 0x0100 + $i * 0x0100;
+      $archives[$archive]= $current;
+    }
+
+    return $archives[$archive];
+  }
+  // }}}
+  
+  // {{{ proto bool stream_open(string path, string mode, int options, string opened_path)
+  //     Open the given stream and check if file exists
+  function stream_open($path, $mode, $options, $opened_path) {
+    sscanf(strtr($path, ';', '?'), 'xar://%[^?]?%[^$]', $archive, $this->filename);
+    $this->archive= self::acquire(urldecode($archive));
+    return isset($this->archive['index'][$this->filename]);
+  }
+  // }}}
+  
+  // {{{ proto string stream_read(int count)
+  //     Read $count bytes up-to-length of file
+  function stream_read($count) {
+    $f= $this->archive['index'][$this->filename];
+    if (0 === $count || $this->position >= $f[0]) return false;
+
+    fseek($this->archive['handle'], $this->archive['offset'] + $f[1] + $this->position, SEEK_SET);
+    $bytes= fread($this->archive['handle'], min($f[0] - $this->position, $count));
+    $this->position+= strlen($bytes);
+    return $bytes;
+  }
+  // }}}
+  
+  // {{{ proto bool stream_eof()
+  //     Returns whether stream is at end of file
+  function stream_eof() {
+    return $this->position >= $this->archive['index'][$this->filename][0];
+  }
+  // }}}
+  
+  // {{{ proto [:int] stream_stat()
+  //     Retrieve status of stream
+  function stream_stat() {
+    return array(
+      'dev'   => $this->archive['dev'],
+      'size'  => $this->archive['index'][$this->filename][0],
+      'ino'   => $this->archive['index'][$this->filename][2]
+    );
+  }
+  // }}}
+
+  // {{{ proto bool stream_seek(int offset, int whence)
+  //     Callback for fseek
+  function stream_seek($offset, $whence) {
+    switch ($whence) {
+      case SEEK_SET: $this->position= $offset; break;
+      case SEEK_CUR: $this->position+= $offset; break;
+      case SEEK_END: $this->position= $this->archive['index'][$this->filename][0] + $offset; break;
+    }
+    return true;
+  }
+  // }}}
+  
+  // {{{ proto int stream_tell
+  //     Callback for ftell
+  function stream_tell() {
+    return $this->position;
+  }
+  // }}}
+  
+  // {{{ proto [:int] url_stat(string path)
+  //     Retrieve status of url
+  function url_stat($path) {
+    sscanf(strtr($path, ';', '?'), 'xar://%[^?]?%[^$]', $archive, $file);
+    $current= self::acquire(urldecode($archive));
+    return isset($current['index'][$file]) ? array(
+      'dev'   => $current['dev'],
+      'mode'  => 0100644,
+      'size'  => $current['index'][$file][0],
+      'ino'   => $current['index'][$file][2]
+    ) : false;
+  }
+  // }}}
+}
+
+stream_wrapper_register('xar', 'xp\xar');
+
+function path($in) {
+  $qn= realpath($in);
+  if (false === $qn) {
+    throw new \Exception('[bootstrap] Classpath element ['.$in.'] not found');
+  } else {
+    return is_dir($qn) ? $qn.DIRECTORY_SEPARATOR : $qn;
+  }
+}
+
+function scan($paths, $home= '.') {
+  $include= array();
+  foreach ($paths as $path) {
+    if ('' === $path) {
+      continue;
+    } else if ('~' === $path{0}) {
+      $path= $home.substr($path, 1);
+    }
+
+    if (!($d= @opendir($path))) continue;
+    while ($e= readdir($d)) {
+      if ('.pth' !== substr($e, -4)) continue;
+
+      foreach (file($path.DIRECTORY_SEPARATOR.$e) as $line) {
+        $line= trim($line);
+        if ('' === $line || '#' === $line{0}) {
+          continue;
+        } else if ('!' === $line{0}) {
+          $pre= true;
+          $line= '!' === $line ? '.' : substr($line, 1);
+        } else {
+          $pre= false;
+        }
+
+        if ('~' === $line{0}) {
+          $qn= $home.DIRECTORY_SEPARATOR.substr($line, 1);
+        } else if ('/' === $line{0} || strlen($line) > 2 && (':' === $line{1} && '\\' === $line{2})) {
+          $qn= $line;
+        } else {
+          $qn= $path.DIRECTORY_SEPARATOR.$line;
+        }
+
+        $pre ? array_unshift($include, path($qn)) : $include[]= path($qn);
+      }
+    }
+    closedir($d);
+  }
+  return $include;
+}
+
+function bootstrap($paths, $merge) {
+  $bootstrap= array();
+  $include= array();
+  $merged= false;
+  do {
+    foreach ($paths as $path) {
+      if (DIRECTORY_SEPARATOR === $path{strlen($path) - 1}) {
+        $f= $path.'__xp.php';
+      } else if (0 === substr_compare($path, '.xar', -4)) {
+        $f= 'xar://'.$path.'?__xp.php';
+      } else if (0 === substr_compare($path, '__xp.php', -8)) {
+        $f= $path;
+        $path= substr($path, 0, -8);
+      } else {
+        $bootstrap[$path]= false;
+        continue;
+      }
+
+      $include[$path]= true;
+      if (is_file($f)) $bootstrap[$f]= true;
+    }
+
+    if ($merged) {
+      return array($bootstrap, $include);
+    } else {
+      $paths= $merge();
+      $merged= true;
+    }
+  } while (true);
+}
+
+list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($home) {
+  $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
+  $paths= scan(array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))), $home);
+  if (isset($parts[1]) && $parts[1] != '') {
+    $paths= array_merge($paths, array_map('xp\path', explode(PATH_SEPARATOR, $parts[1])));
+  }
+  return $paths;
+});
+
+foreach ($bootstrap as $file => $xp) {
+  if ($xp && class_exists('xp', false)) continue;
+  include $file;
+}
+
+if (!class_exists('xp', false)) {
+  throw new \Exception('[bootstrap] Cannot determine boot class path from '.get_include_path());
+}
+
+
+if ('cgi' === PHP_SAPI || 'cgi-fcgi' === PHP_SAPI) {
+  ini_set('html_errors', 0);
+  define('STDIN', fopen('php://stdin', 'rb'));
+  define('STDOUT', fopen('php://stdout', 'wb'));
+  define('STDERR', fopen('php://stderr', 'wb'));
+} else if ('cli' !== PHP_SAPI) {
+  throw new \Exception('[bootstrap] Cannot be run under '.PHP_SAPI.' SAPI');
+}
+
+set_exception_handler(function($e) {
+  if ($e instanceof \lang\Throwable) {
+    fputs(STDERR, 'Uncaught exception: '.$e->toString());
+  } else {
+    fputs(STDERR, 'Uncaught exception: Exception '.get_class($e).' ('.$e->getMessage().")\n");
+    foreach ($e->getTrace() as $trace) {
+      fprintf(STDERR,
+        "  at %s%s%s(%s) [line %d of %s]\n",
+        isset($trace['class']) ? strtr($trace['class'], '\\', '.') : '<main>',
+        isset($trace['type']) ? $trace['type'] : '::',
+        isset($trace['function']) ? $trace['function'] : '<main>',
+        isset($trace['args']) ? implode(', ', array_map(['xp', 'stringOf'], $trace['args'])) : '',
+        isset($trace['line']) ? $trace['line'] : 0,
+        isset($trace['file']) ? basename($trace['file']) : '(unknown)'
+      );
+    }
+  }
+  exit(0xff);
+});
+
+ini_set('display_errors', 'false');
+register_shutdown_function(function() {
+  static $types= array(
+    E_ERROR         => 'Fatal error',
+    E_USER_ERROR    => 'Fatal error',
+    E_CORE_ERROR    => 'Core error',
+    E_PARSE         => 'Parse error',
+    E_COMPILE_ERROR => 'Compile error'
+  );
+
+  $e= error_get_last();
+  if (null !== $e && isset($types[$e['type']])) {
+    __error($e['type'], $e['message'], $e['file'], $e['line']);
+    fprintf(
+      STDERR,
+      "Uncaught error: %s (%s)\n  at <source> [line %d of %s]\n  at <main>(%s) [line 0 of %s]\n",
+      $types[$e['type']],
+      $e['message'],
+      $e['line'],
+      str_replace(getcwd(), '.', $e['file']),
+      implode(', ', array_map(['xp', 'stringOf'], array_slice($_SERVER['argv'], 1))),
+      str_replace('.', DIRECTORY_SEPARATOR, $_SERVER['argv'][0]).\xp::CLASS_FILE_EXT
+    );
+  }
+});
+
+// Start I/O layers
+$encoding= get_cfg_var('encoding');
+iconv_set_encoding('internal_encoding', \xp::ENCODING);
+array_shift($_SERVER['argv']);
+array_shift($argv);
+if ($encoding) {
+  foreach ($argv as $i => $val) {
+    $_SERVER['argv'][$i]= $argv[$i]= iconv($encoding, \xp::ENCODING, $val);
+  }
+}
+
+foreach ($include as $path => $_) {
+  \lang\ClassLoader::registerPath($path);
+}
+
+try {
+  exit(\lang\XPClass::forName($argv[0])->getMethod('main')->invoke(null, array(array_slice($argv, 1))));
+} catch (\lang\SystemExit $e) {
+  if ($message= $e->getMessage()) echo $message, "\n";
+  exit($e->getCode());
+}
 --3289:doclet:--
 #!/bin/sh
 PATHSEP=';'
@@ -407,7 +703,257 @@ if getopts :w: watch ; then
 else
   exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 fi
---3286:xar:--
+--7767:web-main.php:--
+<?php namespace xp;
+
+// Set WEB specific handling
+$cwd= getenv('WEB_ROOT') ?: $_SERVER['DOCUMENT_ROOT'].'/..';
+$config= ini_get('user_dir') ?: $cwd.'/etc';
+$home= getenv('HOME');
+
+final class xar {
+  public
+    $position     = 0,
+    $archive      = null,
+    $filename     = '';
+    
+  // {{{ proto [:var] acquire(string archive)
+  //     Archive instance handling pool function, opens an archive and reads header only once
+  static function acquire($archive) {
+    static $archives= array();
+    static $unpack= array(
+      1 => 'a80id/a80*filename/a80*path/V1size/V1offset/a*reserved',
+      2 => 'a240id/V1size/V1offset/a*reserved'
+    );
+    
+    if ('/' === $archive{0} && ':' === $archive{2}) {
+      $archive= substr($archive, 1);    // Handle xar:///f:/archive.xar => f:/archive.xar
+    }
+
+    if (!isset($archives[$archive])) {
+      $current= array('handle' => fopen($archive, 'rb'), 'dev' => crc32($archive));
+      $header= unpack('a3id/c1version/V1indexsize/a*reserved', fread($current['handle'], 0x0100));
+      if ('CCA' != $header['id']) \raise('lang.FormatException', 'Malformed archive '.$archive);
+      for ($current['index']= array(), $i= 0; $i < $header['indexsize']; $i++) {
+        $entry= unpack(
+          $unpack[$header['version']], 
+          fread($current['handle'], 0x0100)
+        );
+        $current['index'][rtrim($entry['id'], "\0")]= array($entry['size'], $entry['offset'], $i);
+      }
+      $current['offset']= 0x0100 + $i * 0x0100;
+      $archives[$archive]= $current;
+    }
+
+    return $archives[$archive];
+  }
+  // }}}
+  
+  // {{{ proto bool stream_open(string path, string mode, int options, string opened_path)
+  //     Open the given stream and check if file exists
+  function stream_open($path, $mode, $options, $opened_path) {
+    sscanf(strtr($path, ';', '?'), 'xar://%[^?]?%[^$]', $archive, $this->filename);
+    $this->archive= self::acquire(urldecode($archive));
+    return isset($this->archive['index'][$this->filename]);
+  }
+  // }}}
+  
+  // {{{ proto string stream_read(int count)
+  //     Read $count bytes up-to-length of file
+  function stream_read($count) {
+    $f= $this->archive['index'][$this->filename];
+    if (0 === $count || $this->position >= $f[0]) return false;
+
+    fseek($this->archive['handle'], $this->archive['offset'] + $f[1] + $this->position, SEEK_SET);
+    $bytes= fread($this->archive['handle'], min($f[0] - $this->position, $count));
+    $this->position+= strlen($bytes);
+    return $bytes;
+  }
+  // }}}
+  
+  // {{{ proto bool stream_eof()
+  //     Returns whether stream is at end of file
+  function stream_eof() {
+    return $this->position >= $this->archive['index'][$this->filename][0];
+  }
+  // }}}
+  
+  // {{{ proto [:int] stream_stat()
+  //     Retrieve status of stream
+  function stream_stat() {
+    return array(
+      'dev'   => $this->archive['dev'],
+      'size'  => $this->archive['index'][$this->filename][0],
+      'ino'   => $this->archive['index'][$this->filename][2]
+    );
+  }
+  // }}}
+
+  // {{{ proto bool stream_seek(int offset, int whence)
+  //     Callback for fseek
+  function stream_seek($offset, $whence) {
+    switch ($whence) {
+      case SEEK_SET: $this->position= $offset; break;
+      case SEEK_CUR: $this->position+= $offset; break;
+      case SEEK_END: $this->position= $this->archive['index'][$this->filename][0] + $offset; break;
+    }
+    return true;
+  }
+  // }}}
+  
+  // {{{ proto int stream_tell
+  //     Callback for ftell
+  function stream_tell() {
+    return $this->position;
+  }
+  // }}}
+  
+  // {{{ proto [:int] url_stat(string path)
+  //     Retrieve status of url
+  function url_stat($path) {
+    sscanf(strtr($path, ';', '?'), 'xar://%[^?]?%[^$]', $archive, $file);
+    $current= self::acquire(urldecode($archive));
+    return isset($current['index'][$file]) ? array(
+      'dev'   => $current['dev'],
+      'mode'  => 0100644,
+      'size'  => $current['index'][$file][0],
+      'ino'   => $current['index'][$file][2]
+    ) : false;
+  }
+  // }}}
+}
+
+stream_wrapper_register('xar', 'xp\xar');
+
+function path($in) {
+  $qn= realpath($in);
+  if (false === $qn) {
+    throw new \Exception('[bootstrap] Classpath element ['.$in.'] not found');
+  } else {
+    return is_dir($qn) ? $qn.DIRECTORY_SEPARATOR : $qn;
+  }
+}
+
+function scan($paths, $home= '.') {
+  $include= array();
+  foreach ($paths as $path) {
+    if ('' === $path) {
+      continue;
+    } else if ('~' === $path{0}) {
+      $path= $home.substr($path, 1);
+    }
+
+    if (!($d= @opendir($path))) continue;
+    while ($e= readdir($d)) {
+      if ('.pth' !== substr($e, -4)) continue;
+
+      foreach (file($path.DIRECTORY_SEPARATOR.$e) as $line) {
+        $line= trim($line);
+        if ('' === $line || '#' === $line{0}) {
+          continue;
+        } else if ('!' === $line{0}) {
+          $pre= true;
+          $line= substr($line, 1);
+        } else {
+          $pre= false;
+        }
+
+        if ('~' === $line{0}) {
+          $qn= $home.DIRECTORY_SEPARATOR.substr($line, 1);
+        } else if ('/' === $line{0} || strlen($line) > 2 && (':' === $line{1} && '\\' === $line{2})) {
+          $qn= $line;
+        } else {
+          $qn= $path.DIRECTORY_SEPARATOR.$line;
+        }
+
+        $pre ? array_unshift($include, path($qn)) : $include[]= path($qn);
+      }
+    }
+    closedir($d);
+  }
+  return $include;
+}
+
+function bootstrap($paths, $merge) {
+  $bootstrap= array();
+  $include= array();
+  $merged= false;
+  do {
+    foreach ($paths as $path) {
+      if (DIRECTORY_SEPARATOR === $path{strlen($path) - 1}) {
+        $f= $path.'__xp.php';
+      } else if (0 === substr_compare($path, '.xar', -4)) {
+        $f= 'xar://'.$path.'?__xp.php';
+      } else if (0 === substr_compare($path, '__xp.php', -8)) {
+        $f= $path;
+        $path= substr($path, 0, -8);
+      } else {
+        $bootstrap[$path]= false;
+        continue;
+      }
+
+      $include[$path]= true;
+      if (is_file($f)) $bootstrap[$f]= true;
+    }
+
+    if ($merged) {
+      return array($bootstrap, $include);
+    } else {
+      $paths= $merge();
+      $merged= true;
+    }
+  } while (true);
+}
+
+list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($home) {
+  list($use, $inc)= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
+  return array_merge(
+    scan(array_unique(explode(PATH_SEPARATOR, substr($use, 2))), $home),
+    array_map('xp\path', explode(PATH_SEPARATOR, $inc))
+  );
+});
+
+foreach ($bootstrap as $file => $xp) {
+  if ($xp && class_exists('xp', false)) continue;
+  include $file;
+}
+
+if (!class_exists('xp', false)) {
+  throw new \Exception('[bootstrap] Cannot determine boot class path from '.get_include_path());
+}
+
+// Set error status to 516 by default - if a fatal error occurs,
+// this guarantees to at least send an error code.
+if ('cgi' === PHP_SAPI) {
+  header('Status: 516 Unrecoverable Error');
+} else if ('cli-server' === PHP_SAPI) {
+  if (is_file($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'])) {
+    return false;
+  }
+  header('HTTP/1.0 516 Unrecoverable Error');
+  $_SERVER['SCRIPT_URL']= substr($_SERVER['REQUEST_URI'], 0, strcspn($_SERVER['REQUEST_URI'], '?#'));
+  $_SERVER['SERVER_PROFILE']= getenv('SERVER_PROFILE');
+  define('STDIN', fopen('php://stdin', 'rb'));
+  define('STDOUT', fopen('php://stdout', 'wb'));
+  define('STDERR', fopen('php://stderr', 'wb'));
+} else {
+  header('HTTP/1.0 516 Unrecoverable Error');
+}
+
+ini_set('error_prepend_string', '<xmp>');
+ini_set('error_append_string', '</xmp>');
+ini_set('html_errors', 0);
+
+foreach ($include as $path => $_) {
+  \lang\ClassLoader::registerPath($path);
+}
+
+try {
+  exit(\xp\scriptlet\Runner::main(array($home, $config, $_SERVER['SERVER_PROFILE'], $_SERVER['SCRIPT_URL'])));
+} catch (\lang\SystemExit $e) {
+  if ($message= $e->getMessage()) echo $message, "\n";
+  exit($e->getCode());
+}--3286:xar:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -849,6 +1395,10 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--87:xp.ini:--
+[runtime]
+date.timezone=GMT
+default=c:/Programme/php-5.6.12-nts-Win32-VC11-x86/php.exe
 --3290:xpcli:--
 #!/bin/sh
 PATHSEP=';'
@@ -1113,7 +1663,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---6711:xpws:--
+--6740:xpws:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1205,12 +1755,6 @@ while [ $# != 0 ]; do
       INCLUDE_PATH=${INCLUDE_PATH}${PATHSEP}$2
       shift 2
       ;;
-    info|-i)
-      RUNNER=class
-      START=@immediate
-      TOOL='xp.scriptlet.Inspect|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}'
-      shift 1
-      ;;
     -m)
       if [ "develop" = $2 ] ; then
         RUNNER=web
@@ -1227,10 +1771,17 @@ while [ $# != 0 ]; do
       ;;
     -L)
       LOGFILE=$2
+      touch $LOGFILE || exit
       shift 2
       ;;
     start|stop|status|serve)
       ACTION=$1
+      shift 1
+      ;;
+    info|-i)
+      RUNNER=class
+      START=@immediate
+      TOOL='xp.scriptlet.Inspect|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}'
       shift 1
       ;;
     -?)
