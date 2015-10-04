@@ -12,20 +12,29 @@ require 'class-path.php';
 
 // Set error status to 516 by default - if a fatal error occurs,
 // this guarantees to at least send an error code.
-if ('cgi' === PHP_SAPI) {
-  header('Status: 516 Unrecoverable Error');
-} else if ('cli-server' === PHP_SAPI) {
-  if (is_file($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'])) {
-    return false;
+switch (PHP_SAPI) {
+  case 'cgi': {
+    header('Status: 516 Unrecoverable Error');
+    break;
   }
-  header('HTTP/1.0 516 Unrecoverable Error');
-  $_SERVER['SCRIPT_URL']= substr($_SERVER['REQUEST_URI'], 0, strcspn($_SERVER['REQUEST_URI'], '?#'));
-  $_SERVER['SERVER_PROFILE']= getenv('SERVER_PROFILE');
-  define('STDIN', fopen('php://stdin', 'rb'));
-  define('STDOUT', fopen('php://stdout', 'wb'));
-  define('STDERR', fopen('php://stderr', 'wb'));
-} else {
-  header('HTTP/1.0 516 Unrecoverable Error');
+
+  case 'cli-server': {
+    if (is_file($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'])) {
+      return false;
+    }
+    header('HTTP/1.0 516 Unrecoverable Error');
+    $_SERVER['SCRIPT_URL']= substr($_SERVER['REQUEST_URI'], 0, strcspn($_SERVER['REQUEST_URI'], '?#'));
+    $_SERVER['SERVER_PROFILE']= getenv('SERVER_PROFILE');
+    define('STDIN', fopen('php://stdin', 'rb'));
+    define('STDOUT', fopen('php://stdout', 'wb'));
+    define('STDERR', fopen('php://stderr', 'wb'));
+    break;
+  }
+
+  default: {
+    header('HTTP/1.0 516 Unrecoverable Error');
+    break;
+  }
 }
 
 ini_set('error_prepend_string', '<xmp>');
