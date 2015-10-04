@@ -18,6 +18,13 @@ switch (PHP_SAPI) {
     break;
   }
 
+  case 'fpm-fcgi': {
+    header('HTTP/1.0 516 Unrecoverable Error');
+    $_SERVER['SCRIPT_URL']= substr($_SERVER['REQUEST_URI'], 0, strcspn($_SERVER['REQUEST_URI'], '?#'));
+    $_SERVER['SERVER_PROFILE']= getenv('SERVER_PROFILE');
+    break;
+  }
+
   case 'cli-server': {
     if (is_file($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'])) {
       return false;
