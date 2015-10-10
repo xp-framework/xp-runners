@@ -246,7 +246,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3470:unittest:--
+--3371:unittest:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -369,20 +369,14 @@ if [ "" = "$tool" ] ; then
 fi
 export XP_EXE
 IFS="|"
-WATCH=""
-while getopts :w: flag ; do
-  case "$flag" in
-    w) WATCH="$OPTARG"; shift 1 ;;
-  esac
-done
-if [ -n "$WATCH" ] ; then
+if getopts :w: watch ; then
   ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
   if [ $? = 2 ] ; then
     exit 2
   elif [ $? = 126 ] || [ $? = 127 ] ; then
     exit 255
   fi
-  inotifywait -q -e close_write -m -r $WATCH | while read event
+  inotifywait -q -e close_write -m -r $OPTARG | while read event
   do
     ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
   done
@@ -1055,7 +1049,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5345:xpws:--
+--6506:xpws:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -1112,6 +1106,9 @@ INCLUDE_PATH="."
 SERVER_PROFILE=dev
 WEB_ROOT=.
 WEB_CONFIG=
+ACTION=serve
+PIDFILE=".xpws.pid"
+LOGFILE="/dev/null"
 while [ $# != 0 ]; do
   case $1 in
     -p)
@@ -1144,12 +1141,6 @@ while [ $# != 0 ]; do
       INCLUDE_PATH=${INCLUDE_PATH}${PATHSEP}$2
       shift 2
       ;;
-    -i)
-      RUNNER=class
-      START=@immediate
-      TOOL='xp.scriptlet.Inspect|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}'
-      shift 1
-      ;;
     -m)
       if [ "develop" = $2 ] ; then
         RUNNER=web
@@ -1159,6 +1150,25 @@ while [ $# != 0 ]; do
         TOOL='xp.scriptlet.Server|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}|'$2
       fi
       shift 2
+      ;;
+    -P)
+      PIDFILE=$2
+      shift 2
+      ;;
+    -L)
+      LOGFILE=$2
+      touch $LOGFILE || exit
+      shift 2
+      ;;
+    start|stop|status|serve)
+      ACTION=$1
+      shift 1
+      ;;
+    info|-i)
+      RUNNER=class
+      START=@immediate
+      TOOL='xp.scriptlet.Inspect|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}'
+      shift 1
       ;;
     -?)
       RUNNER=class
@@ -1278,12 +1288,47 @@ else
   export SERVER_PROFILE
   export DOCUMENT_ROOT
   eval 'START="'$START'"'
-  ${XP_EXE}${ifs}${START}${args}${ifs}$tool ${ARGS} "$@" &
-  PID=$!
-  echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR @ $WEB_ROOT - Press <Enter> to exit"
-  read enter
-  echo "[xpws-$SERVER_PROFILE#$PID] shutting down..."
-  kill -TERM $PID
+  case $ACTION in
+    serve)
+      ${XP_EXE}${ifs}${START}${args}${ifs}$tool ${ARGS} "$@" &
+      PID=$!
+      echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR @ $WEB_ROOT - Press <Enter> to exit"
+      read enter
+      echo "[xpws-$SERVER_PROFILE#$PID] shutting down..."
+      kill -TERM $PID
+      ;;
+    start)
+      if [ -f "$PIDFILE" ] ; then
+        echo "*** xpws already running"
+        exit 255
+      else
+        ${XP_EXE}${ifs}${START}${args}${ifs}$tool ${ARGS} "$@" 1>"$LOGFILE" 2>&1 &
+        PID=$!
+        echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR @ $WEB_ROOT - Use xpws stop to end"
+        echo $SERVER_PROFILE#$PID > "$PIDFILE"
+      fi
+      ;;
+    stop)
+      if [ -f "$PIDFILE" ] ; then
+        running=$(cat "$PIDFILE")
+        PID=${running#*'#'}
+        echo "[xpws-$running] shutting down..."
+        kill -TERM $PID
+        rm "$PIDFILE"
+      else
+        echo "*** xpws not running"
+        exit 255
+      fi
+      ;;
+    status)
+      if [ -f "$PIDFILE" ] ; then
+        running=$(cat "$PIDFILE")
+        echo "[xpws-$running] running - $PIDFILE"
+      else
+        echo "xpws not running"
+      fi
+      ;;
+  esac
 fi
 --485:xprt-update.sh:--
 #!/bin/sh
@@ -1610,7 +1655,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---8170:web-main.php:--
+--7857:web-main.php:--
 <?php namespace xp;
 
 // Set WEB specific handling
@@ -1833,36 +1878,20 @@ if (!class_exists('xp', false)) {
 
 // Set error status to 516 by default - if a fatal error occurs,
 // this guarantees to at least send an error code.
-switch (PHP_SAPI) {
-  case 'cgi': {
-    header('Status: 516 Unrecoverable Error');
-    break;
+if ('cgi' === PHP_SAPI) {
+  header('Status: 516 Unrecoverable Error');
+} else if ('cli-server' === PHP_SAPI) {
+  if (is_file($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'])) {
+    return false;
   }
-
-  case 'fpm-fcgi': {
-    header('HTTP/1.0 516 Unrecoverable Error');
-    $_SERVER['SCRIPT_URL']= substr($_SERVER['REQUEST_URI'], 0, strcspn($_SERVER['REQUEST_URI'], '?#'));
-    $_SERVER['SERVER_PROFILE']= getenv('SERVER_PROFILE');
-    break;
-  }
-
-  case 'cli-server': {
-    if (is_file($_SERVER['DOCUMENT_ROOT'].$_SERVER['REQUEST_URI'])) {
-      return false;
-    }
-    header('HTTP/1.0 516 Unrecoverable Error');
-    $_SERVER['SCRIPT_URL']= substr($_SERVER['REQUEST_URI'], 0, strcspn($_SERVER['REQUEST_URI'], '?#'));
-    $_SERVER['SERVER_PROFILE']= getenv('SERVER_PROFILE');
-    define('STDIN', fopen('php://stdin', 'rb'));
-    define('STDOUT', fopen('php://stdout', 'wb'));
-    define('STDERR', fopen('php://stderr', 'wb'));
-    break;
-  }
-
-  default: {
-    header('HTTP/1.0 516 Unrecoverable Error');
-    break;
-  }
+  header('HTTP/1.0 516 Unrecoverable Error');
+  $_SERVER['SCRIPT_URL']= substr($_SERVER['REQUEST_URI'], 0, strcspn($_SERVER['REQUEST_URI'], '?#'));
+  $_SERVER['SERVER_PROFILE']= getenv('SERVER_PROFILE');
+  define('STDIN', fopen('php://stdin', 'rb'));
+  define('STDOUT', fopen('php://stdout', 'wb'));
+  define('STDERR', fopen('php://stderr', 'wb'));
+} else {
+  header('HTTP/1.0 516 Unrecoverable Error');
 }
 
 ini_set('error_prepend_string', '<xmp>');
