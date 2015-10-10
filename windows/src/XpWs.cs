@@ -102,6 +102,7 @@ namespace Net.XpFramework.Runner
                     proc.StartInfo.Arguments
                 );
                 proc.Start();
+
                 // Write PID file and exit
                 File.WriteAllText(pidFile, profile + '#' + proc.Id);
                 Console.Out.WriteLine("[xpws-{0}#{1}] running {2}:{3} @ {4} - Use xpws stop to end", profile, proc.Id, server, port, web);
@@ -146,11 +147,13 @@ namespace Net.XpFramework.Runner
                 Console.Error.WriteLine("*** xpws not running");
                 return 0xFF;
             }
+
             // Parse pid file, then delete it
             var spec = File.ReadAllText(pidFile).Trim().Split('#');
             var running = spec[0];
             var pid = Convert.ToInt32(spec[1]);
             File.Delete(pidFile);
+
             // Close process
             Process proc = null;
             try
@@ -305,8 +308,8 @@ namespace Net.XpFramework.Runner
                 root,
                 config,
                 inc.ToArray(),
-                logFile,
-                pidFile
+                pidFile,
+                logFile
             ));
         }
     }
