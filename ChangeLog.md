@@ -3,6 +3,9 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #30: Add support for PHP FPM
+  (@kiesel)
+
 ## 5.5.1 / 2015-10-10
 
 * Fixed passing `-q` to Un*x runners triggering watch mode - see PR #31
