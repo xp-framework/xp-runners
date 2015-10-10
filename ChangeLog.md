@@ -3,9 +3,17 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #30: Add support for PHP FPM
+  (@kiesel)
+
+## 5.5.1 / 2015-10-10
+
+* Fixed passing `-q` to Un*x runners triggering watch mode - see PR #31
+  (@kiesel)
+
 ## 5.5.0 / 2015-08-16
 
-* Fixed isue #27: Core errors unhandled
+* Fixed issue #27: Core errors unhandled
   (@thekid)
 * Merged PR #26: Rewrite fatal error handler, inlining error class
   (@thekid)
