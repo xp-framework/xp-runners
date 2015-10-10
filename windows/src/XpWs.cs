@@ -95,6 +95,8 @@ namespace Net.XpFramework.Runner
             try
             {
                 proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", inc, new string[] { });
+                proc.StartInfo.RedirectStandardOutput = true;
+                proc.StartInfo.RedirectStandardError = true;
                 proc.StartInfo.Arguments = (
                     "-S " + server + ":" + port +
                     " -t \"" + root + "\"" +
@@ -106,6 +108,16 @@ namespace Net.XpFramework.Runner
                 // Write PID file and exit
                 File.WriteAllText(pidFile, profile + '#' + proc.Id);
                 Console.Out.WriteLine("[xpws-{0}#{1}] running {2}:{3} @ {4} - Use xpws stop to end", profile, proc.Id, server, port, web);
+
+                // Swallow all output in a background thread
+                var log = new Thread(new ThreadStart(() =>
+                {
+                    proc.BeginOutputReadLine();
+                    proc.WaitForExit();
+                    File.Delete(pidFile);
+                }));
+                log.IsBackground = true;
+                log.Start();
                 return 0;
             }
             catch (InvalidOperationException e)
