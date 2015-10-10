@@ -3,6 +3,8 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.5.1 / 2015-10-10
+
 * Fixed passing `-q` to Un*x runners triggering watch mode - see PR #31
   (@kiesel)
 

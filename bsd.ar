@@ -254,7 +254,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3466:unittest:--
+--3565:unittest:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -381,14 +381,20 @@ if [ ! -d /proc/1 ] ; then
 fi
 export XP_EXE
 IFS="|"
-if getopts :w: watch ; then
+WATCH=""
+while getopts :w: flag ; do
+  case "$flag" in
+    w) WATCH="$OPTARG"; shift 1 ;;
+  esac
+done
+if [ -n "$WATCH" ] ; then
   ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
   if [ $? = 2 ] ; then
     exit 2
   elif [ $? = 126 ] || [ $? = 127 ] ; then
     exit 255
   fi
-  inotifywait -q -e close_write -m -r $OPTARG | while read event
+  inotifywait -q -e close_write -m -r $WATCH | while read event
   do
     ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
   done
