@@ -9,7 +9,7 @@ namespace Net.XpFramework.Runner
 {
     class XpWs : BaseRunner
     {
-        delegate int Execution(string profile, string server, string port, string web, string root, string config, string[] inc);
+        delegate int Execution(string profile, string server, string port, string web, string root, string config, string[] inc, string pidFile, string logFile);
 
         static int Service(string profile, string server, string port, string web, string root, string config, Func<Process> NewProcess)
         {
@@ -55,7 +55,7 @@ namespace Net.XpFramework.Runner
         }
 
         /// Delegate: Serve web with development webserver
-        static int Develop(string profile, string server, string port, string web, string root, string config, string[] inc)
+        static int Develop(string profile, string server, string port, string web, string root, string config, string[] inc, string pidFile, string logFile)
         {
             return Service(profile, server, port, web, root, config, () => {
                 var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", inc, new string[] { });
@@ -70,7 +70,7 @@ namespace Net.XpFramework.Runner
         }
 
         /// Delegate: Inspect web setup
-        static int Inspect(string profile, string server, string port, string web, string root, string config, string[] inc)
+        static int Inspect(string profile, string server, string port, string web, string root, string config, string[] inc, string pidFile, string logFile)
         {
             Execute("class", "xp.scriptlet.Inspect", inc, new string[]
             {
@@ -83,9 +83,8 @@ namespace Net.XpFramework.Runner
         }
 
         /// Delegate: Start serving web
-        static int Start(string profile, string server, string port, string web, string root, string config, string[] inc)
+        static int Start(string profile, string server, string port, string web, string root, string config, string[] inc, string pidFile, string logFile)
         {
-            var pidFile = ".xpws.pid";
             if (File.Exists(pidFile))
             {
                 Console.Error.WriteLine("*** xpws already running");
@@ -104,7 +103,7 @@ namespace Net.XpFramework.Runner
                 );
                 proc.Start();
                 // Write PID file and exit
-                File.WriteAllText(".xpws.pid", profile + '#' + proc.Id);
+                File.WriteAllText(pidFile, profile + '#' + proc.Id);
                 Console.Out.WriteLine("[xpws-{0}#{1}] running {2}:{3} @ {4} - Use xpws stop to end", profile, proc.Id, server, port, web);
                 return 0;
             }
@@ -125,9 +124,8 @@ namespace Net.XpFramework.Runner
         }
 
         /// Delegate: Show status
-        static int Status(string profile, string server, string port, string web, string root, string config, string[] inc)
+        static int Status(string profile, string server, string port, string web, string root, string config, string[] inc, string pidFile, string logFile)
         {
-            var pidFile = ".xpws.pid";
             if (!File.Exists(pidFile))
             {
                 Console.WriteLine("xpws not running");
@@ -141,9 +139,8 @@ namespace Net.XpFramework.Runner
         }
 
         /// Delegate: Stop serving web
-        static int Stop(string profile, string server, string port, string web, string root, string config, string[] inc)
+        static int Stop(string profile, string server, string port, string web, string root, string config, string[] inc, string pidFile, string logFile)
         {
-            var pidFile = ".xpws.pid";
             if (!File.Exists(pidFile))
             {
                 Console.Error.WriteLine("*** xpws not running");
@@ -188,6 +185,8 @@ namespace Net.XpFramework.Runner
             var root = "";
             var config = "";
             var profile = "dev";
+            var pidFile = ".xpws.pid";
+            var logFile = "";
             // Parse arguments
             var i = 0;
             while (i < args.Length)
@@ -228,6 +227,12 @@ namespace Net.XpFramework.Runner
                     case "-cp":
                         inc.Add(Paths.Resolve(args[++i]));
                         break;
+                    case "-P":
+                        pidFile = args[++i];
+                        break;
+                    case "-L":
+                        logFile = args[++i];
+                        break;
                     case "info": case "-i":
                         action = Inspect;
                         break;
@@ -248,7 +253,7 @@ namespace Net.XpFramework.Runner
                         }
                         else
                         {
-                            action = (_profile, _server, _port, _web, _root, _config, _inc) =>
+                            action = (_profile, _server, _port, _web, _root, _config, _inc, _pid, _log) =>
                             {
                                 return Service(_profile, _server, _port, _web, _root, _config, () => {
                                     return Executor.Instance(Paths.DirName(Paths.Binary()), "class", "xp.scriptlet.Server", _inc, new string[] {
@@ -299,7 +304,9 @@ namespace Net.XpFramework.Runner
                 web,
                 root,
                 config,
-                inc.ToArray()
+                inc.ToArray(),
+                logFile,
+                pidFile
             ));
         }
     }
