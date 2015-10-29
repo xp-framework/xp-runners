@@ -24,6 +24,15 @@ Run `make test [PHP=/path/to/php/binary]` to test runners and the shared code.
 
 ## Installation
 
+This is the preferrred way of installing the runners:
+
+```sh
+$ cd ~/bin
+$ wget 'https://github.com/xp-framework/xp-runners/releases/download/v5.6.0/setup' -O - | php
+```
+
+### From this directory
+
 For Unix, BSD, Cygwin install targets exist that do install the final scripts into /usr/bin (or a given different directory).
 
 ### Debian
