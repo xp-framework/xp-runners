@@ -1314,7 +1314,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---9232:class-main.php:--
+--9455:class-main.php:--
 <?php namespace xp;
 
 // Set CLI specific handling
@@ -1435,10 +1435,13 @@ final class xar {
 
 stream_wrapper_register('xar', 'xp\xar');
 
-function path($in) {
+function path($in, $bail) {
   $qn= realpath($in);
   if (false === $qn) {
-    throw new \Exception('[bootstrap] Classpath element ['.$in.'] not found');
+    if ($bail) {
+      throw new \Exception('[bootstrap] Classpath element ['.$in.'] not found');
+    }
+    return null;
   } else {
     return is_dir($qn) ? $qn.DIRECTORY_SEPARATOR : $qn;
   }
@@ -1459,11 +1462,15 @@ function scan($paths, $home= '.') {
 
       foreach (file($path.DIRECTORY_SEPARATOR.$e) as $line) {
         $line= trim($line);
+        $bail= true;
         if ('' === $line || '#' === $line{0}) {
           continue;
         } else if ('!' === $line{0}) {
           $pre= true;
           $line= '!' === $line ? '.' : substr($line, 1);
+        } else if ('?' === $line{0}) {
+          $bail= false;
+          $line= substr($line, 1);
         } else {
           $pre= false;
         }
@@ -1476,7 +1483,9 @@ function scan($paths, $home= '.') {
           $qn= $path.DIRECTORY_SEPARATOR.$line;
         }
 
-        $pre ? array_unshift($include, path($qn)) : $include[]= path($qn);
+        if ($resolved= path($qn, $bail)) {
+          $pre ? array_unshift($include, $resolved) : $include[]= $resolved;
+        }
       }
     }
     closedir($d);
@@ -1610,7 +1619,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---8170:web-main.php:--
+--8393:web-main.php:--
 <?php namespace xp;
 
 // Set WEB specific handling
@@ -1732,10 +1741,13 @@ final class xar {
 
 stream_wrapper_register('xar', 'xp\xar');
 
-function path($in) {
+function path($in, $bail) {
   $qn= realpath($in);
   if (false === $qn) {
-    throw new \Exception('[bootstrap] Classpath element ['.$in.'] not found');
+    if ($bail) {
+      throw new \Exception('[bootstrap] Classpath element ['.$in.'] not found');
+    }
+    return null;
   } else {
     return is_dir($qn) ? $qn.DIRECTORY_SEPARATOR : $qn;
   }
@@ -1756,11 +1768,15 @@ function scan($paths, $home= '.') {
 
       foreach (file($path.DIRECTORY_SEPARATOR.$e) as $line) {
         $line= trim($line);
+        $bail= true;
         if ('' === $line || '#' === $line{0}) {
           continue;
         } else if ('!' === $line{0}) {
           $pre= true;
           $line= '!' === $line ? '.' : substr($line, 1);
+        } else if ('?' === $line{0}) {
+          $bail= false;
+          $line= substr($line, 1);
         } else {
           $pre= false;
         }
@@ -1773,7 +1789,9 @@ function scan($paths, $home= '.') {
           $qn= $path.DIRECTORY_SEPARATOR.$line;
         }
 
-        $pre ? array_unshift($include, path($qn)) : $include[]= path($qn);
+        if ($resolved= path($qn, $bail)) {
+          $pre ? array_unshift($include, $resolved) : $include[]= $resolved;
+        }
       }
     }
     closedir($d);

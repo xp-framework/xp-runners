@@ -3,6 +3,10 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.6.0 / 2015-10-29
+
+* Merged PR #32: Support optional class path entries via ?[path]
+  (@kiesel, @thekid)
 * Merged PR #30: Add support for PHP FPM
   (@kiesel)
 
