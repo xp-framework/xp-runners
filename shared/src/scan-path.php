@@ -1,9 +1,12 @@
 <?php namespace xp;
 
-function path($in) {
+function path($in, $bail) {
   $qn= realpath($in);
   if (false === $qn) {
-    throw new \Exception('[bootstrap] Classpath element ['.$in.'] not found');
+    if ($bail) {
+      throw new \Exception('[bootstrap] Classpath element ['.$in.'] not found');
+    }
+    return null;
   } else {
     return is_dir($qn) ? $qn.DIRECTORY_SEPARATOR : $qn;
   }
@@ -24,11 +27,15 @@ function scan($paths, $home= '.') {
 
       foreach (file($path.DIRECTORY_SEPARATOR.$e) as $line) {
         $line= trim($line);
+        $bail= true;
         if ('' === $line || '#' === $line{0}) {
           continue;
         } else if ('!' === $line{0}) {
           $pre= true;
           $line= '!' === $line ? '.' : substr($line, 1);
+        } else if ('?' === $line{0}) {
+          $bail= false;
+          $line= substr($line, 1);
         } else {
           $pre= false;
         }
@@ -41,7 +48,9 @@ function scan($paths, $home= '.') {
           $qn= $path.DIRECTORY_SEPARATOR.$line;
         }
 
-        $pre ? array_unshift($include, path($qn)) : $include[]= path($qn);
+        if ($resolved= path($qn, $bail)) {
+          $pre ? array_unshift($include, $resolved) : $include[]= $resolved;
+        }
       }
     }
     closedir($d);
