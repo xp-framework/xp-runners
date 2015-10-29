@@ -1314,7 +1314,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---9455:class-main.php:--
+--9461:class-main.php:--
 <?php namespace xp;
 
 // Set CLI specific handling
@@ -1435,7 +1435,7 @@ final class xar {
 
 stream_wrapper_register('xar', 'xp\xar');
 
-function path($in, $bail) {
+function path($in, $bail= true) {
   $qn= realpath($in);
   if (false === $qn) {
     if ($bail) {
@@ -1619,7 +1619,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---8393:web-main.php:--
+--8399:web-main.php:--
 <?php namespace xp;
 
 // Set WEB specific handling
@@ -1741,7 +1741,7 @@ final class xar {
 
 stream_wrapper_register('xar', 'xp\xar');
 
-function path($in, $bail) {
+function path($in, $bail= true) {
   $qn= realpath($in);
   if (false === $qn) {
     if ($bail) {

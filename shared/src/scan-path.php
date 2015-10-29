@@ -1,6 +1,6 @@
 <?php namespace xp;
 
-function path($in, $bail) {
+function path($in, $bail= true) {
   $qn= realpath($in);
   if (false === $qn) {
     if ($bail) {
