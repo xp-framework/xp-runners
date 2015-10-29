@@ -169,6 +169,14 @@ exit($test->run([
     );
   },
 
+  'non-existant entries with question marks are ok' => function() use($path) {
+    file_put_contents($path->compose($this->classpath, 'class.pth'), '?does-not-exist');
+    $this->assertEquals(
+      [],
+      \xp\scan([$this->classpath], $this->home)
+    );
+  },
+
   'supports ~ in include path' => function() use($path) {
     $xar= $path->compose($this->home, 'core.xar');
     file_put_contents($path->compose($this->classpath, 'class.pth'), $xar);
