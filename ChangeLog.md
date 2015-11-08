@@ -3,6 +3,11 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.6.1 / 2015-11-08
+
+* Merged PR #33: Display startup errors with stack traces
+  (@thekid)
+
 ## 5.6.0 / 2015-10-29
 
 * Merged PR #32: Support optional class path entries via ?[path]
