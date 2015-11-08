@@ -1,35 +1,18 @@
 <?php namespace xp;
 
-// Set CLI specific handling
-$home= getenv('HOME');
-$cwd= '.';
-
-require 'xar-support.php';
-require 'scan-path.php';
-require 'bootstrap.php';
-require 'class-path.php';
-
-if ('cgi' === PHP_SAPI || 'cgi-fcgi' === PHP_SAPI) {
-  ini_set('html_errors', 0);
-  define('STDIN', fopen('php://stdin', 'rb'));
-  define('STDOUT', fopen('php://stdout', 'wb'));
-  define('STDERR', fopen('php://stderr', 'wb'));
-} else if ('cli' !== PHP_SAPI) {
-  throw new \Exception('[bootstrap] Cannot be run under '.PHP_SAPI.' SAPI');
-}
-
 set_exception_handler(function($e) {
   if ($e instanceof \lang\Throwable) {
     fputs(STDERR, 'Uncaught exception: '.$e->toString());
   } else {
-    fputs(STDERR, 'Uncaught exception: Exception '.get_class($e).' ('.$e->getMessage().")\n");
+    fputs(STDERR, 'Uncaught exception: '.get_class($e).' ('.$e->getMessage().")\n");
+    $stringOf= class_exists('xp', false) ? ['xp', 'stringOf'] : function($val) { return var_export($val, 1); };
     foreach ($e->getTrace() as $trace) {
       fprintf(STDERR,
         "  at %s%s%s(%s) [line %d of %s]\n",
         isset($trace['class']) ? strtr($trace['class'], '\\', '.') : '<main>',
         isset($trace['type']) ? $trace['type'] : '::',
         isset($trace['function']) ? $trace['function'] : '<main>',
-        isset($trace['args']) ? implode(', ', array_map(['xp', 'stringOf'], $trace['args'])) : '',
+        isset($trace['args']) ? implode(', ', array_map($stringOf, $trace['args'])) : '',
         isset($trace['line']) ? $trace['line'] : 0,
         isset($trace['file']) ? basename($trace['file']) : '(unknown)'
       );
@@ -50,7 +33,12 @@ register_shutdown_function(function() {
 
   $e= error_get_last();
   if (null !== $e && isset($types[$e['type']])) {
-    __error($e['type'], $e['message'], $e['file'], $e['line']);
+    if (class_exists('xp', false)) {
+      __error($e['type'], $e['message'], $e['file'], $e['line']);
+      $stringOf= ['xp', 'stringOf'];
+    } else {
+      $stringOf= function($val) { return var_export($val, 1); };
+    }
     fprintf(
       STDERR,
       "Uncaught error: %s (%s)\n  at <source> [line %d of %s]\n  at <main>(%s) [line 0 of %s]\n",
@@ -58,11 +46,29 @@ register_shutdown_function(function() {
       $e['message'],
       $e['line'],
       str_replace(getcwd(), '.', $e['file']),
-      implode(', ', array_map(['xp', 'stringOf'], array_slice($_SERVER['argv'], 1))),
-      str_replace('.', DIRECTORY_SEPARATOR, $_SERVER['argv'][0]).\xp::CLASS_FILE_EXT
+      implode(', ', array_map($stringOf, array_slice($_SERVER['argv'], 1))),
+      str_replace('.', DIRECTORY_SEPARATOR, $_SERVER['argv'][0]).'.class.php'
     );
   }
 });
+
+// Set CLI specific handling
+$home= getenv('HOME');
+$cwd= '.';
+
+if ('cgi' === PHP_SAPI || 'cgi-fcgi' === PHP_SAPI) {
+  ini_set('html_errors', 0);
+  define('STDIN', fopen('php://stdin', 'rb'));
+  define('STDOUT', fopen('php://stdout', 'wb'));
+  define('STDERR', fopen('php://stderr', 'wb'));
+} else if ('cli' !== PHP_SAPI) {
+  throw new \Exception('[bootstrap] Cannot be run under '.PHP_SAPI.' SAPI');
+}
+
+require 'xar-support.php';
+require 'scan-path.php';
+require 'bootstrap.php';
+require 'class-path.php';
 
 // Start I/O layers
 $encoding= get_cfg_var('encoding');
