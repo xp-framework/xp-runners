@@ -35,10 +35,10 @@ unix.ar: unix unix/default/* shared/class-main.php shared/web-main.php
 	cat unix/src/xprt-update.sh.in | sed -e 's/@TYPE@/unix/g' > unix/xprt-update.sh
 	sh ar.sh unix.ar unix/default/* unix/xprt-update.sh shared/class-main.php shared/web-main.php
 
-generic.install:
+generic.install: shared/class-main.php shared/web-main.php
 	@echo "===> Installing XP runners to $(INSTTARGET) ..."
 	@chmod a+x $(from)/*
-	@cp -pv $(from)/* $(INSTTARGET)
+	@cp -pv $(from)/* shared/*.php $(INSTTARGET)
 	@echo "---> Done."
 
 unix.install: unix
