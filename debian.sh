@@ -24,6 +24,8 @@ sudo checkinstall \
   --reset-uids=yes \
   make unix.install
 
+DATE=`date +%Y-%m-%d`
+
 PACKAGE="{
   \"package\": {
     \"name\": \"xp-runners\",
