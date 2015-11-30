@@ -12,12 +12,14 @@
         "gpgSign": true
     },
 
-    "files":
-        [{"includePattern": "./xp-runners(.*\.deb)", "uploadPattern": "$1",
-        "matrixParams": {
-            "deb_distribution": "vivid",
-            "deb_component": "main",
-            "deb_architecture": "amd64"}
+    "files": [
+        {
+            "includePattern": "(.*deb)", "uploadPattern": "$1",
+            "matrixParams": {
+                "deb_distribution": "jessie",
+                "deb_component": "main",
+                "deb_architecture": "i386,amd64"
+            }
         }
     ],
     "publish": false
