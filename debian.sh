@@ -1,6 +1,10 @@
 #!/bin/bash
 
-TRAVIS_TAG="v5.6.2"
+if [ -z $TRAVIS_TAG ]; then
+    echo This is not a build for a tag, aborting...
+    exit 1
+fi
+
 RELEASENUMBER=${TRAVIS_TAG:1}
 
 sudo apt-get install -qq checkinstall
@@ -46,8 +50,5 @@ FILES="\"files\": [
    \"publish\": false"
 
 BINTRAY_CONFIG=$PACKAGE$FILES"}"
-
-echo Generated Bintray config:
-echo $BINTRAY_CONFIG
 
 echo $BINTRAY_CONFIG >> bintray.config
