@@ -1,5 +1,7 @@
 #!/bin/sh
 
+TRAVIS_TAG="v5.6.2"
+
 sudo apt-get install -qq checkinstall
 
 RELEASENUMBER=${TRAVIS_TAG:1}
