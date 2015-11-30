@@ -13,7 +13,7 @@
     },
 
     "files":
-        [{"includePattern": "(.*\.deb)", "uploadPattern": "$1",
+        [{"includePattern": "(xp-runners_.*\.deb)", "uploadPattern": "$1",
         "matrixParams": {
             "deb_distribution": "vivid",
             "deb_component": "main",
