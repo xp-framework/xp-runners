@@ -14,7 +14,7 @@
 
     "files": [
         {
-            "includePattern": "(.*deb)", "uploadPattern": "$1",
+            "includePattern": "build/bin/(.*\.deb)", "uploadPattern": "$1",
             "matrixParams": {
                 "deb_distribution": "jessie",
                 "deb_component": "main",
