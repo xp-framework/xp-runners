@@ -1,10 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 TRAVIS_TAG="v5.6.2"
+RELEASENUMBER=${TRAVIS_TAG:1}
 
 sudo apt-get install -qq checkinstall
-
-RELEASENUMBER=${TRAVIS_TAG:1}
 
 sudo checkinstall \
   --pakdir=build/bin \
