@@ -6,10 +6,9 @@ php:
 - 5.6
 - hhvm
 - nightly
-before_install:
-    - sudo apt-get install -qq checkinstall
 script: make test
 before_deploy:
+    - sudo apt-get install -qq checkinstall
     - sudo checkinstall --pakdir=build/bin --type=debian --pkgname=xp-runners --pkgversion=5.6.2 --pkggroup=devel --pkglicense=BSD --pkgarch all -y --requires=php5-cli,realpath --backup=no --install=no --nodoc --reset-uids=yes make unix.install
 deploy:
   provider: bintray
