@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z $TRAVIS_TAG ]; then
-    echo This is not a build for a tag, aborting...
+    echo "This is not a build for a tag, aborting..."  >&2
     exit 1
 fi
 
