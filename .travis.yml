@@ -8,7 +8,7 @@ php:
 - nightly
 script: make test
 before_deploy:
-    - sudo debian.sh
+    - sh debian.sh
 deploy:
   provider: bintray
   file: bintray.config
