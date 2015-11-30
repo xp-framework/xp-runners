@@ -29,8 +29,8 @@ DATE=`date +%Y-%m-%d`
 PACKAGE="{
   \"package\": {
     \"name\": \"xp-runners\",
-    \"repo\": \"deb\",
-    \"subject\": \"mikey179\"
+    \"repo\": \"xp-runners\",
+    \"subject\": \"xp-framework\"
   },
   \"version\": {
     \"name\": \"$RELEASENUMBER\",
