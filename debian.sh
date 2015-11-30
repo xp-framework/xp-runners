@@ -49,7 +49,7 @@ FILES="\"files\": [
         }
      }
    ],
-   \"publish\": false"
+   \"publish\": true"
 
 BINTRAY_CONFIG=$PACKAGE$FILES"}"
 
