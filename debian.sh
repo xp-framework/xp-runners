@@ -43,7 +43,7 @@ FILES="\"files\": [
       {
         \"includePattern\": \"build/bin/(.*\.deb)\", \"uploadPattern\": \"\$1\",
         \"matrixParams\": {
-            \"deb_distribution\": \"vivid\",
+            \"deb_distribution\": \"jessie\",
             \"deb_component\": \"main\",
             \"deb_architecture\": \"i386,amd64\"
         }
