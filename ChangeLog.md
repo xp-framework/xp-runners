@@ -3,6 +3,12 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 5.6.2 / 2015-12-20
+
+* Changed code to no longer set `iconv.internal_encoding` which is 
+  deprecated
+  (@thekid)
+
 ## 5.6.1 / 2015-11-08
 
 * Merged PR #33: Display startup errors with stack traces
