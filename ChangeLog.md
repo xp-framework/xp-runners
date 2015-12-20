@@ -3,7 +3,7 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
-## 5.6.2 / 2015-12-20
+## 5.7.2 / 2015-12-20
 
 * Changed code to no longer set `iconv.internal_encoding` which is 
   deprecated
