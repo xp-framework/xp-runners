@@ -9,6 +9,11 @@ XP Runners ChangeLog
   deprecated
   (@thekid)
 
+## 5.7.1 / 2015-12-01
+
+* Switch Debian distribution to jessie  
+  (@mikey179)
+
 ## 5.7.0 / 2015-11-30
 
 * Merged PR #34: Automatically create Debian package and publish to Bintray 
