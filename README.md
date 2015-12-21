@@ -28,7 +28,7 @@ This is the preferrred way of installing the runners:
 
 ```sh
 $ cd ~/bin
-$ wget 'https://github.com/xp-framework/xp-runners/releases/download/v5.6.1/setup' -O - | php
+$ wget 'https://github.com/xp-framework/xp-runners/releases/download/v5.7.2/setup' -O - | php
 ```
 
 ### From this directory
