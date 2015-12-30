@@ -33,6 +33,9 @@ else
       -cp)              # Add class path
         INCLUDE_ARG=${PATHSEP}
         ;;
+      -m)               # Add module
+        INCLUDE_ARG="%"${PATHSEP}
+        ;;
       -xar)             # Run a xar
         TOOL="xp.runtime.Xar"
         OPTIND=$(expr $OPTIND + 1)

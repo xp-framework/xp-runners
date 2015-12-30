@@ -55,6 +55,11 @@ namespace Net.XpFramework.Runner
                             shift += 2;
                             break;
 
+                        case "-m":
+                            includes.Add("%" + args[++i]);
+                            shift += 2;
+                            break;
+
                         default:
                             if (args[i].StartsWith("-"))
                             {

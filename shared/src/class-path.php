@@ -4,7 +4,13 @@ list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($
   $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
   $paths= scan(array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))), $home);
   if (isset($parts[1]) && $parts[1] != '') {
-    $paths= array_merge($paths, array_map('xp\path', explode(PATH_SEPARATOR, $parts[1])));
+    foreach (explode(PATH_SEPARATOR, $parts[1]) as $path) {
+      if ('%' === $path{0}) {
+        $paths= array_merge($paths, scan(array(substr($path, 1)), $home));
+      } else {
+        $paths[]= path($path);
+      }
+    }
   }
   return $paths;
 });
