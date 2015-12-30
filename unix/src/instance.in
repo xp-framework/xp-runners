@@ -14,13 +14,17 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then 
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
 
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
 
         *.\;*)
@@ -32,25 +36,25 @@ for i in "." "$HOME/.xp" "$base" ; do
         ;;
 
         runtime.modules=*|runtime@$XP_RT.modules=*)
-          module_path="${line#*=}"
+          module_path="$value"
         ;;
 
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
 
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
 
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
