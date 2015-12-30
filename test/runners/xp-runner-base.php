@@ -19,11 +19,14 @@ return [
     }
 
     $this->boot= $path->compose($this->tmp, 'boot.pth');
-    unset($_SERVER['argc'], $_SERVER['argv']);
-    $this->env= array_merge($_SERVER, ['USE_XP' => $this->tmp, 'PATH' => dirname(PHP_BINARY).PATH_SEPARATOR.$_SERVER['PATH']]);
+    $this->env= [];
     $this->prepare();
 
-    file_put_contents($path->compose($this->tmp, 'xp.ini'), "[runtime]\ndate.timezone=Europe/Berlin");
+    file_put_contents($path->compose($this->tmp, 'xp.ini'), sprintf(
+      "use=%s\n[runtime]\ndefault=%s\nmodules=\nextension=\ndate.timezone=Europe/Berlin",
+      $this->tmp,
+      PHP_BINARY
+    ));
   },
 
   '@after' => function() use($path) {
@@ -54,14 +57,14 @@ return [
     $this->assertEquals(true, (bool)preg_grep('/Class "Test" could not be found/', current($result)));
   },
 
-  'run test class' => function() use($path, $proc) {
+  'run test class from class path' => function() use($path, $proc) {
     $this->assertEquals(
-      [0 => ['Hello World']],
+      [0 => ['Hello Classpath']],
       $proc->execute($this->exe, ['-cp', __DIR__.'/classes', 'Test'], $this->env, $this->tmp)
     );
   },
 
-  'run test class with argument' => function() use($path, $proc) {
+  'run test class from class path with argument' => function() use($path, $proc) {
     $this->assertEquals(
       [0 => ['Hello Tester']],
       $proc->execute($this->exe, ['-cp', __DIR__.'/classes', 'Test', 'Tester'], $this->env, $this->tmp)
