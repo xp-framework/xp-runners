@@ -6,6 +6,7 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+module_path=""
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -28,6 +29,10 @@ for i in "." "$HOME/.xp" "$base" ; do
         *.\[*\])
           section=${line#\[}
           section=${section%]}
+        ;;
+
+        runtime.modules=*|runtime@$XP_RT.modules=*)
+          module_path="${line#*=}"
         ;;
 
         runtime.extension=*|runtime@$XP_RT.extension=*)
@@ -69,9 +74,26 @@ for k in $dkeys ; do
 done
 
 XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
+
+if [ "" = "$module_path$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
+elif [ "" = "$module_path" ] ; then
+  if [ "" != "$MODULES" ] ; then
+    echo "*** Cannot use modules without defining module path" >&2
+    exit 255
+  fi
+else
+  USE_XP=.
+  MODULES="xp-framework/core$MODULES"
+  for m in $MODULES ; do
+    path=$(module "$module_path" $m)
+    if [ "" = "$path" ] ; then
+      echo "*** Cannot find module $m" >&2
+      exit 255
+    fi
+    USE_XP=$USE_XP$PATHSEP$path
+  done
 fi
 
 args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"

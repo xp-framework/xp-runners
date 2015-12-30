@@ -6,12 +6,12 @@ namespace Net.XpFramework.Runner
     class BaseRunner
     {
 
-        protected static void Execute(string runner, string tool, string[] includes, string[] args)
+        protected static void Execute(string runner, string tool, string[] modules, string[] includes, string[] args)
         {
             // Execute
             try
             {
-                Environment.Exit(Executor.Execute(Paths.DirName(Paths.Binary()), runner, tool, includes, args));
+                Environment.Exit(Executor.Execute(Paths.DirName(Paths.Binary()), runner, tool, modules, includes, args));
             }
             catch (Exception e) 
             {

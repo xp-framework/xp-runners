@@ -17,7 +17,7 @@ namespace Net.XpFramework.Runner
         /// <summary>
         /// Returns the use_xp setting derived from this config source
         /// </summary>
-        public IEnumerable<string> GetUse() 
+        public IEnumerable<string> GetUse()
         {
             string env = Environment.GetEnvironmentVariable("USE_XP");
             return env == null ? null : Paths.Translate(
@@ -25,11 +25,11 @@ namespace Net.XpFramework.Runner
                 env.Split(new char[] { Path.PathSeparator })
             );
         }
-        
+
         /// <summary>
         /// Returns the runtime to be used from this config source
         /// </summary>
-        public string GetRuntime() 
+        public string GetRuntime()
         {
             return Environment.GetEnvironmentVariable("XP_RT");
         }
@@ -39,6 +39,15 @@ namespace Net.XpFramework.Runner
         /// based on the given runtime version, using the default otherwise.
         /// </summary>
         public string GetExecutable(string runtime) 
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the paths to load XP modules from based on the given
+        /// runtime version and the defaults.
+        /// </summary>
+        public IEnumerable<string> GetModules(string runtime)
         {
             return null;
         }

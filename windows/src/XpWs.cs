@@ -60,7 +60,7 @@ namespace Net.XpFramework.Runner
         static int Develop(string profile, string server, string port, string web, string root, string config, string[] inc)
         {
             return Service(profile, server, port, web, root, config, () => {
-                var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", inc, new string[] { });
+                var proc = Executor.Instance(Paths.DirName(Paths.Binary()), "web", "", new string[] { }, inc, new string[] { });
                 proc.StartInfo.Arguments = (
                     "-S " + server + ":" + port +
                     " -t \"" + root + "\"" +
@@ -74,7 +74,7 @@ namespace Net.XpFramework.Runner
         /// Delegate: Inspect web setup
         static int Inspect(string profile, string server, string port, string web, string root, string config, string[] inc)
         {
-            Execute("class", "xp.scriptlet.Inspect", inc, new string[]
+            Execute("class", "xp.scriptlet.Inspect", new string[] { }, inc, new string[]
             {
                 web,
                 config,
@@ -89,7 +89,7 @@ namespace Net.XpFramework.Runner
         {
             Execution action = Develop;
             var addr = new string[] { "localhost" };
-            var inc = new List<string>(new string[] { "." });
+            var inc = new List<string>(new string[] { });
             var web = ".";
             var root = "";
             var config = "";
@@ -155,7 +155,7 @@ namespace Net.XpFramework.Runner
                             action = (_profile, _server, _port, _web, _root, _config, _inc) =>
                             {
                                 return Service(_profile, _server, _port, _web, _root, _config, () => {
-                                    return Executor.Instance(Paths.DirName(Paths.Binary()), "class", "xp.scriptlet.Server", _inc, new string[] {
+                                    return Executor.Instance(Paths.DirName(Paths.Binary()), "class", "xp.scriptlet.Server",     new string[] { }, _inc, new string[] {
                                         _web,
                                         _config,
                                         _profile,
@@ -168,7 +168,7 @@ namespace Net.XpFramework.Runner
                         break;
 
                     case "-?":
-                        Execute("class", "xp.scriptlet.Usage", inc.ToArray(), new string[] { "xpws.txt" });
+                        Execute("class", "xp.scriptlet.Usage", new string[] { }, inc.ToArray(), new string[] { "xpws.txt" });
                         return;
 
                     default:

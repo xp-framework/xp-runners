@@ -8,7 +8,7 @@ namespace Net.XpFramework.Runner
 
         static void Main(string[] args)
         {
-            Execute("class", "xp.compiler.Runner", new string[] { "." }, args);
+            Execute("class", "xp.compiler.Runner", new string[] { }, new string[] { }, args);
         }
     }
 }

@@ -76,12 +76,27 @@ namespace Net.XpFramework.Runner
             return ret.ToString();
         }
 
+        private static string LookupModule(IEnumerable<string> modules, string module)
+        {
+            string[] names = module.Split('/');
+            foreach (var path in modules)
+            {
+                var replaced = path.Replace("{vendor}", names[0]).Replace("{name}", names[1]);
+                if (Directory.Exists(replaced))
+                {
+                    return replaced;
+                }
+            }
+            throw new EntryPointNotFoundException("Cannot find module " + module);
+        }
+
         /// <summary>
         /// Creates the executor process instance
         /// </summary>
-        public static Process Instance(string base_dir, string runner, string tool, string[] includes, string[] args)
+        public static Process Instance(string base_dir, string runner, string tool, string[] modules, string[] includes, string[] args)
         {
             string home = Environment.GetEnvironmentVariable("HOME");
+            string argv;
 
             // Read configuration
             XpConfigSource configs = new CompositeConfigSource(
@@ -92,31 +107,49 @@ namespace Net.XpFramework.Runner
                 new IniConfigSource(new Ini(Paths.Compose(base_dir, "xp.ini")))
             );
 
-            IEnumerable<string> use_xp = configs.GetUse();
-            string runtime = configs.GetRuntime();
-            string executor = configs.GetExecutable(runtime) ?? "php";
             
-            if (null == use_xp)
-            {
-                throw new EntryPointNotFoundException("Cannot determine use_xp setting from " + configs);
-            }
-        
+            var runtime = configs.GetRuntime();
+            var use_xp = configs.GetUse();
+            var executor = configs.GetExecutable(runtime) ?? "php";
+            var module_path = configs.GetModules(runtime);
+            var use = "";
+
             // Pass "USE_XP" and includes inside include_path separated by two path 
-            // separators. Prepend "." for the oddity that if the first element does
-            // not exist, PHP scraps all the others(!)
+            // separators.
             //
             // E.g.: -dinclude_path=".;xp\5.7.0;..\dialog;;..\impl.xar;..\log.xar"
             //                       ^ ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^
             //                       | |                   include_path
             //                       | USE_XP
             //                       Dot
-            string argv = String.Format(
-                "-C -q -d include_path=\".{1}{0}{1}{1}{2}\" -d magic_quotes_gpc=0",
-                String.Join(PATH_SEPARATOR, new List<string>(use_xp).ToArray()),
+            if (null == module_path && null == use_xp)
+            {
+                throw new EntryPointNotFoundException("Cannot determine use_xp setting from " + configs);
+            }
+            else if (null == module_path)
+            {
+                use = String.Join(PATH_SEPARATOR, new List<string>(use_xp).ToArray());
+                if (modules.Length > 0)
+                {
+                    throw new EntryPointNotFoundException("Cannot use modules without defining module path");
+                }
+            }
+            else
+            {
+                use = "." + PATH_SEPARATOR + LookupModule(module_path, "xp-framework/core");
+                foreach (var module in modules)
+                {
+                    use += PATH_SEPARATOR + LookupModule(module_path, module);
+                }
+            }
+
+            argv = String.Format(
+                "-C -q -d include_path=\".{1}{0}{1}{1}.{1}{2}\" -d magic_quotes_gpc=0",
+                use,
                 PATH_SEPARATOR,
                 String.Join(PATH_SEPARATOR, includes)
             );
-            
+
             // Look for PHP configuration
             foreach (KeyValuePair<string, IEnumerable<string>> kv in configs.GetArgs(runtime))
             {
@@ -146,17 +179,17 @@ namespace Net.XpFramework.Runner
             string entry;
             bool redirect;
             Argument argument;
-            if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + ".php")))
-            {
-                argument = Pass;
-                redirect = false;
-            } 
-            else if (null != (entry = Paths.Find(new string[] { base_dir }, runner + "-main.php")))
+            if (null != (entry = Paths.Find(new string[] { base_dir }, runner + "-main.php")))
             {
                 argument = Encode;
                 redirect = true;
                 argv += " -d encoding=utf-7";
             }
+            else if (null != (entry = Paths.Find(use_xp, "tools\\" + runner + ".php")))
+            {
+                argument = Pass;
+                redirect = false;
+            } 
             else
             {
                 throw new EntryPointNotFoundException("Cannot find tool in " + String.Join(", ", new List<string>(use_xp).ToArray()));
@@ -202,12 +235,12 @@ namespace Net.XpFramework.Runner
         /// <summary>
         /// Creates and runs the executor instance. Returns the process' exitcode.
         /// </summary>
-        public static int Execute(string base_dir, string runner, string tool, string[] includes, string[] args)
+        public static int Execute(string base_dir, string runner, string tool, string[] modules, string[] includes, string[] args)
         {
             var encoding = Console.OutputEncoding;
             Console.OutputEncoding = Encoding.UTF8;
 
-            var proc = Instance(base_dir, runner, tool, includes, args);
+            var proc = Instance(base_dir, runner, tool, modules, includes, args);
             try
             {
                 proc.Start();
