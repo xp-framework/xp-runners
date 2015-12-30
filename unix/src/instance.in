@@ -97,10 +97,11 @@ else
 fi
 
 args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 #ifdef __CYGWIN
+else
   tool=$(cygpath -m "$tool")
   _args=()
   IFS=" "
