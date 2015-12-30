@@ -25,7 +25,7 @@ return [
     file_put_contents($path->compose($this->tmp, 'xp.ini'), sprintf(
       "use=%s\n[runtime]\ndefault=%s\nmodules=\nextension=\ndate.timezone=Europe/Berlin",
       $this->tmp,
-      PHP_BINARY
+      defined('HHVM_VERSION') ? 'php' : PHP_BINARY
     ));
   },
 
