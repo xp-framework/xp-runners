@@ -13,7 +13,6 @@ namespace Net.XpFramework.Runner
     class Executor
     {
         private static string PATH_SEPARATOR = new string(new char[] { Path.PathSeparator});
-        private static List<string> EMPTY_LIST = new List<string>();
 
         /// <summary>
         /// Encodes a given string for use in a command line argument. The returned
@@ -128,7 +127,7 @@ namespace Net.XpFramework.Runner
             }
             else if (null == module_path)
             {
-                use = String.Join(PATH_SEPARATOR, new List<string>(use_xp).ToArray());
+                use = String.Join(PATH_SEPARATOR, use_xp);
                 if (modules.Length > 0)
                 {
                     throw new EntryPointNotFoundException("Cannot use modules without defining module path");
@@ -192,7 +191,7 @@ namespace Net.XpFramework.Runner
             } 
             else
             {
-                throw new EntryPointNotFoundException("Cannot find tool in " + String.Join(", ", new List<string>(use_xp).ToArray()));
+                throw new EntryPointNotFoundException("Cannot find tool in " + String.Join(PATH_SEPARATOR, use_xp));
             }
 
             // Spawn runtime
