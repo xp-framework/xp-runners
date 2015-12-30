@@ -1,4 +1,4 @@
---4163:cgen:--
+--4236:cgen:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -141,8 +141,12 @@ elif [ "" = "$module_path" ] ; then
     exit 255
   fi
 else
-  USE_XP=.
-  MODULES="xp-framework/core$MODULES"
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
   for m in $MODULES ; do
     path=$(module "$module_path" $m)
     if [ "" = "$path" ] ; then
@@ -465,7 +469,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---4162:doclet:--
+--4235:doclet:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -608,8 +612,12 @@ elif [ "" = "$module_path" ] ; then
     exit 255
   fi
 else
-  USE_XP=.
-  MODULES="xp-framework/core$MODULES"
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
   for m in $MODULES ; do
     path=$(module "$module_path" $m)
     if [ "" = "$path" ] ; then
@@ -636,7 +644,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4573:unittest:--
+--4646:unittest:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -779,8 +787,12 @@ elif [ "" = "$module_path" ] ; then
     exit 255
   fi
 else
-  USE_XP=.
-  MODULES="xp-framework/core$MODULES"
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
   for m in $MODULES ; do
     path=$(module "$module_path" $m)
     if [ "" = "$path" ] ; then
@@ -1076,7 +1088,7 @@ try {
 } catch (\lang\SystemExit $e) {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
-}--4159:xar:--
+}--4232:xar:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1219,8 +1231,12 @@ elif [ "" = "$module_path" ] ; then
     exit 255
   fi
 else
-  USE_XP=.
-  MODULES="xp-framework/core$MODULES"
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
   for m in $MODULES ; do
     path=$(module "$module_path" $m)
     if [ "" = "$path" ] ; then
@@ -1247,7 +1263,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4164:xcc:--
+--4237:xcc:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1390,8 +1406,12 @@ elif [ "" = "$module_path" ] ; then
     exit 255
   fi
 else
-  USE_XP=.
-  MODULES="xp-framework/core$MODULES"
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
   for m in $MODULES ; do
     path=$(module "$module_path" $m)
     if [ "" = "$path" ] ; then
@@ -1418,7 +1438,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5171:xp:--
+--5244:xp:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1608,8 +1628,12 @@ elif [ "" = "$module_path" ] ; then
     exit 255
   fi
 else
-  USE_XP=.
-  MODULES="xp-framework/core$MODULES"
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
   for m in $MODULES ; do
     path=$(module "$module_path" $m)
     if [ "" = "$path" ] ; then
@@ -1640,7 +1664,7 @@ exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 [runtime]
 date.timezone=GMT
 default=c:/Programme/php-5.6.12-nts-Win32-VC11-x86/php.exe
---4163:xpcli:--
+--4236:xpcli:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1783,8 +1807,12 @@ elif [ "" = "$module_path" ] ; then
     exit 255
   fi
 else
-  USE_XP=.
-  MODULES="xp-framework/core$MODULES"
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
   for m in $MODULES ; do
     path=$(module "$module_path" $m)
     if [ "" = "$path" ] ; then
@@ -1811,7 +1839,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4163:xpi:--
+--4236:xpi:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1954,8 +1982,12 @@ elif [ "" = "$module_path" ] ; then
     exit 255
   fi
 else
-  USE_XP=.
-  MODULES="xp-framework/core$MODULES"
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
   for m in $MODULES ; do
     path=$(module "$module_path" $m)
     if [ "" = "$path" ] ; then
@@ -1982,7 +2014,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---6448:xpws:--
+--6521:xpws:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -2206,8 +2238,12 @@ elif [ "" = "$module_path" ] ; then
     exit 255
   fi
 else
-  USE_XP=.
-  MODULES="xp-framework/core$MODULES"
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
   for m in $MODULES ; do
     path=$(module "$module_path" $m)
     if [ "" = "$path" ] ; then

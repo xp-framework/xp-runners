@@ -48,5 +48,18 @@ exit($test->run(array_merge($base, [
     $this->assertEquals(255, key($result));
     $this->assertEquals(true, (bool)preg_grep('/Uncaught exception/', current($result)));
     $this->assertEquals(true, (bool)preg_grep('/  at lang.reflect.Method.+invoke/', current($result)));
+  },
+
+  'run test class from module' => function() use($path, $proc) {
+    file_put_contents($path->compose($this->tmp, 'xp.ini'), sprintf(
+      "use=%s\n[runtime]\ndefault=%s\nmodules=%s\nextension=\ndate.timezone=Europe/Berlin",
+      $this->tmp,
+      defined('HHVM_VERSION') ? 'php' : PHP_BINARY,
+      $path->compose(__DIR__, '{name}')
+    ));
+    $this->assertEquals(
+      [0 => ['Hello Module']],
+      $proc->execute($this->exe, ['-m', 'test/module', 'Test'], $this->env, $this->tmp)
+    );
   }
 ])));

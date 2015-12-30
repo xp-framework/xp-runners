@@ -88,8 +88,12 @@ elif [ "" = "$module_path" ] ; then
     exit 255
   fi
 else
-  USE_XP=.
-  MODULES="xp-framework/core$MODULES"
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
   for m in $MODULES ; do
     path=$(module "$module_path" $m)
     if [ "" = "$path" ] ; then
