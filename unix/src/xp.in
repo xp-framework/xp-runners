@@ -20,6 +20,7 @@ else
         ;;
       -w|-d)             # Evaluate source and dump result
         TOOL="xp.runtime.Dump"
+        break
         ;;
       -r)               # Reflect given class
         TOOL="xp.runtime.Reflect"
