@@ -6,6 +6,15 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+#ifdef __CYGWIN
+elif [ -d "$APPDATA/Composer" ] ; then
+  module_path="$APPDATA/Composer/vendor/{vendor}/{name}"
+#endif
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -13,13 +22,17 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then 
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
 
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
 
         *.\;*)
@@ -30,22 +43,26 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
 
+        runtime.modules=*|runtime@$XP_RT.modules=*)
+          module_path="$value"
+        ;;
+
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
 
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
 
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -69,16 +86,38 @@ for k in $dkeys ; do
 done
 
 XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
+
+if [ "" = "$module_path$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
+elif [ "" = "$module_path" ] ; then
+  if [ "" != "$MODULES" ] ; then
+    echo "*** Cannot use modules without defining module path" >&2
+    exit 255
+  fi
+else
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
+  for m in $MODULES ; do
+    path=$(module "$module_path" $m)
+    if [ "" = "$path" ] ; then
+      echo "*** Cannot find module $m in $module_path" >&2
+      exit 255
+    fi
+    USE_XP=$USE_XP$PATHSEP$path
+  done
 fi
 
 args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
 #ifdef __CYGWIN
+else
   tool=$(cygpath -m "$tool")
   _args=()
   IFS=" "

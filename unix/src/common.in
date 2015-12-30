@@ -63,3 +63,25 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
+
+module() {
+  path="$1"
+
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
+
+  vendor="${2%/*}"
+  name="${2#*/}"
+
+  IFS="$PATHSEP"
+  for i in $path; do
+    dir=$(echo $i | sed -e "s/{vendor}/$vendor/g" | sed -e "s/{name}/$name/g")
+    if [ -d "$dir" ] ; then
+      echo "$dir"
+      return
+    fi
+  done
+  echo ""
+}

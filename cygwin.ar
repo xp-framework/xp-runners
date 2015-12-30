@@ -1,4 +1,4 @@
---3290:cgen:--
+--4476:cgen:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -48,6 +48,24 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
+module() {
+  path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
+  vendor="${2%/*}"
+  name="${2#*/}"
+  IFS="$PATHSEP"
+  for i in $path; do
+    dir=$(echo $i | sed -e "s/{vendor}/$vendor/g" | sed -e "s/{name}/$name/g")
+    if [ -d "$dir" ] ; then
+      echo "$dir"
+      return
+    fi
+  done
+  echo ""
+}
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.codegen.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
@@ -56,6 +74,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -63,12 +88,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -76,20 +105,23 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${line#\[}
           section=${section%]}
         ;;
+        runtime.modules=*|runtime@$XP_RT.modules=*)
+          module_path="$value"
+        ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -110,14 +142,35 @@ for k in $dkeys ; do
   fi
 done
 XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
+if [ "" = "$module_path$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
+elif [ "" = "$module_path" ] ; then
+  if [ "" != "$MODULES" ] ; then
+    echo "*** Cannot use modules without defining module path" >&2
+    exit 255
+  fi
+else
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
+  for m in $MODULES ; do
+    path=$(module "$module_path" $m)
+    if [ "" = "$path" ] ; then
+      echo "*** Cannot find module $m in $module_path" >&2
+      exit 255
+    fi
+    USE_XP=$USE_XP$PATHSEP$path
+  done
 fi
 args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+else
   tool=$(cygpath -m "$tool")
   _args=()
   IFS=" "
@@ -426,7 +479,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---3289:doclet:--
+--4475:doclet:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -476,6 +529,24 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
+module() {
+  path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
+  vendor="${2%/*}"
+  name="${2#*/}"
+  IFS="$PATHSEP"
+  for i in $path; do
+    dir=$(echo $i | sed -e "s/{vendor}/$vendor/g" | sed -e "s/{name}/$name/g")
+    if [ -d "$dir" ] ; then
+      echo "$dir"
+      return
+    fi
+  done
+  echo ""
+}
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.doclet.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
@@ -484,6 +555,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -491,12 +569,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -504,20 +586,23 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${line#\[}
           section=${section%]}
         ;;
+        runtime.modules=*|runtime@$XP_RT.modules=*)
+          module_path="$value"
+        ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -538,14 +623,35 @@ for k in $dkeys ; do
   fi
 done
 XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
+if [ "" = "$module_path$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
+elif [ "" = "$module_path" ] ; then
+  if [ "" != "$MODULES" ] ; then
+    echo "*** Cannot use modules without defining module path" >&2
+    exit 255
+  fi
+else
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
+  for m in $MODULES ; do
+    path=$(module "$module_path" $m)
+    if [ "" = "$path" ] ; then
+      echo "*** Cannot find module $m in $module_path" >&2
+      exit 255
+    fi
+    USE_XP=$USE_XP$PATHSEP$path
+  done
 fi
 args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+else
   tool=$(cygpath -m "$tool")
   _args=()
   IFS=" "
@@ -558,7 +664,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3700:unittest:--
+--4886:unittest:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -608,6 +714,24 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
+module() {
+  path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
+  vendor="${2%/*}"
+  name="${2#*/}"
+  IFS="$PATHSEP"
+  for i in $path; do
+    dir=$(echo $i | sed -e "s/{vendor}/$vendor/g" | sed -e "s/{name}/$name/g")
+    if [ -d "$dir" ] ; then
+      echo "$dir"
+      return
+    fi
+  done
+  echo ""
+}
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.unittest.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
@@ -616,6 +740,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -623,12 +754,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -636,20 +771,23 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${line#\[}
           section=${section%]}
         ;;
+        runtime.modules=*|runtime@$XP_RT.modules=*)
+          module_path="$value"
+        ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -670,14 +808,35 @@ for k in $dkeys ; do
   fi
 done
 XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
+if [ "" = "$module_path$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
+elif [ "" = "$module_path" ] ; then
+  if [ "" != "$MODULES" ] ; then
+    echo "*** Cannot use modules without defining module path" >&2
+    exit 255
+  fi
+else
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
+  for m in $MODULES ; do
+    path=$(module "$module_path" $m)
+    if [ "" = "$path" ] ; then
+      echo "*** Cannot find module $m in $module_path" >&2
+      exit 255
+    fi
+    USE_XP=$USE_XP$PATHSEP$path
+  done
 fi
 args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+else
   tool=$(cygpath -m "$tool")
   _args=()
   IFS=" "
@@ -959,7 +1118,7 @@ try {
 } catch (\lang\SystemExit $e) {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
-}--3286:xar:--
+}--4472:xar:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1007,6 +1166,24 @@ locate() {
     fi
   done
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+module() {
+  path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
+  vendor="${2%/*}"
+  name="${2#*/}"
+  IFS="$PATHSEP"
+  for i in $path; do
+    dir=$(echo $i | sed -e "s/{vendor}/$vendor/g" | sed -e "s/{name}/$name/g")
+    if [ -d "$dir" ] ; then
+      echo "$dir"
+      return
+    fi
+  done
   echo ""
 }
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.xar.Runner IFS="|";
@@ -1017,6 +1194,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -1024,12 +1208,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -1037,20 +1225,23 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${line#\[}
           section=${section%]}
         ;;
+        runtime.modules=*|runtime@$XP_RT.modules=*)
+          module_path="$value"
+        ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -1071,14 +1262,35 @@ for k in $dkeys ; do
   fi
 done
 XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
+if [ "" = "$module_path$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
+elif [ "" = "$module_path" ] ; then
+  if [ "" != "$MODULES" ] ; then
+    echo "*** Cannot use modules without defining module path" >&2
+    exit 255
+  fi
+else
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
+  for m in $MODULES ; do
+    path=$(module "$module_path" $m)
+    if [ "" = "$path" ] ; then
+      echo "*** Cannot find module $m in $module_path" >&2
+      exit 255
+    fi
+    USE_XP=$USE_XP$PATHSEP$path
+  done
 fi
 args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+else
   tool=$(cygpath -m "$tool")
   _args=()
   IFS=" "
@@ -1091,7 +1303,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3291:xcc:--
+--4477:xcc:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1139,6 +1351,24 @@ locate() {
     fi
   done
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+module() {
+  path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
+  vendor="${2%/*}"
+  name="${2#*/}"
+  IFS="$PATHSEP"
+  for i in $path; do
+    dir=$(echo $i | sed -e "s/{vendor}/$vendor/g" | sed -e "s/{name}/$name/g")
+    if [ -d "$dir" ] ; then
+      echo "$dir"
+      return
+    fi
+  done
   echo ""
 }
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.compiler.Runner IFS="|";
@@ -1149,6 +1379,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -1156,12 +1393,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -1169,20 +1410,23 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${line#\[}
           section=${section%]}
         ;;
+        runtime.modules=*|runtime@$XP_RT.modules=*)
+          module_path="$value"
+        ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -1203,14 +1447,35 @@ for k in $dkeys ; do
   fi
 done
 XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
+if [ "" = "$module_path$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
+elif [ "" = "$module_path" ] ; then
+  if [ "" != "$MODULES" ] ; then
+    echo "*** Cannot use modules without defining module path" >&2
+    exit 255
+  fi
+else
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
+  for m in $MODULES ; do
+    path=$(module "$module_path" $m)
+    if [ "" = "$path" ] ; then
+      echo "*** Cannot find module $m in $module_path" >&2
+      exit 255
+    fi
+    USE_XP=$USE_XP$PATHSEP$path
+  done
 fi
 args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+else
   tool=$(cygpath -m "$tool")
   _args=()
   IFS=" "
@@ -1223,7 +1488,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4419:xp:--
+--5484:xp:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1273,40 +1538,60 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
+module() {
+  path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
+  vendor="${2%/*}"
+  name="${2#*/}"
+  IFS="$PATHSEP"
+  for i in $path; do
+    dir=$(echo $i | sed -e "s/{vendor}/$vendor/g" | sed -e "s/{name}/$name/g")
+    if [ -d "$dir" ] ; then
+      echo "$dir"
+      return
+    fi
+  done
+  echo ""
+}
 OPTIND=0
 INCLUDE_PATH="."
+MODULES=
 TOOL=
 if [ 0 = $# ] ; then
   TOOL="xp.runtime.ShowResource|usage.txt|255"
 else
-  for arg in "$@" ; do
-    if [ ! -z "$INCLUDE_ARG" ] ; then
-      INCLUDE_PATH="$arg$INCLUDE_ARG$INCLUDE_PATH" ; INCLUDE_ARG=""
-      OPTIND=`expr $OPTIND + 2`
-      continue
-    fi
-    case $arg in
+  while [ $# != 0 ] ; do
+    case $1 in
       -v) # Display version
         TOOL="xp.runtime.Version"
-        OPTIND=$(expr $OPTIND + 1)
+        shift
         ;;
       -e) # Run source passed via command line
         TOOL="xp.runtime.Evaluate"
-        OPTIND=$(expr $OPTIND + 1)
+        shift
         ;;
       -w|-d) # Evaluate source and dump result
         TOOL="xp.runtime.Dump"
+        break
         ;;
       -r) # Reflect given class
         TOOL="xp.runtime.Reflect"
-        OPTIND=$(expr $OPTIND + 1)
+        shift
         ;;
       -cp) # Add class path
-        INCLUDE_ARG=${PATHSEP}
+        INCLUDE_PATH=${INCLUDE_PATH}${PATHSEP}$2
+        shift 2
+        ;;
+      -m) # Add module
+        MODULES=${MODULES}"|"$2
+        shift 2
         ;;
       -xar) # Run a xar
         TOOL="xp.runtime.Xar"
-        OPTIND=$(expr $OPTIND + 1)
+        shift
         ;;
       -*) # Any other arg
         echo "*** Invalid argument $arg" >&2
@@ -1317,7 +1602,6 @@ else
         ;;
     esac
   done
-  shift $OPTIND
 fi
 base="$DIRNAME" RUNNER="class" INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
 ifs="|"
@@ -1327,6 +1611,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -1334,12 +1625,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -1347,20 +1642,23 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${line#\[}
           section=${section%]}
         ;;
+        runtime.modules=*|runtime@$XP_RT.modules=*)
+          module_path="$value"
+        ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -1381,14 +1679,35 @@ for k in $dkeys ; do
   fi
 done
 XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
+if [ "" = "$module_path$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
+elif [ "" = "$module_path" ] ; then
+  if [ "" != "$MODULES" ] ; then
+    echo "*** Cannot use modules without defining module path" >&2
+    exit 255
+  fi
+else
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
+  for m in $MODULES ; do
+    path=$(module "$module_path" $m)
+    if [ "" = "$path" ] ; then
+      echo "*** Cannot find module $m in $module_path" >&2
+      exit 255
+    fi
+    USE_XP=$USE_XP$PATHSEP$path
+  done
 fi
 args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+else
   tool=$(cygpath -m "$tool")
   _args=()
   IFS=" "
@@ -1405,7 +1724,7 @@ exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 [runtime]
 date.timezone=GMT
 default=c:/Programme/php-5.6.12-nts-Win32-VC11-x86/php.exe
---3290:xpcli:--
+--4476:xpcli:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1453,6 +1772,24 @@ locate() {
     fi
   done
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+module() {
+  path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
+  vendor="${2%/*}"
+  name="${2#*/}"
+  IFS="$PATHSEP"
+  for i in $path; do
+    dir=$(echo $i | sed -e "s/{vendor}/$vendor/g" | sed -e "s/{name}/$name/g")
+    if [ -d "$dir" ] ; then
+      echo "$dir"
+      return
+    fi
+  done
   echo ""
 }
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.command.Runner IFS="|";
@@ -1463,6 +1800,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -1470,12 +1814,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -1483,20 +1831,23 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${line#\[}
           section=${section%]}
         ;;
+        runtime.modules=*|runtime@$XP_RT.modules=*)
+          module_path="$value"
+        ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -1517,14 +1868,35 @@ for k in $dkeys ; do
   fi
 done
 XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
+if [ "" = "$module_path$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
+elif [ "" = "$module_path" ] ; then
+  if [ "" != "$MODULES" ] ; then
+    echo "*** Cannot use modules without defining module path" >&2
+    exit 255
+  fi
+else
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
+  for m in $MODULES ; do
+    path=$(module "$module_path" $m)
+    if [ "" = "$path" ] ; then
+      echo "*** Cannot find module $m in $module_path" >&2
+      exit 255
+    fi
+    USE_XP=$USE_XP$PATHSEP$path
+  done
 fi
 args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+else
   tool=$(cygpath -m "$tool")
   _args=()
   IFS=" "
@@ -1537,7 +1909,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3290:xpi:--
+--4476:xpi:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1587,6 +1959,24 @@ locate() {
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
   echo ""
 }
+module() {
+  path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
+  vendor="${2%/*}"
+  name="${2#*/}"
+  IFS="$PATHSEP"
+  for i in $path; do
+    dir=$(echo $i | sed -e "s/{vendor}/$vendor/g" | sed -e "s/{name}/$name/g")
+    if [ -d "$dir" ] ; then
+      echo "$dir"
+      return
+    fi
+  done
+  echo ""
+}
 base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.install.Runner IFS="|";
 ifs="|"
 if [ "" = "$USE_XP" ] ; then
@@ -1595,6 +1985,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -1602,12 +1999,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -1615,20 +2016,23 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${line#\[}
           section=${section%]}
         ;;
+        runtime.modules=*|runtime@$XP_RT.modules=*)
+          module_path="$value"
+        ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -1649,14 +2053,35 @@ for k in $dkeys ; do
   fi
 done
 XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
+if [ "" = "$module_path$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
+elif [ "" = "$module_path" ] ; then
+  if [ "" != "$MODULES" ] ; then
+    echo "*** Cannot use modules without defining module path" >&2
+    exit 255
+  fi
+else
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
+  for m in $MODULES ; do
+    path=$(module "$module_path" $m)
+    if [ "" = "$path" ] ; then
+      echo "*** Cannot find module $m in $module_path" >&2
+      exit 255
+    fi
+    USE_XP=$USE_XP$PATHSEP$path
+  done
 fi
 args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+else
   tool=$(cygpath -m "$tool")
   _args=()
   IFS=" "
@@ -1669,7 +2094,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5575:xpws:--
+--6761:xpws:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1717,6 +2142,24 @@ locate() {
     fi
   done
   if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+module() {
+  path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
+  vendor="${2%/*}"
+  name="${2#*/}"
+  IFS="$PATHSEP"
+  for i in $path; do
+    dir=$(echo $i | sed -e "s/{vendor}/$vendor/g" | sed -e "s/{name}/$name/g")
+    if [ -d "$dir" ] ; then
+      echo "$dir"
+      return
+    fi
+  done
   echo ""
 }
 RUNNER=web
@@ -1808,6 +2251,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -1815,12 +2265,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -1828,20 +2282,23 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${line#\[}
           section=${section%]}
         ;;
+        runtime.modules=*|runtime@$XP_RT.modules=*)
+          module_path="$value"
+        ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -1862,14 +2319,35 @@ for k in $dkeys ; do
   fi
 done
 XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
+if [ "" = "$module_path$USE_XP" ] ; then
   echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
   exit 255
+elif [ "" = "$module_path" ] ; then
+  if [ "" != "$MODULES" ] ; then
+    echo "*** Cannot use modules without defining module path" >&2
+    exit 255
+  fi
+else
+  if [ "" = "$USE_XP" ] ; then
+    MODULES="xp-framework/core$MODULES"
+    USE_XP=.
+  else
+    MODULES=${MODULES#\|}
+  fi
+  for m in $MODULES ; do
+    path=$(module "$module_path" $m)
+    if [ "" = "$path" ] ; then
+      echo "*** Cannot find module $m in $module_path" >&2
+      exit 255
+    fi
+    USE_XP=$USE_XP$PATHSEP$path
+  done
 fi
 args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 0)
 if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 1)
+else
   tool=$(cygpath -m "$tool")
   _args=()
   IFS=" "
@@ -1936,7 +2414,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---9642:class-main.php:--
+--9702:class-main.php:--
 <?php namespace xp;
 
 set_exception_handler(function($e) {
@@ -2211,7 +2689,9 @@ list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($
   $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
   $paths= scan(array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))), $home);
   if (isset($parts[1]) && $parts[1] != '') {
-    $paths= array_merge($paths, array_map('xp\path', explode(PATH_SEPARATOR, $parts[1])));
+    foreach (explode(PATH_SEPARATOR, $parts[1]) as $path) {
+      $paths[]= path($path);
+    }
   }
   return $paths;
 });
@@ -2228,6 +2708,7 @@ if (!class_exists('xp', false)) {
 
 // Start I/O layers
 $encoding= get_cfg_var('encoding');
+iconv_set_encoding('internal_encoding', \xp::ENCODING);
 array_shift($_SERVER['argv']);
 array_shift($argv);
 if ($encoding) {
@@ -2246,7 +2727,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---8399:web-main.php:--
+--8403:web-main.php:--
 <?php namespace xp;
 
 // Set WEB specific handling
@@ -2461,7 +2942,9 @@ list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($
   $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
   $paths= scan(array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))), $home);
   if (isset($parts[1]) && $parts[1] != '') {
-    $paths= array_merge($paths, array_map('xp\path', explode(PATH_SEPARATOR, $parts[1])));
+    foreach (explode(PATH_SEPARATOR, $parts[1]) as $path) {
+      $paths[]= path($path);
+    }
   }
   return $paths;
 });

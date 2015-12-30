@@ -29,6 +29,12 @@ namespace Net.XpFramework.Runner
         string GetExecutable(string runtime);
 
         /// <summary>
+        /// Returns the paths to load XP modules from based on the given
+        /// runtime version and the defaults.
+        /// </summary>
+        IEnumerable<string> GetModules(string runtime);
+
+        /// <summary>
         /// Returns the PHP extensions to be loaded from this config source
         /// based on the given runtime version and the defaults.
         /// </summary>

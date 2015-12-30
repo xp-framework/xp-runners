@@ -2,40 +2,41 @@
 
 OPTIND=0
 INCLUDE_PATH="."
+MODULES=
 TOOL=
 
 if [ 0 = $# ] ; then 
   TOOL="xp.runtime.ShowResource|usage.txt|255"
 else
-  for arg in "$@" ; do
-    if [ ! -z "$INCLUDE_ARG" ] ; then
-      INCLUDE_PATH="$arg$INCLUDE_ARG$INCLUDE_PATH" ; INCLUDE_ARG=""
-      OPTIND=`expr $OPTIND + 2`
-      continue
-    fi
-
-    case $arg in
+  while [ $# != 0 ] ; do
+    case $1 in
       -v)               # Display version
         TOOL="xp.runtime.Version"
-        OPTIND=$(expr $OPTIND + 1)
+        shift
         ;;
       -e)               # Run source passed via command line
         TOOL="xp.runtime.Evaluate"
-        OPTIND=$(expr $OPTIND + 1)
+        shift
         ;;
       -w|-d)             # Evaluate source and dump result
         TOOL="xp.runtime.Dump"
+        break
         ;;
       -r)               # Reflect given class
         TOOL="xp.runtime.Reflect"
-        OPTIND=$(expr $OPTIND + 1)
+        shift
         ;;
       -cp)              # Add class path
-        INCLUDE_ARG=${PATHSEP}
+        INCLUDE_PATH=${INCLUDE_PATH}${PATHSEP}$2
+        shift 2
+        ;;
+      -m)               # Add module
+        MODULES=${MODULES}"|"$2
+        shift 2
         ;;
       -xar)             # Run a xar
         TOOL="xp.runtime.Xar"
-        OPTIND=$(expr $OPTIND + 1)
+        shift
         ;;
       -*)               # Any other arg
         echo "*** Invalid argument $arg" >&2
@@ -46,7 +47,6 @@ else
         ;;
     esac
   done
-  shift $OPTIND
 fi
 
 EXEC("class", $INCLUDE_PATH, $TOOL)

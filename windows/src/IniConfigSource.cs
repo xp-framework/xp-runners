@@ -24,11 +24,11 @@ namespace Net.XpFramework.Runner
         {
             this.ini = ini;
         }
-        
+
         /// <summary>
         /// Returns the use_xp setting derived from this config source
         /// </summary>
-        public IEnumerable<string> GetUse() 
+        public IEnumerable<string> GetUse()
         {
             string value = this.ini.Get("default", "use");
             return null == value ? null : Paths.Translate(
@@ -68,6 +68,19 @@ namespace Net.XpFramework.Runner
                     yield return e;
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns the paths to load XP modules from based on the given
+        /// runtime version and the defaults.
+        /// </summary>
+        public IEnumerable<string> GetModules(string runtime)
+        {
+            string value = this.ini.Get("runtime@" + runtime, "modules") ?? this.ini.Get("runtime", "modules");
+            return null == value ? null : Paths.Translate(
+                Paths.DirName(this.ini.FileName),
+                value.Split(new char[] { Path.PathSeparator })
+            );
         }
 
         /// <summary>

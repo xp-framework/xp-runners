@@ -31,11 +31,11 @@ namespace Net.XpFramework.Runner
         public bool Valid() {
             return true;
         }
-    
+
         /// <summary>
         /// Returns the use_xp setting derived from this config source
         /// </summary>
-        public IEnumerable<string> GetUse() 
+        public IEnumerable<string> GetUse()
         {
             return AskEach<IEnumerable<string>>((s) => s.GetUse());
         }
@@ -55,6 +55,15 @@ namespace Net.XpFramework.Runner
         public string GetExecutable(string runtime)
         {
             return AskEach<string>((s) => s.GetExecutable(runtime));
+        }
+
+        /// <summary>
+        /// Returns the paths to load XP modules from based on the given
+        /// runtime version and the defaults.
+        /// </summary>
+        public IEnumerable<string> GetModules(string runtime)
+        {
+            return AskEach<IEnumerable<string>>((s) => s.GetModules(runtime));
         }
 
         /// <summary>

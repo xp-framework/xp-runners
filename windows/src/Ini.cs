@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Linq;
 
 namespace Net.XpFramework.Runner
 {
@@ -61,7 +62,10 @@ namespace Net.XpFramework.Runner
                         {
                             this.sections[section][parsed[KEY]] = new List<string>();
                         }
-                        this.sections[section][parsed[KEY]].Add(parsed[VALUE]);
+                        if (!String.IsNullOrEmpty(parsed[VALUE]))
+                        {
+                            this.sections[section][parsed[KEY]].Add(parsed[VALUE]);
+                        }
                     }
                 }
                 this.parsed = true;
@@ -72,7 +76,7 @@ namespace Net.XpFramework.Runner
             this.Parse(false);
             if (!this.sections.ContainsKey(section)) return defaultValue;
             if (!this.sections[section].ContainsKey(key)) return defaultValue;
-            return this.sections[section][key][0];
+            return this.sections[section][key].FirstOrDefault();
         }   
 
         public string Get(string section, string key) {

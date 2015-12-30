@@ -12,7 +12,7 @@ namespace Net.XpFramework.Runner
         {
             try
             {
-                return Executor.Execute(Paths.DirName(Paths.Binary()), "class", "xp.unittest.Runner", new string[] { "." }, args);
+                return Executor.Execute(Paths.DirName(Paths.Binary()), "class", "xp.unittest.Runner", new string[] { }, new string[] { }, args);
             }
             catch (Exception e) 
             {
