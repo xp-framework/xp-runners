@@ -89,7 +89,7 @@ else
   for m in $MODULES ; do
     path=$(module "$module_path" $m)
     if [ "" = "$path" ] ; then
-      echo "*** Cannot find module $m" >&2
+      echo "*** Cannot find module $m in $module_path" >&2
       exit 255
     fi
     USE_XP=$USE_XP$PATHSEP$path

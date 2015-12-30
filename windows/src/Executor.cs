@@ -87,7 +87,7 @@ namespace Net.XpFramework.Runner
                     return replaced;
                 }
             }
-            throw new EntryPointNotFoundException("Cannot find module " + module);
+            throw new EntryPointNotFoundException("Cannot find module " + module + " in " + String.Join(PATH_SEPARATOR, modules));
         }
 
         /// <summary>
