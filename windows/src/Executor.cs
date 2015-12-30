@@ -77,6 +77,11 @@ namespace Net.XpFramework.Runner
 
         private static string LookupModule(IEnumerable<string> modules, string module)
         {
+            if (Directory.Exists(module))
+            {
+                return module;
+            }
+
             string[] names = module.Split('/');
             foreach (var path in modules)
             {

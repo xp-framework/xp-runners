@@ -1,4 +1,4 @@
---4236:cgen:--
+--4290:cgen:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -50,6 +50,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"
@@ -469,7 +473,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---4235:doclet:--
+--4289:doclet:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -521,6 +525,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"
@@ -644,7 +652,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4646:unittest:--
+--4700:unittest:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -696,6 +704,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"
@@ -1088,7 +1100,7 @@ try {
 } catch (\lang\SystemExit $e) {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
-}--4232:xar:--
+}--4286:xar:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1140,6 +1152,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"
@@ -1263,7 +1279,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4237:xcc:--
+--4291:xcc:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1315,6 +1331,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"
@@ -1438,7 +1458,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5244:xp:--
+--5298:xp:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1490,6 +1510,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"
@@ -1664,7 +1688,7 @@ exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 [runtime]
 date.timezone=GMT
 default=c:/Programme/php-5.6.12-nts-Win32-VC11-x86/php.exe
---4236:xpcli:--
+--4290:xpcli:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1716,6 +1740,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"
@@ -1839,7 +1867,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4236:xpi:--
+--4290:xpi:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1891,6 +1919,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"
@@ -2014,7 +2046,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---6521:xpws:--
+--6575:xpws:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -2066,6 +2098,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"

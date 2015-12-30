@@ -1,4 +1,4 @@
---4001:cgen:--
+--4055:cgen:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -50,6 +50,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"
@@ -474,7 +478,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---4000:doclet:--
+--4054:doclet:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -526,6 +530,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"
@@ -640,7 +648,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4411:unittest:--
+--4465:unittest:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -692,6 +700,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"
@@ -825,7 +837,7 @@ if [ -n "$WATCH" ] ; then
 else
   exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 fi
---3997:xar:--
+--4051:xar:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -877,6 +889,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"
@@ -991,7 +1007,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4002:xcc:--
+--4056:xcc:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -1043,6 +1059,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"
@@ -1157,7 +1177,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5009:xp:--
+--5063:xp:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -1209,6 +1229,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"
@@ -1374,7 +1398,7 @@ exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 [runtime]
 date.timezone=Europe/Berlin
 modules=/devel/xp/{name}:~/.composer/vendor/{vendor}/{name}
---4001:xpcli:--
+--4055:xpcli:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -1426,6 +1450,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"
@@ -1540,7 +1568,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4001:xpi:--
+--4055:xpi:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -1592,6 +1620,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"
@@ -1706,7 +1738,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---6286:xpws:--
+--6340:xpws:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -1758,6 +1790,10 @@ locate() {
 }
 module() {
   path="$1"
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
   vendor="${2%/*}"
   name="${2#*/}"
   IFS="$PATHSEP"

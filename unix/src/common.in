@@ -66,6 +66,12 @@ locate() {
 
 module() {
   path="$1"
+
+  if [ -d "$2" ] ; then
+    echo "$2"
+    return
+  fi
+
   vendor="${2%/*}"
   name="${2#*/}"
 
