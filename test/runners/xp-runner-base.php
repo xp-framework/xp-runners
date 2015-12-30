@@ -47,6 +47,27 @@ return [
     );
   },
 
+  'cannot run nonexistant test class' => function() use($path, $proc) {
+    $result= $proc->execute($this->exe, ['Test'], $this->env, $this->tmp);
+    $this->assertEquals(255, key($result));
+    $this->assertEquals(true, (bool)preg_grep('/Uncaught exception/', current($result)));
+    $this->assertEquals(true, (bool)preg_grep('/Class "Test" could not be found/', current($result)));
+  },
+
+  'run test class' => function() use($path, $proc) {
+    $this->assertEquals(
+      [0 => ['Hello World']],
+      $proc->execute($this->exe, ['-cp', __DIR__.'/classes', 'Test'], $this->env, $this->tmp)
+    );
+  },
+
+  'run test class with argument' => function() use($path, $proc) {
+    $this->assertEquals(
+      [0 => ['Hello Tester']],
+      $proc->execute($this->exe, ['-cp', __DIR__.'/classes', 'Test', 'Tester'], $this->env, $this->tmp)
+    );
+  },
+
   'uncaught exceptions' => function() use($path, $proc) {
     $result= $proc->execute($this->exe, ['-e', '"throw new Exception(\"Test\")"'], $this->env, $this->tmp);
     $this->assertEquals(255, key($result));
