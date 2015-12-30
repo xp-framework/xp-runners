@@ -135,7 +135,7 @@ namespace Net.XpFramework.Runner
             }
             else
             {
-                use = "." + PATH_SEPARATOR + LookupModule(module_path, "xp-framework/core");
+                use = LookupModule(module_path, "xp-framework/core");
                 foreach (var module in modules)
                 {
                     use += PATH_SEPARATOR + LookupModule(module_path, module);
