@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using System.IO;
 using System.Diagnostics;
 using System.Threading;
@@ -94,6 +95,12 @@ namespace Net.XpFramework.Runner
             throw new EntryPointNotFoundException("Cannot find module " + module + " in " + String.Join(PATH_SEPARATOR, modules));
         }
 
+        private static IEnumerable<string> ComposerPaths(string home)
+        {
+            yield return Paths.Compose(home, ".composer");
+            yield return Paths.Compose(Environment.SpecialFolder.ApplicationData, "Composer");
+        }
+
         /// <summary>
         /// Creates the executor process instance
         /// </summary>
@@ -111,12 +118,20 @@ namespace Net.XpFramework.Runner
                 new IniConfigSource(new Ini(Paths.Compose(base_dir, "xp.ini")))
             );
 
-            
+            var use = "";
             var runtime = configs.GetRuntime();
             var use_xp = configs.GetUse();
             var executor = configs.GetExecutable(runtime) ?? "php";
             var module_path = configs.GetModules(runtime);
-            var use = "";
+
+            if (null == module_path)
+            {
+                foreach (var path in ComposerPaths(home).Where(Directory.Exists))
+                {
+                    module_path = new string[] { Paths.Compose(path, "vendor", "{vendor}", "{name}") };
+                    break;
+                }
+            }
 
             // Pass "USE_XP" and includes inside include_path separated by two path 
             // separators.

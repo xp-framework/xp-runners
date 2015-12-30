@@ -1,4 +1,4 @@
---4290:cgen:--
+--4476:cgen:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -74,7 +74,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
-module_path=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -473,7 +479,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---4289:doclet:--
+--4475:doclet:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -549,7 +555,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
-module_path=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -652,7 +664,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4700:unittest:--
+--4886:unittest:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -728,7 +740,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
-module_path=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -1100,7 +1118,7 @@ try {
 } catch (\lang\SystemExit $e) {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
-}--4286:xar:--
+}--4472:xar:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1176,7 +1194,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
-module_path=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -1279,7 +1303,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4291:xcc:--
+--4477:xcc:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1355,7 +1379,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
-module_path=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -1458,7 +1488,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5298:xp:--
+--5484:xp:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1581,7 +1611,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
-module_path=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -1688,7 +1724,7 @@ exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 [runtime]
 date.timezone=GMT
 default=c:/Programme/php-5.6.12-nts-Win32-VC11-x86/php.exe
---4290:xpcli:--
+--4476:xpcli:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1764,7 +1800,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
-module_path=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -1867,7 +1909,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4290:xpi:--
+--4476:xpi:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1943,7 +1985,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
-module_path=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
@@ -2046,7 +2094,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---6575:xpws:--
+--6761:xpws:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -2203,7 +2251,13 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
-module_path=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+elif [ -d $APPDATA/Composer ] ; then
+  module_path=$APPDATA/Composer/vendor/{vendor}/{name}
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do

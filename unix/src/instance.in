@@ -6,7 +6,15 @@ else
   USE_XP=$(translate_paths "." "$USE_XP")
 fi
 RT_ARG=""
-module_path=""
+if [ -d $HOME/.composer ] ; then
+  module_path=$HOME/.composer/vendor/{vendor}/{name}
+#ifdef __CYGWIN
+elif [ -d "$APPDATA/Composer" ] ; then
+  module_path="$APPDATA/Composer/vendor/{vendor}/{name}"
+#endif
+else
+  module_path=
+fi
 dkeys=""
 vkeys=""
 for i in "." "$HOME/.xp" "$base" ; do
