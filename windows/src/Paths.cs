@@ -271,7 +271,10 @@ namespace Net.XpFramework.Runner
                 // Normalize path
                 var normalized = path.Replace('/', Path.DirectorySeparatorChar);
 
-                if (normalized.StartsWith("~"))
+                if (String.IsNullOrEmpty(normalized))
+                {
+                    // Skip
+                } else if (normalized.StartsWith("~"))
                 {
                     // Path in home directory
                     yield return Resolve(Compose(HOME, normalized.Substring(1)));
