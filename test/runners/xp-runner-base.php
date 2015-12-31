@@ -71,6 +71,13 @@ return [
     );
   },
 
+  'run test class from module' => function() use($path, $proc) {
+    $this->assertEquals(
+      [0 => ['Hello Module']],
+      $proc->execute($this->exe, ['-m', __DIR__.'/module', 'Test'], $this->env, $this->tmp)
+    );
+  },
+
   'uncaught exceptions' => function() use($path, $proc) {
     $result= $proc->execute($this->exe, ['-e', '"throw new Exception(\"Test\")"'], $this->env, $this->tmp);
     $this->assertEquals(255, key($result));

@@ -12,6 +12,7 @@ namespace Net.XpFramework.Runner
             string tool = "";
             int shift = 0;
             var includes = new List<string>();
+            var modules = new List<string>();
             includes.Add(".");
             
             if (0 == args.Length) 
@@ -55,6 +56,11 @@ namespace Net.XpFramework.Runner
                             shift += 2;
                             break;
 
+                        case "-m":
+                            modules.Add(args[++i]);
+                            shift += 2;
+                            break;
+
                         default:
                             if (args[i].StartsWith("-"))
                             {
@@ -75,7 +81,7 @@ namespace Net.XpFramework.Runner
             }
 
             // Execute
-            Execute("class", tool, includes.ToArray(), argv);
+            Execute("class", tool, modules.ToArray(), includes.ToArray(), argv);
         }
     }
 }
