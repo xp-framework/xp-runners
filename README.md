@@ -28,7 +28,7 @@ This is the preferrred way of installing the runners:
 
 ```sh
 $ cd ~/bin
-$ wget 'https://github.com/xp-framework/xp-runners/releases/download/v5.7.2/setup' -O - | php
+$ wget 'https://github.com/xp-framework/xp-runners/releases/download/v6.0.0/setup' -O - | php
 ```
 
 ### From this directory
@@ -43,7 +43,7 @@ We recommend creating Debian `.deb` files using the `checkinstall` utility:
 % xp-runners$ sudo checkinstall \
   --type=debian \
   --pkgname=xp-runners \
-  --pkgversion=5.7.2 \
+  --pkgversion=6.0.0 \
   --pkggroup=devel \
   --pkglicense=BSD \
   --pkgarch all -y \
