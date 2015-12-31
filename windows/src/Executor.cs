@@ -79,7 +79,7 @@ namespace Net.XpFramework.Runner
         /// <summary>
         /// Creates the executor process instance
         /// </summary>
-        public static Process Instance(string base_dir, string runner, string tool, string[] includes, string[] args)
+        public static Process Instance(string base_dir, string runner, string tool, string[] modules, string[] includes, string[] args)
         {
             string home = Environment.GetEnvironmentVariable("HOME");
 
@@ -111,9 +111,10 @@ namespace Net.XpFramework.Runner
             //                       | USE_XP
             //                       Dot
             string argv = String.Format(
-                "-C -q -d include_path=\".{1}{0}{1}{1}{2}\" -d magic_quotes_gpc=0",
-                String.Join(PATH_SEPARATOR, new List<string>(use_xp).ToArray()),
+                "-C -q -d include_path=\".{0}{1}{0}{2}{0}{0}{3}\" -d magic_quotes_gpc=0",
                 PATH_SEPARATOR,
+                String.Join(PATH_SEPARATOR, use_xp),
+                String.Join(PATH_SEPARATOR, modules),
                 String.Join(PATH_SEPARATOR, includes)
             );
             
@@ -202,12 +203,12 @@ namespace Net.XpFramework.Runner
         /// <summary>
         /// Creates and runs the executor instance. Returns the process' exitcode.
         /// </summary>
-        public static int Execute(string base_dir, string runner, string tool, string[] includes, string[] args)
+        public static int Execute(string base_dir, string runner, string tool, string[] modules, string[] includes, string[] args)
         {
             var encoding = Console.OutputEncoding;
             Console.OutputEncoding = Encoding.UTF8;
 
-            var proc = Instance(base_dir, runner, tool, includes, args);
+            var proc = Instance(base_dir, runner, tool, modules, includes, args);
             try
             {
                 proc.Start();
