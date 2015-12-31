@@ -5,6 +5,8 @@ XP Runners ChangeLog
 
 ## 6.0.0 / 2015-12-31
 
+* Adopted xp-framework/rfc#300 and switched to semantic versioning
+  (@thekid, @kiesel)
 * Implemented xp-framework/rfc#306: Load modules, see PR #36.
   (@thekid)
 * Allowed empty ini keys, treat them the same as being absent
