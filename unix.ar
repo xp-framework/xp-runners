@@ -1,4 +1,4 @@
---3060:cgen:--
+--3125:cgen:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -63,1150 +63,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
-      case "$section.$line" in
-        default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
-        ;;
-        default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
-        ;;
-        *.\;*)
-          ;;
-        *.\[*\])
-          section=${line#\[}
-          section=${section%]}
-        ;;
-        runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
-        ;;
-        runtime.*=*)
-          key=${line%=*}
-          key=$(echo $key | sed 's/\./__/g')
-          dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
-        ;;
-        runtime@$XP_RT.*=*)
-          key=${line%=*}
-          key=$(echo $key | sed 's/\./__/g')
-          vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
-        ;;
-      esac
-    done < "$i/xp.ini"
-  fi
-done
-for k in $vkeys ; do
-  eval "d$k=\$v$k"
-  dkeys="$dkeys${ifs}$k"
-done
-for k in $dkeys ; do
-  if [ $k ] ; then
-    eval "v=\$d$k"
-    if [ default = $k ] ; then
-      XP_EXE=${XP_EXE-$v}
-    else
-      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
-    fi
-  fi
-done
-XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
-  exit 255
-fi
-args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
-if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
-fi
-export XP_EXE
-IFS="|"
-exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3059:doclet:--
-#!/bin/sh
-PATHSEP=':'
-DIRSEP='/'
-if [ -L "$0" ] ; then
-  link="$(readlink "$0")"
-  case "$link" in
-    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
-  esac
-else
-  DIRNAME=$(dirname "$0")
-fi
-translate_path() {
-  base="$1"
-  path="$2"
-  case "$path" in
-    ?:*) ;; # C:\xp
-    \\*) ;; # \\filesrv\shares
-    [/]*) ;; # /usr/local/lib
-    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
-    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
-  esac
-  echo $path
-}
-translate_paths() {
-  base="$1"
-  path="$2"
-  translated=""
-  IFS="$PATHSEP"
-  for i in $path ; do
-    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
-  done
-  echo "${translated#$PATHSEP}"
-}
-locate() {
-  path="$1"
-  file="$2"
-  expect=$3
-  IFS="$PATHSEP"
-  for i in $path ; do
-    qualified="$i/$file"
-    if [ -e "$qualified" ] ; then
-      echo "$qualified"
-      if [ $expect = 1 ] ; then return ; fi
-    fi
-  done
-  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
-  echo ""
-}
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.doclet.Runner IFS="|";
-ifs="|"
-if [ "" = "$USE_XP" ] ; then
-  unset USE_XP
-else
-  USE_XP=$(translate_paths "." "$USE_XP")
-fi
-RT_ARG=""
-dkeys=""
-vkeys=""
-for i in "." "$HOME/.xp" "$base" ; do
-  if [ -e "$i/xp.ini" ] ; then
-    section=default
-    while read line || [ -n "$line" ] ; do
-      line="${line%"${line##*[![:space:]]}"}"
-      case "$section.$line" in
-        default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
-        ;;
-        default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
-        ;;
-        *.\;*)
-          ;;
-        *.\[*\])
-          section=${line#\[}
-          section=${section%]}
-        ;;
-        runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
-        ;;
-        runtime.*=*)
-          key=${line%=*}
-          key=$(echo $key | sed 's/\./__/g')
-          dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
-        ;;
-        runtime@$XP_RT.*=*)
-          key=${line%=*}
-          key=$(echo $key | sed 's/\./__/g')
-          vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
-        ;;
-      esac
-    done < "$i/xp.ini"
-  fi
-done
-for k in $vkeys ; do
-  eval "d$k=\$v$k"
-  dkeys="$dkeys${ifs}$k"
-done
-for k in $dkeys ; do
-  if [ $k ] ; then
-    eval "v=\$d$k"
-    if [ default = $k ] ; then
-      XP_EXE=${XP_EXE-$v}
-    else
-      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
-    fi
-  fi
-done
-XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
-  exit 255
-fi
-args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
-if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
-fi
-export XP_EXE
-IFS="|"
-exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3470:unittest:--
-#!/bin/sh
-PATHSEP=':'
-DIRSEP='/'
-if [ -L "$0" ] ; then
-  link="$(readlink "$0")"
-  case "$link" in
-    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
-  esac
-else
-  DIRNAME=$(dirname "$0")
-fi
-translate_path() {
-  base="$1"
-  path="$2"
-  case "$path" in
-    ?:*) ;; # C:\xp
-    \\*) ;; # \\filesrv\shares
-    [/]*) ;; # /usr/local/lib
-    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
-    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
-  esac
-  echo $path
-}
-translate_paths() {
-  base="$1"
-  path="$2"
-  translated=""
-  IFS="$PATHSEP"
-  for i in $path ; do
-    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
-  done
-  echo "${translated#$PATHSEP}"
-}
-locate() {
-  path="$1"
-  file="$2"
-  expect=$3
-  IFS="$PATHSEP"
-  for i in $path ; do
-    qualified="$i/$file"
-    if [ -e "$qualified" ] ; then
-      echo "$qualified"
-      if [ $expect = 1 ] ; then return ; fi
-    fi
-  done
-  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
-  echo ""
-}
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.unittest.Runner IFS="|";
-ifs="|"
-if [ "" = "$USE_XP" ] ; then
-  unset USE_XP
-else
-  USE_XP=$(translate_paths "." "$USE_XP")
-fi
-RT_ARG=""
-dkeys=""
-vkeys=""
-for i in "." "$HOME/.xp" "$base" ; do
-  if [ -e "$i/xp.ini" ] ; then
-    section=default
-    while read line || [ -n "$line" ] ; do
-      line="${line%"${line##*[![:space:]]}"}"
-      case "$section.$line" in
-        default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
-        ;;
-        default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
-        ;;
-        *.\;*)
-          ;;
-        *.\[*\])
-          section=${line#\[}
-          section=${section%]}
-        ;;
-        runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
-        ;;
-        runtime.*=*)
-          key=${line%=*}
-          key=$(echo $key | sed 's/\./__/g')
-          dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
-        ;;
-        runtime@$XP_RT.*=*)
-          key=${line%=*}
-          key=$(echo $key | sed 's/\./__/g')
-          vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
-        ;;
-      esac
-    done < "$i/xp.ini"
-  fi
-done
-for k in $vkeys ; do
-  eval "d$k=\$v$k"
-  dkeys="$dkeys${ifs}$k"
-done
-for k in $dkeys ; do
-  if [ $k ] ; then
-    eval "v=\$d$k"
-    if [ default = $k ] ; then
-      XP_EXE=${XP_EXE-$v}
-    else
-      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
-    fi
-  fi
-done
-XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
-  exit 255
-fi
-args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
-if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
-fi
-export XP_EXE
-IFS="|"
-WATCH=""
-while getopts :w: flag ; do
-  case "$flag" in
-    w) WATCH="$OPTARG"; shift 1 ;;
-  esac
-done
-if [ -n "$WATCH" ] ; then
-  ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
-  if [ $? = 2 ] ; then
-    exit 2
-  elif [ $? = 126 ] || [ $? = 127 ] ; then
-    exit 255
-  fi
-  inotifywait -q -e close_write -m -r $WATCH | while read event
-  do
-    ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
-  done
-else
-  exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
-fi
---3056:xar:--
-#!/bin/sh
-PATHSEP=':'
-DIRSEP='/'
-if [ -L "$0" ] ; then
-  link="$(readlink "$0")"
-  case "$link" in
-    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
-  esac
-else
-  DIRNAME=$(dirname "$0")
-fi
-translate_path() {
-  base="$1"
-  path="$2"
-  case "$path" in
-    ?:*) ;; # C:\xp
-    \\*) ;; # \\filesrv\shares
-    [/]*) ;; # /usr/local/lib
-    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
-    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
-  esac
-  echo $path
-}
-translate_paths() {
-  base="$1"
-  path="$2"
-  translated=""
-  IFS="$PATHSEP"
-  for i in $path ; do
-    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
-  done
-  echo "${translated#$PATHSEP}"
-}
-locate() {
-  path="$1"
-  file="$2"
-  expect=$3
-  IFS="$PATHSEP"
-  for i in $path ; do
-    qualified="$i/$file"
-    if [ -e "$qualified" ] ; then
-      echo "$qualified"
-      if [ $expect = 1 ] ; then return ; fi
-    fi
-  done
-  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
-  echo ""
-}
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.xar.Runner IFS="|";
-ifs="|"
-if [ "" = "$USE_XP" ] ; then
-  unset USE_XP
-else
-  USE_XP=$(translate_paths "." "$USE_XP")
-fi
-RT_ARG=""
-dkeys=""
-vkeys=""
-for i in "." "$HOME/.xp" "$base" ; do
-  if [ -e "$i/xp.ini" ] ; then
-    section=default
-    while read line || [ -n "$line" ] ; do
-      line="${line%"${line##*[![:space:]]}"}"
-      case "$section.$line" in
-        default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
-        ;;
-        default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
-        ;;
-        *.\;*)
-          ;;
-        *.\[*\])
-          section=${line#\[}
-          section=${section%]}
-        ;;
-        runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
-        ;;
-        runtime.*=*)
-          key=${line%=*}
-          key=$(echo $key | sed 's/\./__/g')
-          dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
-        ;;
-        runtime@$XP_RT.*=*)
-          key=${line%=*}
-          key=$(echo $key | sed 's/\./__/g')
-          vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
-        ;;
-      esac
-    done < "$i/xp.ini"
-  fi
-done
-for k in $vkeys ; do
-  eval "d$k=\$v$k"
-  dkeys="$dkeys${ifs}$k"
-done
-for k in $dkeys ; do
-  if [ $k ] ; then
-    eval "v=\$d$k"
-    if [ default = $k ] ; then
-      XP_EXE=${XP_EXE-$v}
-    else
-      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
-    fi
-  fi
-done
-XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
-  exit 255
-fi
-args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
-if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
-fi
-export XP_EXE
-IFS="|"
-exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3061:xcc:--
-#!/bin/sh
-PATHSEP=':'
-DIRSEP='/'
-if [ -L "$0" ] ; then
-  link="$(readlink "$0")"
-  case "$link" in
-    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
-  esac
-else
-  DIRNAME=$(dirname "$0")
-fi
-translate_path() {
-  base="$1"
-  path="$2"
-  case "$path" in
-    ?:*) ;; # C:\xp
-    \\*) ;; # \\filesrv\shares
-    [/]*) ;; # /usr/local/lib
-    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
-    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
-  esac
-  echo $path
-}
-translate_paths() {
-  base="$1"
-  path="$2"
-  translated=""
-  IFS="$PATHSEP"
-  for i in $path ; do
-    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
-  done
-  echo "${translated#$PATHSEP}"
-}
-locate() {
-  path="$1"
-  file="$2"
-  expect=$3
-  IFS="$PATHSEP"
-  for i in $path ; do
-    qualified="$i/$file"
-    if [ -e "$qualified" ] ; then
-      echo "$qualified"
-      if [ $expect = 1 ] ; then return ; fi
-    fi
-  done
-  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
-  echo ""
-}
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.compiler.Runner IFS="|";
-ifs="|"
-if [ "" = "$USE_XP" ] ; then
-  unset USE_XP
-else
-  USE_XP=$(translate_paths "." "$USE_XP")
-fi
-RT_ARG=""
-dkeys=""
-vkeys=""
-for i in "." "$HOME/.xp" "$base" ; do
-  if [ -e "$i/xp.ini" ] ; then
-    section=default
-    while read line || [ -n "$line" ] ; do
-      line="${line%"${line##*[![:space:]]}"}"
-      case "$section.$line" in
-        default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
-        ;;
-        default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
-        ;;
-        *.\;*)
-          ;;
-        *.\[*\])
-          section=${line#\[}
-          section=${section%]}
-        ;;
-        runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
-        ;;
-        runtime.*=*)
-          key=${line%=*}
-          key=$(echo $key | sed 's/\./__/g')
-          dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
-        ;;
-        runtime@$XP_RT.*=*)
-          key=${line%=*}
-          key=$(echo $key | sed 's/\./__/g')
-          vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
-        ;;
-      esac
-    done < "$i/xp.ini"
-  fi
-done
-for k in $vkeys ; do
-  eval "d$k=\$v$k"
-  dkeys="$dkeys${ifs}$k"
-done
-for k in $dkeys ; do
-  if [ $k ] ; then
-    eval "v=\$d$k"
-    if [ default = $k ] ; then
-      XP_EXE=${XP_EXE-$v}
-    else
-      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
-    fi
-  fi
-done
-XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
-  exit 255
-fi
-args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
-if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
-fi
-export XP_EXE
-IFS="|"
-exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4189:xp:--
-#!/bin/sh
-PATHSEP=':'
-DIRSEP='/'
-if [ -L "$0" ] ; then
-  link="$(readlink "$0")"
-  case "$link" in
-    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
-  esac
-else
-  DIRNAME=$(dirname "$0")
-fi
-translate_path() {
-  base="$1"
-  path="$2"
-  case "$path" in
-    ?:*) ;; # C:\xp
-    \\*) ;; # \\filesrv\shares
-    [/]*) ;; # /usr/local/lib
-    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
-    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
-  esac
-  echo $path
-}
-translate_paths() {
-  base="$1"
-  path="$2"
-  translated=""
-  IFS="$PATHSEP"
-  for i in $path ; do
-    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
-  done
-  echo "${translated#$PATHSEP}"
-}
-locate() {
-  path="$1"
-  file="$2"
-  expect=$3
-  IFS="$PATHSEP"
-  for i in $path ; do
-    qualified="$i/$file"
-    if [ -e "$qualified" ] ; then
-      echo "$qualified"
-      if [ $expect = 1 ] ; then return ; fi
-    fi
-  done
-  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
-  echo ""
-}
-OPTIND=0
-INCLUDE_PATH="."
-TOOL=
-if [ 0 = $# ] ; then
-  TOOL="xp.runtime.ShowResource|usage.txt|255"
-else
-  for arg in "$@" ; do
-    if [ ! -z "$INCLUDE_ARG" ] ; then
-      INCLUDE_PATH="$arg$INCLUDE_ARG$INCLUDE_PATH" ; INCLUDE_ARG=""
-      OPTIND=`expr $OPTIND + 2`
-      continue
-    fi
-    case $arg in
-      -v) # Display version
-        TOOL="xp.runtime.Version"
-        OPTIND=$(expr $OPTIND + 1)
-        ;;
-      -e) # Run source passed via command line
-        TOOL="xp.runtime.Evaluate"
-        OPTIND=$(expr $OPTIND + 1)
-        ;;
-      -w|-d) # Evaluate source and dump result
-        TOOL="xp.runtime.Dump"
-        ;;
-      -r) # Reflect given class
-        TOOL="xp.runtime.Reflect"
-        OPTIND=$(expr $OPTIND + 1)
-        ;;
-      -cp) # Add class path
-        INCLUDE_ARG=${PATHSEP}
-        ;;
-      -xar) # Run a xar
-        TOOL="xp.runtime.Xar"
-        OPTIND=$(expr $OPTIND + 1)
-        ;;
-      -*) # Any other arg
-        echo "*** Invalid argument $arg" >&2
-        exit 255
-        ;;
-      *) # First arg we find that does not begin with a "-"
-        break
-        ;;
-    esac
-  done
-  shift $OPTIND
-fi
-base="$DIRNAME" RUNNER="class" INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
-ifs="|"
-if [ "" = "$USE_XP" ] ; then
-  unset USE_XP
-else
-  USE_XP=$(translate_paths "." "$USE_XP")
-fi
-RT_ARG=""
-dkeys=""
-vkeys=""
-for i in "." "$HOME/.xp" "$base" ; do
-  if [ -e "$i/xp.ini" ] ; then
-    section=default
-    while read line || [ -n "$line" ] ; do
-      line="${line%"${line##*[![:space:]]}"}"
-      case "$section.$line" in
-        default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
-        ;;
-        default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
-        ;;
-        *.\;*)
-          ;;
-        *.\[*\])
-          section=${line#\[}
-          section=${section%]}
-        ;;
-        runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
-        ;;
-        runtime.*=*)
-          key=${line%=*}
-          key=$(echo $key | sed 's/\./__/g')
-          dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
-        ;;
-        runtime@$XP_RT.*=*)
-          key=${line%=*}
-          key=$(echo $key | sed 's/\./__/g')
-          vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
-        ;;
-      esac
-    done < "$i/xp.ini"
-  fi
-done
-for k in $vkeys ; do
-  eval "d$k=\$v$k"
-  dkeys="$dkeys${ifs}$k"
-done
-for k in $dkeys ; do
-  if [ $k ] ; then
-    eval "v=\$d$k"
-    if [ default = $k ] ; then
-      XP_EXE=${XP_EXE-$v}
-    else
-      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
-    fi
-  fi
-done
-XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
-  exit 255
-fi
-args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
-if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
-fi
-export XP_EXE
-IFS="|"
-exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3060:xpcli:--
-#!/bin/sh
-PATHSEP=':'
-DIRSEP='/'
-if [ -L "$0" ] ; then
-  link="$(readlink "$0")"
-  case "$link" in
-    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
-  esac
-else
-  DIRNAME=$(dirname "$0")
-fi
-translate_path() {
-  base="$1"
-  path="$2"
-  case "$path" in
-    ?:*) ;; # C:\xp
-    \\*) ;; # \\filesrv\shares
-    [/]*) ;; # /usr/local/lib
-    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
-    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
-  esac
-  echo $path
-}
-translate_paths() {
-  base="$1"
-  path="$2"
-  translated=""
-  IFS="$PATHSEP"
-  for i in $path ; do
-    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
-  done
-  echo "${translated#$PATHSEP}"
-}
-locate() {
-  path="$1"
-  file="$2"
-  expect=$3
-  IFS="$PATHSEP"
-  for i in $path ; do
-    qualified="$i/$file"
-    if [ -e "$qualified" ] ; then
-      echo "$qualified"
-      if [ $expect = 1 ] ; then return ; fi
-    fi
-  done
-  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
-  echo ""
-}
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.command.Runner IFS="|";
-ifs="|"
-if [ "" = "$USE_XP" ] ; then
-  unset USE_XP
-else
-  USE_XP=$(translate_paths "." "$USE_XP")
-fi
-RT_ARG=""
-dkeys=""
-vkeys=""
-for i in "." "$HOME/.xp" "$base" ; do
-  if [ -e "$i/xp.ini" ] ; then
-    section=default
-    while read line || [ -n "$line" ] ; do
-      line="${line%"${line##*[![:space:]]}"}"
-      case "$section.$line" in
-        default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
-        ;;
-        default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
-        ;;
-        *.\;*)
-          ;;
-        *.\[*\])
-          section=${line#\[}
-          section=${section%]}
-        ;;
-        runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
-        ;;
-        runtime.*=*)
-          key=${line%=*}
-          key=$(echo $key | sed 's/\./__/g')
-          dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
-        ;;
-        runtime@$XP_RT.*=*)
-          key=${line%=*}
-          key=$(echo $key | sed 's/\./__/g')
-          vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
-        ;;
-      esac
-    done < "$i/xp.ini"
-  fi
-done
-for k in $vkeys ; do
-  eval "d$k=\$v$k"
-  dkeys="$dkeys${ifs}$k"
-done
-for k in $dkeys ; do
-  if [ $k ] ; then
-    eval "v=\$d$k"
-    if [ default = $k ] ; then
-      XP_EXE=${XP_EXE-$v}
-    else
-      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
-    fi
-  fi
-done
-XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
-  exit 255
-fi
-args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
-if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
-fi
-export XP_EXE
-IFS="|"
-exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3060:xpi:--
-#!/bin/sh
-PATHSEP=':'
-DIRSEP='/'
-if [ -L "$0" ] ; then
-  link="$(readlink "$0")"
-  case "$link" in
-    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
-  esac
-else
-  DIRNAME=$(dirname "$0")
-fi
-translate_path() {
-  base="$1"
-  path="$2"
-  case "$path" in
-    ?:*) ;; # C:\xp
-    \\*) ;; # \\filesrv\shares
-    [/]*) ;; # /usr/local/lib
-    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
-    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
-  esac
-  echo $path
-}
-translate_paths() {
-  base="$1"
-  path="$2"
-  translated=""
-  IFS="$PATHSEP"
-  for i in $path ; do
-    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
-  done
-  echo "${translated#$PATHSEP}"
-}
-locate() {
-  path="$1"
-  file="$2"
-  expect=$3
-  IFS="$PATHSEP"
-  for i in $path ; do
-    qualified="$i/$file"
-    if [ -e "$qualified" ] ; then
-      echo "$qualified"
-      if [ $expect = 1 ] ; then return ; fi
-    fi
-  done
-  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
-  echo ""
-}
-base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.install.Runner IFS="|";
-ifs="|"
-if [ "" = "$USE_XP" ] ; then
-  unset USE_XP
-else
-  USE_XP=$(translate_paths "." "$USE_XP")
-fi
-RT_ARG=""
-dkeys=""
-vkeys=""
-for i in "." "$HOME/.xp" "$base" ; do
-  if [ -e "$i/xp.ini" ] ; then
-    section=default
-    while read line || [ -n "$line" ] ; do
-      line="${line%"${line##*[![:space:]]}"}"
-      case "$section.$line" in
-        default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
-        ;;
-        default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
-        ;;
-        *.\;*)
-          ;;
-        *.\[*\])
-          section=${line#\[}
-          section=${section%]}
-        ;;
-        runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
-        ;;
-        runtime.*=*)
-          key=${line%=*}
-          key=$(echo $key | sed 's/\./__/g')
-          dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
-        ;;
-        runtime@$XP_RT.*=*)
-          key=${line%=*}
-          key=$(echo $key | sed 's/\./__/g')
-          vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
-        ;;
-      esac
-    done < "$i/xp.ini"
-  fi
-done
-for k in $vkeys ; do
-  eval "d$k=\$v$k"
-  dkeys="$dkeys${ifs}$k"
-done
-for k in $dkeys ; do
-  if [ $k ] ; then
-    eval "v=\$d$k"
-    if [ default = $k ] ; then
-      XP_EXE=${XP_EXE-$v}
-    else
-      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
-    fi
-  fi
-done
-XP_EXE=${XP_EXE-php}
-if [ "" = "$USE_XP" ] ; then
-  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
-  exit 255
-fi
-args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
-tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
-if [ "" = "$tool" ] ; then
-  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
-fi
-export XP_EXE
-IFS="|"
-exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5345:xpws:--
-#!/bin/sh
-PATHSEP=':'
-DIRSEP='/'
-if [ -L "$0" ] ; then
-  link="$(readlink "$0")"
-  case "$link" in
-    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
-    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
-  esac
-else
-  DIRNAME=$(dirname "$0")
-fi
-translate_path() {
-  base="$1"
-  path="$2"
-  case "$path" in
-    ?:*) ;; # C:\xp
-    \\*) ;; # \\filesrv\shares
-    [/]*) ;; # /usr/local/lib
-    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
-    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
-  esac
-  echo $path
-}
-translate_paths() {
-  base="$1"
-  path="$2"
-  translated=""
-  IFS="$PATHSEP"
-  for i in $path ; do
-    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
-  done
-  echo "${translated#$PATHSEP}"
-}
-locate() {
-  path="$1"
-  file="$2"
-  expect=$3
-  IFS="$PATHSEP"
-  for i in $path ; do
-    qualified="$i/$file"
-    if [ -e "$qualified" ] ; then
-      echo "$qualified"
-      if [ $expect = 1 ] ; then return ; fi
-    fi
-  done
-  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
-  echo ""
-}
-RUNNER=web
-TOOL=
-START='-S${ifs}${ADDR}${ifs}-t${ifs}"${DOCUMENT_ROOT}"${ifs}-duser_dir="$WEB_CONFIG"${ifs}'
-INCLUDE_PATH="."
-SERVER_PROFILE=dev
-WEB_ROOT=.
-WEB_CONFIG=
-while [ $# != 0 ]; do
-  case $1 in
-    -p)
-      SERVER_PROFILE=$2
-      shift 2
-      ;;
-    -r)
-      DOCUMENT_ROOT=$2
-      if [ ! -d "$DOCUMENT_ROOT" ] ; then
-        echo "*** Document root $DOCUMENT_ROOT does not exist, exiting." >&2
-        exit 3
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
       fi
-      shift 2
-      ;;
-    -c)
-      if [ "-" = "$2" ] ; then
-        WEB_CONFIG=-
-      elif [ -e "$2/web.ini" ] ; then
-        WEB_CONFIG="$2/web.ini"
-      else
-        WEB_CONFIG=":$2"
-      fi
-      shift 2
-      ;;
-    -w)
-      WEB_ROOT=$2
-      shift 2
-      ;;
-    -cp)
-      INCLUDE_PATH=${INCLUDE_PATH}${PATHSEP}$2
-      shift 2
-      ;;
-    -i)
-      RUNNER=class
-      START=@immediate
-      TOOL='xp.scriptlet.Inspect|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}'
-      shift 1
-      ;;
-    -m)
-      if [ "develop" = $2 ] ; then
-        RUNNER=web
-      else
-        RUNNER=class
-        START=
-        TOOL='xp.scriptlet.Server|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}|'$2
-      fi
-      shift 2
-      ;;
-    -?)
-      RUNNER=class
-      START=@immediate
-      TOOL="xp.scriptlet.Usage|xpws.txt"
-      break
-      ;;
-    *:*)
-      server=${1%:*}
-      port=${1#*:}
-      shift 1
-      ;;
-    *)
-      server=$1
-      shift 1
-      ;;
-  esac
-done
-if [ "" = "$WEB_CONFIG" ] ; then
-  if [ -e ./etc/web.ini ] ; then
-    WEB_CONFIG=./etc
-  else
-    WEB_CONFIG=-
-  fi
-fi
-ADDR=${server-localhost}:${port-8080}
-eval 'TOOL="'$TOOL'"'
-base="$DIRNAME" RUNNER=$RUNNER INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
-ifs="|"
-if [ "" = "$USE_XP" ] ; then
-  unset USE_XP
-else
-  USE_XP=$(translate_paths "." "$USE_XP")
-fi
-RT_ARG=""
-dkeys=""
-vkeys=""
-for i in "." "$HOME/.xp" "$base" ; do
-  if [ -e "$i/xp.ini" ] ; then
-    section=default
-    while read line || [ -n "$line" ] ; do
-      line="${line%"${line##*[![:space:]]}"}"
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -1215,19 +81,19 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -1259,61 +125,7 @@ if [ "" = "$tool" ] ; then
 fi
 export XP_EXE
 IFS="|"
-if [ $START = "@immediate" ] ; then
-  ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
-else
-  if [ "" = "$DOCUMENT_ROOT" ] ; then
-    if [ -d "$WEB_ROOT/static" ] ; then
-      DOCUMENT_ROOT="$WEB_ROOT/static"
-    else
-      DOCUMENT_ROOT=.
-    fi
-  else
-    DOCUMENT_ROOT=${DOCUMENT_ROOT%/}
-  fi
-  if [ "-" = "$WEB_CONFIG" ] ; then
-    echo "No configuration given, serving static content from $DOCUMENT_ROOT"
-  fi
-  export WEB_ROOT
-  export SERVER_PROFILE
-  export DOCUMENT_ROOT
-  eval 'START="'$START'"'
-  ${XP_EXE}${ifs}${START}${args}${ifs}$tool ${ARGS} "$@" &
-  PID=$!
-  echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR @ $WEB_ROOT - Press <Enter> to exit"
-  read enter
-  echo "[xpws-$SERVER_PROFILE#$PID] shutting down..."
-  kill -TERM $PID
-fi
---485:xprt-update.sh:--
-#!/bin/sh
-
-DIR=$(dirname "$0")
-BIN=$(realpath "$DIR")
-
-if [ -z $TEMP ] ; then
-  TARGET=/tmp/.xp
-else
-  TARGET=$TEMP/.xp
-fi
-
-echo "===> Downloading unix runners to $TARGET"
-xpi download bin/unix $TARGET
-if [ $? != 0 ] ; then
-  exit
-fi
-
-echo "===> Extracting into $BIN"
-i=0
-for e in `ls -1 $TARGET/*` ; do
-  (head -1 $e | grep '^#!/bin/sh' >/dev/null) && chmod +x $e
-  mv $e $BIN
-  i=`expr $i + 1`
-done
-echo "$i file(s) copied"
-
-rmdir $TARGET
-echo "===> Done, runners have been updated"
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 --9642:class-main.php:--
 <?php namespace xp;
 
@@ -1624,7 +436,1548 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---8399:web-main.php:--
+--3124:doclet:--
+#!/bin/sh
+PATHSEP=':'
+DIRSEP='/'
+if [ -L "$0" ] ; then
+  link="$(readlink "$0")"
+  case "$link" in
+    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
+  esac
+else
+  DIRNAME=$(dirname "$0")
+fi
+translate_path() {
+  base="$1"
+  path="$2"
+  case "$path" in
+    ?:*) ;; # C:\xp
+    \\*) ;; # \\filesrv\shares
+    [/]*) ;; # /usr/local/lib
+    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
+    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
+  esac
+  echo $path
+}
+translate_paths() {
+  base="$1"
+  path="$2"
+  translated=""
+  IFS="$PATHSEP"
+  for i in $path ; do
+    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
+  done
+  echo "${translated#$PATHSEP}"
+}
+locate() {
+  path="$1"
+  file="$2"
+  expect=$3
+  IFS="$PATHSEP"
+  for i in $path ; do
+    qualified="$i/$file"
+    if [ -e "$qualified" ] ; then
+      echo "$qualified"
+      if [ $expect = 1 ] ; then return ; fi
+    fi
+  done
+  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.doclet.Runner IFS="|";
+ifs="|"
+if [ "" = "$USE_XP" ] ; then
+  unset USE_XP
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
+RT_ARG=""
+dkeys=""
+vkeys=""
+for i in "." "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    section=default
+    while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
+      case "$section.$line" in
+        default.use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
+        ;;
+        default.rt=*)
+          XP_RT=${XP_RT-$value}
+        ;;
+        *.\;*)
+          ;;
+        *.\[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
+        ;;
+        runtime.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=$value
+        ;;
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=$value
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
+    fi
+  fi
+done
+XP_EXE=${XP_EXE-php}
+if [ "" = "$USE_XP" ] ; then
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
+fi
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+fi
+export XP_EXE
+IFS="|"
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--3535:unittest:--
+#!/bin/sh
+PATHSEP=':'
+DIRSEP='/'
+if [ -L "$0" ] ; then
+  link="$(readlink "$0")"
+  case "$link" in
+    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
+  esac
+else
+  DIRNAME=$(dirname "$0")
+fi
+translate_path() {
+  base="$1"
+  path="$2"
+  case "$path" in
+    ?:*) ;; # C:\xp
+    \\*) ;; # \\filesrv\shares
+    [/]*) ;; # /usr/local/lib
+    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
+    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
+  esac
+  echo $path
+}
+translate_paths() {
+  base="$1"
+  path="$2"
+  translated=""
+  IFS="$PATHSEP"
+  for i in $path ; do
+    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
+  done
+  echo "${translated#$PATHSEP}"
+}
+locate() {
+  path="$1"
+  file="$2"
+  expect=$3
+  IFS="$PATHSEP"
+  for i in $path ; do
+    qualified="$i/$file"
+    if [ -e "$qualified" ] ; then
+      echo "$qualified"
+      if [ $expect = 1 ] ; then return ; fi
+    fi
+  done
+  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.unittest.Runner IFS="|";
+ifs="|"
+if [ "" = "$USE_XP" ] ; then
+  unset USE_XP
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
+RT_ARG=""
+dkeys=""
+vkeys=""
+for i in "." "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    section=default
+    while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
+      case "$section.$line" in
+        default.use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
+        ;;
+        default.rt=*)
+          XP_RT=${XP_RT-$value}
+        ;;
+        *.\;*)
+          ;;
+        *.\[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
+        ;;
+        runtime.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=$value
+        ;;
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=$value
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
+    fi
+  fi
+done
+XP_EXE=${XP_EXE-php}
+if [ "" = "$USE_XP" ] ; then
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
+fi
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+fi
+export XP_EXE
+IFS="|"
+WATCH=""
+while getopts :w: flag ; do
+  case "$flag" in
+    w) WATCH="$OPTARG"; shift 1 ;;
+  esac
+done
+if [ -n "$WATCH" ] ; then
+  ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+  if [ $? = 2 ] ; then
+    exit 2
+  elif [ $? = 126 ] || [ $? = 127 ] ; then
+    exit 255
+  fi
+  inotifywait -q -e close_write -m -r $WATCH | while read event
+  do
+    ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+  done
+else
+  exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+fi
+--3121:xar:--
+#!/bin/sh
+PATHSEP=':'
+DIRSEP='/'
+if [ -L "$0" ] ; then
+  link="$(readlink "$0")"
+  case "$link" in
+    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
+  esac
+else
+  DIRNAME=$(dirname "$0")
+fi
+translate_path() {
+  base="$1"
+  path="$2"
+  case "$path" in
+    ?:*) ;; # C:\xp
+    \\*) ;; # \\filesrv\shares
+    [/]*) ;; # /usr/local/lib
+    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
+    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
+  esac
+  echo $path
+}
+translate_paths() {
+  base="$1"
+  path="$2"
+  translated=""
+  IFS="$PATHSEP"
+  for i in $path ; do
+    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
+  done
+  echo "${translated#$PATHSEP}"
+}
+locate() {
+  path="$1"
+  file="$2"
+  expect=$3
+  IFS="$PATHSEP"
+  for i in $path ; do
+    qualified="$i/$file"
+    if [ -e "$qualified" ] ; then
+      echo "$qualified"
+      if [ $expect = 1 ] ; then return ; fi
+    fi
+  done
+  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.xar.Runner IFS="|";
+ifs="|"
+if [ "" = "$USE_XP" ] ; then
+  unset USE_XP
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
+RT_ARG=""
+dkeys=""
+vkeys=""
+for i in "." "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    section=default
+    while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
+      case "$section.$line" in
+        default.use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
+        ;;
+        default.rt=*)
+          XP_RT=${XP_RT-$value}
+        ;;
+        *.\;*)
+          ;;
+        *.\[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
+        ;;
+        runtime.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=$value
+        ;;
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=$value
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
+    fi
+  fi
+done
+XP_EXE=${XP_EXE-php}
+if [ "" = "$USE_XP" ] ; then
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
+fi
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+fi
+export XP_EXE
+IFS="|"
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--3126:xcc:--
+#!/bin/sh
+PATHSEP=':'
+DIRSEP='/'
+if [ -L "$0" ] ; then
+  link="$(readlink "$0")"
+  case "$link" in
+    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
+  esac
+else
+  DIRNAME=$(dirname "$0")
+fi
+translate_path() {
+  base="$1"
+  path="$2"
+  case "$path" in
+    ?:*) ;; # C:\xp
+    \\*) ;; # \\filesrv\shares
+    [/]*) ;; # /usr/local/lib
+    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
+    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
+  esac
+  echo $path
+}
+translate_paths() {
+  base="$1"
+  path="$2"
+  translated=""
+  IFS="$PATHSEP"
+  for i in $path ; do
+    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
+  done
+  echo "${translated#$PATHSEP}"
+}
+locate() {
+  path="$1"
+  file="$2"
+  expect=$3
+  IFS="$PATHSEP"
+  for i in $path ; do
+    qualified="$i/$file"
+    if [ -e "$qualified" ] ; then
+      echo "$qualified"
+      if [ $expect = 1 ] ; then return ; fi
+    fi
+  done
+  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.compiler.Runner IFS="|";
+ifs="|"
+if [ "" = "$USE_XP" ] ; then
+  unset USE_XP
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
+RT_ARG=""
+dkeys=""
+vkeys=""
+for i in "." "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    section=default
+    while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
+      case "$section.$line" in
+        default.use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
+        ;;
+        default.rt=*)
+          XP_RT=${XP_RT-$value}
+        ;;
+        *.\;*)
+          ;;
+        *.\[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
+        ;;
+        runtime.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=$value
+        ;;
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=$value
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
+    fi
+  fi
+done
+XP_EXE=${XP_EXE-php}
+if [ "" = "$USE_XP" ] ; then
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
+fi
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+fi
+export XP_EXE
+IFS="|"
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--4254:xp:--
+#!/bin/sh
+PATHSEP=':'
+DIRSEP='/'
+if [ -L "$0" ] ; then
+  link="$(readlink "$0")"
+  case "$link" in
+    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
+  esac
+else
+  DIRNAME=$(dirname "$0")
+fi
+translate_path() {
+  base="$1"
+  path="$2"
+  case "$path" in
+    ?:*) ;; # C:\xp
+    \\*) ;; # \\filesrv\shares
+    [/]*) ;; # /usr/local/lib
+    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
+    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
+  esac
+  echo $path
+}
+translate_paths() {
+  base="$1"
+  path="$2"
+  translated=""
+  IFS="$PATHSEP"
+  for i in $path ; do
+    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
+  done
+  echo "${translated#$PATHSEP}"
+}
+locate() {
+  path="$1"
+  file="$2"
+  expect=$3
+  IFS="$PATHSEP"
+  for i in $path ; do
+    qualified="$i/$file"
+    if [ -e "$qualified" ] ; then
+      echo "$qualified"
+      if [ $expect = 1 ] ; then return ; fi
+    fi
+  done
+  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+OPTIND=0
+INCLUDE_PATH="."
+TOOL=
+if [ 0 = $# ] ; then
+  TOOL="xp.runtime.ShowResource|usage.txt|255"
+else
+  for arg in "$@" ; do
+    if [ ! -z "$INCLUDE_ARG" ] ; then
+      INCLUDE_PATH="$arg$INCLUDE_ARG$INCLUDE_PATH" ; INCLUDE_ARG=""
+      OPTIND=`expr $OPTIND + 2`
+      continue
+    fi
+    case $arg in
+      -v) # Display version
+        TOOL="xp.runtime.Version"
+        OPTIND=$(expr $OPTIND + 1)
+        ;;
+      -e) # Run source passed via command line
+        TOOL="xp.runtime.Evaluate"
+        OPTIND=$(expr $OPTIND + 1)
+        ;;
+      -w|-d) # Evaluate source and dump result
+        TOOL="xp.runtime.Dump"
+        ;;
+      -r) # Reflect given class
+        TOOL="xp.runtime.Reflect"
+        OPTIND=$(expr $OPTIND + 1)
+        ;;
+      -cp) # Add class path
+        INCLUDE_ARG=${PATHSEP}
+        ;;
+      -xar) # Run a xar
+        TOOL="xp.runtime.Xar"
+        OPTIND=$(expr $OPTIND + 1)
+        ;;
+      -*) # Any other arg
+        echo "*** Invalid argument $arg" >&2
+        exit 255
+        ;;
+      *) # First arg we find that does not begin with a "-"
+        break
+        ;;
+    esac
+  done
+  shift $OPTIND
+fi
+base="$DIRNAME" RUNNER="class" INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
+ifs="|"
+if [ "" = "$USE_XP" ] ; then
+  unset USE_XP
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
+RT_ARG=""
+dkeys=""
+vkeys=""
+for i in "." "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    section=default
+    while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
+      case "$section.$line" in
+        default.use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
+        ;;
+        default.rt=*)
+          XP_RT=${XP_RT-$value}
+        ;;
+        *.\;*)
+          ;;
+        *.\[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
+        ;;
+        runtime.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=$value
+        ;;
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=$value
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
+    fi
+  fi
+done
+XP_EXE=${XP_EXE-php}
+if [ "" = "$USE_XP" ] ; then
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
+fi
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+fi
+export XP_EXE
+IFS="|"
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--99:xp.ini:--
+[runtime]
+date.timezone=Europe/Berlin
+;modules=/devel/xp/{name}:~/.composer/vendor/{vendor}/{name}
+--3125:xpcli:--
+#!/bin/sh
+PATHSEP=':'
+DIRSEP='/'
+if [ -L "$0" ] ; then
+  link="$(readlink "$0")"
+  case "$link" in
+    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
+  esac
+else
+  DIRNAME=$(dirname "$0")
+fi
+translate_path() {
+  base="$1"
+  path="$2"
+  case "$path" in
+    ?:*) ;; # C:\xp
+    \\*) ;; # \\filesrv\shares
+    [/]*) ;; # /usr/local/lib
+    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
+    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
+  esac
+  echo $path
+}
+translate_paths() {
+  base="$1"
+  path="$2"
+  translated=""
+  IFS="$PATHSEP"
+  for i in $path ; do
+    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
+  done
+  echo "${translated#$PATHSEP}"
+}
+locate() {
+  path="$1"
+  file="$2"
+  expect=$3
+  IFS="$PATHSEP"
+  for i in $path ; do
+    qualified="$i/$file"
+    if [ -e "$qualified" ] ; then
+      echo "$qualified"
+      if [ $expect = 1 ] ; then return ; fi
+    fi
+  done
+  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.command.Runner IFS="|";
+ifs="|"
+if [ "" = "$USE_XP" ] ; then
+  unset USE_XP
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
+RT_ARG=""
+dkeys=""
+vkeys=""
+for i in "." "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    section=default
+    while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
+      case "$section.$line" in
+        default.use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
+        ;;
+        default.rt=*)
+          XP_RT=${XP_RT-$value}
+        ;;
+        *.\;*)
+          ;;
+        *.\[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
+        ;;
+        runtime.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=$value
+        ;;
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=$value
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
+    fi
+  fi
+done
+XP_EXE=${XP_EXE-php}
+if [ "" = "$USE_XP" ] ; then
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
+fi
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+fi
+export XP_EXE
+IFS="|"
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--3125:xpi:--
+#!/bin/sh
+PATHSEP=':'
+DIRSEP='/'
+if [ -L "$0" ] ; then
+  link="$(readlink "$0")"
+  case "$link" in
+    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
+  esac
+else
+  DIRNAME=$(dirname "$0")
+fi
+translate_path() {
+  base="$1"
+  path="$2"
+  case "$path" in
+    ?:*) ;; # C:\xp
+    \\*) ;; # \\filesrv\shares
+    [/]*) ;; # /usr/local/lib
+    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
+    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
+  esac
+  echo $path
+}
+translate_paths() {
+  base="$1"
+  path="$2"
+  translated=""
+  IFS="$PATHSEP"
+  for i in $path ; do
+    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
+  done
+  echo "${translated#$PATHSEP}"
+}
+locate() {
+  path="$1"
+  file="$2"
+  expect=$3
+  IFS="$PATHSEP"
+  for i in $path ; do
+    qualified="$i/$file"
+    if [ -e "$qualified" ] ; then
+      echo "$qualified"
+      if [ $expect = 1 ] ; then return ; fi
+    fi
+  done
+  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+base="$DIRNAME" RUNNER="class" INCLUDE="." xppath="$DIRNAME" ARGS=xp.install.Runner IFS="|";
+ifs="|"
+if [ "" = "$USE_XP" ] ; then
+  unset USE_XP
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
+RT_ARG=""
+dkeys=""
+vkeys=""
+for i in "." "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    section=default
+    while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
+      case "$section.$line" in
+        default.use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
+        ;;
+        default.rt=*)
+          XP_RT=${XP_RT-$value}
+        ;;
+        *.\;*)
+          ;;
+        *.\[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
+        ;;
+        runtime.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=$value
+        ;;
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=$value
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
+    fi
+  fi
+done
+XP_EXE=${XP_EXE-php}
+if [ "" = "$USE_XP" ] ; then
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
+fi
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+fi
+export XP_EXE
+IFS="|"
+exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+--5410:xpws:--
+#!/bin/sh
+PATHSEP=':'
+DIRSEP='/'
+if [ -L "$0" ] ; then
+  link="$(readlink "$0")"
+  case "$link" in
+    [/]*) DIRNAME=$(dirname "$link") ;; # Absolute
+    *) DIRNAME=$(dirname "$(dirname "$0")/$link") ;; # Relative
+  esac
+else
+  DIRNAME=$(dirname "$0")
+fi
+translate_path() {
+  base="$1"
+  path="$2"
+  case "$path" in
+    ?:*) ;; # C:\xp
+    \\*) ;; # \\filesrv\shares
+    [/]*) ;; # /usr/local/lib
+    ~*) path=$HOME$DIRSEP${path#"~"} ;; # ~/lib
+    *) path=$base$DIRSEP$path ;; # lib, ../lib, ./classes
+  esac
+  echo $path
+}
+translate_paths() {
+  base="$1"
+  path="$2"
+  translated=""
+  IFS="$PATHSEP"
+  for i in $path ; do
+    translated="$translated$PATHSEP"$(translate_path "$base" "$i")
+  done
+  echo "${translated#$PATHSEP}"
+}
+locate() {
+  path="$1"
+  file="$2"
+  expect=$3
+  IFS="$PATHSEP"
+  for i in $path ; do
+    qualified="$i/$file"
+    if [ -e "$qualified" ] ; then
+      echo "$qualified"
+      if [ $expect = 1 ] ; then return ; fi
+    fi
+  done
+  if [ $expect = 1 ] ; then echo "*** Failed to locate $file in $path" >&2 ; fi
+  echo ""
+}
+RUNNER=web
+TOOL=
+START='-S${ifs}${ADDR}${ifs}-t${ifs}"${DOCUMENT_ROOT}"${ifs}-duser_dir="$WEB_CONFIG"${ifs}'
+INCLUDE_PATH="."
+SERVER_PROFILE=dev
+WEB_ROOT=.
+WEB_CONFIG=
+while [ $# != 0 ]; do
+  case $1 in
+    -p)
+      SERVER_PROFILE=$2
+      shift 2
+      ;;
+    -r)
+      DOCUMENT_ROOT=$2
+      if [ ! -d "$DOCUMENT_ROOT" ] ; then
+        echo "*** Document root $DOCUMENT_ROOT does not exist, exiting." >&2
+        exit 3
+      fi
+      shift 2
+      ;;
+    -c)
+      if [ "-" = "$2" ] ; then
+        WEB_CONFIG=-
+      elif [ -e "$2/web.ini" ] ; then
+        WEB_CONFIG="$2/web.ini"
+      else
+        WEB_CONFIG=":$2"
+      fi
+      shift 2
+      ;;
+    -w)
+      WEB_ROOT=$2
+      shift 2
+      ;;
+    -cp)
+      INCLUDE_PATH=${INCLUDE_PATH}${PATHSEP}$2
+      shift 2
+      ;;
+    -i)
+      RUNNER=class
+      START=@immediate
+      TOOL='xp.scriptlet.Inspect|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}'
+      shift 1
+      ;;
+    -m)
+      if [ "develop" = $2 ] ; then
+        RUNNER=web
+      else
+        RUNNER=class
+        START=
+        TOOL='xp.scriptlet.Server|${WEB_ROOT}|${WEB_CONFIG}|${SERVER_PROFILE}|${ADDR}|'$2
+      fi
+      shift 2
+      ;;
+    -?)
+      RUNNER=class
+      START=@immediate
+      TOOL="xp.scriptlet.Usage|xpws.txt"
+      break
+      ;;
+    *:*)
+      server=${1%:*}
+      port=${1#*:}
+      shift 1
+      ;;
+    *)
+      server=$1
+      shift 1
+      ;;
+  esac
+done
+if [ "" = "$WEB_CONFIG" ] ; then
+  if [ -e ./etc/web.ini ] ; then
+    WEB_CONFIG=./etc
+  else
+    WEB_CONFIG=-
+  fi
+fi
+ADDR=${server-localhost}:${port-8080}
+eval 'TOOL="'$TOOL'"'
+base="$DIRNAME" RUNNER=$RUNNER INCLUDE=$INCLUDE_PATH xppath="$DIRNAME" ARGS=$TOOL IFS="|";
+ifs="|"
+if [ "" = "$USE_XP" ] ; then
+  unset USE_XP
+else
+  USE_XP=$(translate_paths "." "$USE_XP")
+fi
+RT_ARG=""
+dkeys=""
+vkeys=""
+for i in "." "$HOME/.xp" "$base" ; do
+  if [ -e "$i/xp.ini" ] ; then
+    section=default
+    while read line || [ -n "$line" ] ; do
+      line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
+      case "$section.$line" in
+        default.use=*)
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
+        ;;
+        default.rt=*)
+          XP_RT=${XP_RT-$value}
+        ;;
+        *.\;*)
+          ;;
+        *.\[*\])
+          section=${line#\[}
+          section=${section%]}
+        ;;
+        runtime.extension=*|runtime@$XP_RT.extension=*)
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
+        ;;
+        runtime.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          dkeys="$dkeys${ifs}$key"
+          eval "d$key"=$value
+        ;;
+        runtime@$XP_RT.*=*)
+          key=${line%=*}
+          key=$(echo $key | sed 's/\./__/g')
+          vkeys="$vkeys${ifs}$key"
+          eval "v$key"=$value
+        ;;
+      esac
+    done < "$i/xp.ini"
+  fi
+done
+for k in $vkeys ; do
+  eval "d$k=\$v$k"
+  dkeys="$dkeys${ifs}$k"
+done
+for k in $dkeys ; do
+  if [ $k ] ; then
+    eval "v=\$d$k"
+    if [ default = $k ] ; then
+      XP_EXE=${XP_EXE-$v}
+    else
+      RT_ARG="$RT_ARG${ifs}-d${ifs}$(echo $k | sed 's/__/./g')=\"$v\""
+    fi
+  fi
+done
+XP_EXE=${XP_EXE-php}
+if [ "" = "$USE_XP" ] ; then
+  echo "*** Cannot determine use_xp setting from [ ENV $HOME/.xp/xp.ini $base/xp.ini ]" >&2
+  exit 255
+fi
+args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$PATHSEP$PATHSEP$INCLUDE\"${ifs}-d${ifs}magic_quotes_gpc=0$RT_ARG"
+tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
+if [ "" = "$tool" ] ; then
+  tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+fi
+export XP_EXE
+IFS="|"
+if [ $START = "@immediate" ] ; then
+  ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
+else
+  if [ "" = "$DOCUMENT_ROOT" ] ; then
+    if [ -d "$WEB_ROOT/static" ] ; then
+      DOCUMENT_ROOT="$WEB_ROOT/static"
+    else
+      DOCUMENT_ROOT=.
+    fi
+  else
+    DOCUMENT_ROOT=${DOCUMENT_ROOT%/}
+  fi
+  if [ "-" = "$WEB_CONFIG" ] ; then
+    echo "No configuration given, serving static content from $DOCUMENT_ROOT"
+  fi
+  export WEB_ROOT
+  export SERVER_PROFILE
+  export DOCUMENT_ROOT
+  eval 'START="'$START'"'
+  ${XP_EXE}${ifs}${START}${args}${ifs}$tool ${ARGS} "$@" &
+  PID=$!
+  echo "[xpws-$SERVER_PROFILE#$PID] running $ADDR @ $WEB_ROOT - Press <Enter> to exit"
+  read enter
+  echo "[xpws-$SERVER_PROFILE#$PID] shutting down..."
+  kill -TERM $PID
+fi
+--485:xprt-update.sh:--
+#!/bin/sh
+
+DIR=$(dirname "$0")
+BIN=$(realpath "$DIR")
+
+if [ -z $TEMP ] ; then
+  TARGET=/tmp/.xp
+else
+  TARGET=$TEMP/.xp
+fi
+
+echo "===> Downloading unix runners to $TARGET"
+xpi download bin/unix $TARGET
+if [ $? != 0 ] ; then
+  exit
+fi
+
+echo "===> Extracting into $BIN"
+i=0
+for e in `ls -1 $TARGET/*` ; do
+  (head -1 $e | grep '^#!/bin/sh' >/dev/null) && chmod +x $e
+  mv $e $BIN
+  i=`expr $i + 1`
+done
+echo "$i file(s) copied"
+
+rmdir $TARGET
+echo "===> Done, runners have been updated"
+--9702:class-main.php:--
+<?php namespace xp;
+
+set_exception_handler(function($e) {
+  if ($e instanceof \lang\Throwable) {
+    fputs(STDERR, 'Uncaught exception: '.$e->toString());
+  } else {
+    fputs(STDERR, 'Uncaught exception: '.get_class($e).' ('.$e->getMessage().")\n");
+    $stringOf= class_exists('xp', false) ? ['xp', 'stringOf'] : function($val) { return var_export($val, 1); };
+    foreach ($e->getTrace() as $trace) {
+      fprintf(STDERR,
+        "  at %s%s%s(%s) [line %d of %s]\n",
+        isset($trace['class']) ? strtr($trace['class'], '\\', '.') : '<main>',
+        isset($trace['type']) ? $trace['type'] : '::',
+        isset($trace['function']) ? $trace['function'] : '<main>',
+        isset($trace['args']) ? implode(', ', array_map($stringOf, $trace['args'])) : '',
+        isset($trace['line']) ? $trace['line'] : 0,
+        isset($trace['file']) ? basename($trace['file']) : '(unknown)'
+      );
+    }
+  }
+  exit(0xff);
+});
+
+ini_set('display_errors', 'false');
+register_shutdown_function(function() {
+  static $types= array(
+    E_ERROR         => 'Fatal error',
+    E_USER_ERROR    => 'Fatal error',
+    E_CORE_ERROR    => 'Core error',
+    E_PARSE         => 'Parse error',
+    E_COMPILE_ERROR => 'Compile error'
+  );
+
+  $e= error_get_last();
+  if (null !== $e && isset($types[$e['type']])) {
+    if (class_exists('xp', false)) {
+      __error($e['type'], $e['message'], $e['file'], $e['line']);
+      $stringOf= ['xp', 'stringOf'];
+    } else {
+      $stringOf= function($val) { return var_export($val, 1); };
+    }
+    fprintf(
+      STDERR,
+      "Uncaught error: %s (%s)\n  at <source> [line %d of %s]\n  at <main>(%s) [line 0 of %s]\n",
+      $types[$e['type']],
+      $e['message'],
+      $e['line'],
+      str_replace(getcwd(), '.', $e['file']),
+      implode(', ', array_map($stringOf, array_slice($_SERVER['argv'], 1))),
+      str_replace('.', DIRECTORY_SEPARATOR, $_SERVER['argv'][0]).'.class.php'
+    );
+  }
+});
+
+// Set CLI specific handling
+$home= getenv('HOME');
+$cwd= '.';
+
+if ('cgi' === PHP_SAPI || 'cgi-fcgi' === PHP_SAPI) {
+  ini_set('html_errors', 0);
+  define('STDIN', fopen('php://stdin', 'rb'));
+  define('STDOUT', fopen('php://stdout', 'wb'));
+  define('STDERR', fopen('php://stderr', 'wb'));
+} else if ('cli' !== PHP_SAPI) {
+  throw new \Exception('[bootstrap] Cannot be run under '.PHP_SAPI.' SAPI');
+}
+
+final class xar {
+  public
+    $position     = 0,
+    $archive      = null,
+    $filename     = '';
+    
+  // {{{ proto [:var] acquire(string archive)
+  //     Archive instance handling pool function, opens an archive and reads header only once
+  static function acquire($archive) {
+    static $archives= array();
+    static $unpack= array(
+      1 => 'a80id/a80*filename/a80*path/V1size/V1offset/a*reserved',
+      2 => 'a240id/V1size/V1offset/a*reserved'
+    );
+    
+    if ('/' === $archive{0} && ':' === $archive{2}) {
+      $archive= substr($archive, 1);    // Handle xar:///f:/archive.xar => f:/archive.xar
+    }
+
+    if (!isset($archives[$archive])) {
+      $current= array('handle' => fopen($archive, 'rb'), 'dev' => crc32($archive));
+      $header= unpack('a3id/c1version/V1indexsize/a*reserved', fread($current['handle'], 0x0100));
+      if ('CCA' != $header['id']) \raise('lang.FormatException', 'Malformed archive '.$archive);
+      for ($current['index']= array(), $i= 0; $i < $header['indexsize']; $i++) {
+        $entry= unpack(
+          $unpack[$header['version']], 
+          fread($current['handle'], 0x0100)
+        );
+        $current['index'][rtrim($entry['id'], "\0")]= array($entry['size'], $entry['offset'], $i);
+      }
+      $current['offset']= 0x0100 + $i * 0x0100;
+      $archives[$archive]= $current;
+    }
+
+    return $archives[$archive];
+  }
+  // }}}
+  
+  // {{{ proto bool stream_open(string path, string mode, int options, string opened_path)
+  //     Open the given stream and check if file exists
+  function stream_open($path, $mode, $options, $opened_path) {
+    sscanf(strtr($path, ';', '?'), 'xar://%[^?]?%[^$]', $archive, $this->filename);
+    $this->archive= self::acquire(urldecode($archive));
+    return isset($this->archive['index'][$this->filename]);
+  }
+  // }}}
+  
+  // {{{ proto string stream_read(int count)
+  //     Read $count bytes up-to-length of file
+  function stream_read($count) {
+    $f= $this->archive['index'][$this->filename];
+    if (0 === $count || $this->position >= $f[0]) return false;
+
+    fseek($this->archive['handle'], $this->archive['offset'] + $f[1] + $this->position, SEEK_SET);
+    $bytes= fread($this->archive['handle'], min($f[0] - $this->position, $count));
+    $this->position+= strlen($bytes);
+    return $bytes;
+  }
+  // }}}
+  
+  // {{{ proto bool stream_eof()
+  //     Returns whether stream is at end of file
+  function stream_eof() {
+    return $this->position >= $this->archive['index'][$this->filename][0];
+  }
+  // }}}
+  
+  // {{{ proto [:int] stream_stat()
+  //     Retrieve status of stream
+  function stream_stat() {
+    return array(
+      'dev'   => $this->archive['dev'],
+      'size'  => $this->archive['index'][$this->filename][0],
+      'ino'   => $this->archive['index'][$this->filename][2]
+    );
+  }
+  // }}}
+
+  // {{{ proto bool stream_seek(int offset, int whence)
+  //     Callback for fseek
+  function stream_seek($offset, $whence) {
+    switch ($whence) {
+      case SEEK_SET: $this->position= $offset; break;
+      case SEEK_CUR: $this->position+= $offset; break;
+      case SEEK_END: $this->position= $this->archive['index'][$this->filename][0] + $offset; break;
+    }
+    return true;
+  }
+  // }}}
+  
+  // {{{ proto int stream_tell
+  //     Callback for ftell
+  function stream_tell() {
+    return $this->position;
+  }
+  // }}}
+  
+  // {{{ proto [:int] url_stat(string path)
+  //     Retrieve status of url
+  function url_stat($path) {
+    sscanf(strtr($path, ';', '?'), 'xar://%[^?]?%[^$]', $archive, $file);
+    $current= self::acquire(urldecode($archive));
+    return isset($current['index'][$file]) ? array(
+      'dev'   => $current['dev'],
+      'mode'  => 0100644,
+      'size'  => $current['index'][$file][0],
+      'ino'   => $current['index'][$file][2]
+    ) : false;
+  }
+  // }}}
+}
+
+stream_wrapper_register('xar', 'xp\xar');
+
+function path($in, $bail= true) {
+  $qn= realpath($in);
+  if (false === $qn) {
+    if ($bail) {
+      throw new \Exception('[bootstrap] Classpath element ['.$in.'] not found');
+    }
+    return null;
+  } else {
+    return is_dir($qn) ? $qn.DIRECTORY_SEPARATOR : $qn;
+  }
+}
+
+function scan($paths, $home= '.') {
+  $include= array();
+  foreach ($paths as $path) {
+    if ('' === $path) {
+      continue;
+    } else if ('~' === $path{0}) {
+      $path= $home.substr($path, 1);
+    }
+
+    if (!($d= @opendir($path))) continue;
+    while ($e= readdir($d)) {
+      if ('.pth' !== substr($e, -4)) continue;
+
+      foreach (file($path.DIRECTORY_SEPARATOR.$e) as $line) {
+        $line= trim($line);
+        $bail= true;
+        if ('' === $line || '#' === $line{0}) {
+          continue;
+        } else if ('!' === $line{0}) {
+          $pre= true;
+          $line= '!' === $line ? '.' : substr($line, 1);
+        } else if ('?' === $line{0}) {
+          $bail= false;
+          $line= substr($line, 1);
+        } else {
+          $pre= false;
+        }
+
+        if ('~' === $line{0}) {
+          $qn= $home.DIRECTORY_SEPARATOR.substr($line, 1);
+        } else if ('/' === $line{0} || strlen($line) > 2 && (':' === $line{1} && '\\' === $line{2})) {
+          $qn= $line;
+        } else {
+          $qn= $path.DIRECTORY_SEPARATOR.$line;
+        }
+
+        if ($resolved= path($qn, $bail)) {
+          $pre ? array_unshift($include, $resolved) : $include[]= $resolved;
+        }
+      }
+    }
+    closedir($d);
+  }
+  return $include;
+}
+
+function bootstrap($paths, $merge) {
+  $bootstrap= array();
+  $include= array();
+  $merged= false;
+  do {
+    foreach ($paths as $path) {
+      if (DIRECTORY_SEPARATOR === $path{strlen($path) - 1}) {
+        $f= $path.'__xp.php';
+      } else if (0 === substr_compare($path, '.xar', -4)) {
+        $f= 'xar://'.$path.'?__xp.php';
+      } else if (0 === substr_compare($path, '__xp.php', -8)) {
+        $f= $path;
+        $path= substr($path, 0, -8);
+      } else {
+        $bootstrap[$path]= false;
+        continue;
+      }
+
+      $include[$path]= true;
+      if (is_file($f)) $bootstrap[$f]= true;
+    }
+
+    if ($merged) {
+      return array($bootstrap, $include);
+    } else {
+      $paths= $merge();
+      $merged= true;
+    }
+  } while (true);
+}
+
+list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($home) {
+  $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
+  $paths= scan(array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))), $home);
+  if (isset($parts[1]) && $parts[1] != '') {
+    foreach (explode(PATH_SEPARATOR, $parts[1]) as $path) {
+      $paths[]= path($path);
+    }
+  }
+  return $paths;
+});
+
+foreach ($bootstrap as $file => $xp) {
+  if ($xp && class_exists('xp', false)) continue;
+  include $file;
+}
+
+if (!class_exists('xp', false)) {
+  throw new \Exception('[bootstrap] Cannot determine boot class path from '.get_include_path());
+}
+
+
+// Start I/O layers
+$encoding= get_cfg_var('encoding');
+iconv_set_encoding('internal_encoding', \xp::ENCODING);
+array_shift($_SERVER['argv']);
+array_shift($argv);
+if ($encoding) {
+  foreach ($argv as $i => $val) {
+    $_SERVER['argv'][$i]= $argv[$i]= iconv($encoding, \xp::ENCODING, $val);
+  }
+}
+
+foreach ($include as $path => $_) {
+  \lang\ClassLoader::registerPath($path);
+}
+
+try {
+  exit(\lang\XPClass::forName($argv[0])->getMethod('main')->invoke(null, array(array_slice($argv, 1))));
+} catch (\lang\SystemExit $e) {
+  if ($message= $e->getMessage()) echo $message, "\n";
+  exit($e->getCode());
+}
+--8403:web-main.php:--
 <?php namespace xp;
 
 // Set WEB specific handling
@@ -1839,7 +2192,9 @@ list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($
   $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
   $paths= scan(array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))), $home);
   if (isset($parts[1]) && $parts[1] != '') {
-    $paths= array_merge($paths, array_map('xp\path', explode(PATH_SEPARATOR, $parts[1])));
+    foreach (explode(PATH_SEPARATOR, $parts[1]) as $path) {
+      $paths[]= path($path);
+    }
   }
   return $paths;
 });

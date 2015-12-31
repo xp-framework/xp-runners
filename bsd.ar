@@ -1,4 +1,4 @@
---3155:cgen:--
+--3220:cgen:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -63,12 +63,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -77,19 +81,19 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -126,7 +130,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3154:doclet:--
+--3219:doclet:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -191,12 +195,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -205,19 +213,19 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -254,7 +262,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3565:unittest:--
+--3630:unittest:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -319,12 +327,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -333,19 +345,19 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -401,7 +413,7 @@ if [ -n "$WATCH" ] ; then
 else
   exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 fi
---3151:xar:--
+--3216:xar:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -466,12 +478,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -480,19 +496,19 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -529,7 +545,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3156:xcc:--
+--3221:xcc:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -594,12 +610,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -608,19 +628,19 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -657,7 +677,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4284:xp:--
+--4349:xp:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -768,12 +788,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -782,19 +806,19 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -831,7 +855,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3155:xpcli:--
+--3220:xpcli:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -896,12 +920,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -910,19 +938,19 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -959,7 +987,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3155:xpi:--
+--3220:xpi:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -1024,12 +1052,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -1038,19 +1070,19 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -1087,7 +1119,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5440:xpws:--
+--5505:xpws:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -1233,12 +1265,16 @@ for i in "." "$HOME/.xp" "$base" ; do
     section=default
     while read line || [ -n "$line" ] ; do
       line="${line%"${line##*[![:space:]]}"}"
+      value="${line#*=}"
+      if [ "" = "$value" ] ; then
+        continue
+      fi
       case "$section.$line" in
         default.use=*)
-          USE_XP=${USE_XP-$(translate_paths "$i" "${line#*=}")}
+          USE_XP=${USE_XP-$(translate_paths "$i" "$value")}
         ;;
         default.rt=*)
-          XP_RT=${XP_RT-${line#*=}}
+          XP_RT=${XP_RT-$value}
         ;;
         *.\;*)
           ;;
@@ -1247,19 +1283,19 @@ for i in "." "$HOME/.xp" "$base" ; do
           section=${section%]}
         ;;
         runtime.extension=*|runtime@$XP_RT.extension=*)
-          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=${line#*=}"
+          RT_ARG="$RT_ARG${ifs}-d${ifs}extension=$value"
         ;;
         runtime.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           dkeys="$dkeys${ifs}$key"
-          eval "d$key"=${line#*=}
+          eval "d$key"=$value
         ;;
         runtime@$XP_RT.*=*)
           key=${line%=*}
           key=$(echo $key | sed 's/\./__/g')
           vkeys="$vkeys${ifs}$key"
-          eval "v$key"=${line#*=}
+          eval "v$key"=$value
         ;;
       esac
     done < "$i/xp.ini"
@@ -1350,7 +1386,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---9642:class-main.php:--
+--9702:class-main.php:--
 <?php namespace xp;
 
 set_exception_handler(function($e) {
@@ -1625,7 +1661,9 @@ list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($
   $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
   $paths= scan(array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))), $home);
   if (isset($parts[1]) && $parts[1] != '') {
-    $paths= array_merge($paths, array_map('xp\path', explode(PATH_SEPARATOR, $parts[1])));
+    foreach (explode(PATH_SEPARATOR, $parts[1]) as $path) {
+      $paths[]= path($path);
+    }
   }
   return $paths;
 });
@@ -1642,6 +1680,7 @@ if (!class_exists('xp', false)) {
 
 // Start I/O layers
 $encoding= get_cfg_var('encoding');
+iconv_set_encoding('internal_encoding', \xp::ENCODING);
 array_shift($_SERVER['argv']);
 array_shift($argv);
 if ($encoding) {
@@ -1660,7 +1699,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---8399:web-main.php:--
+--8403:web-main.php:--
 <?php namespace xp;
 
 // Set WEB specific handling
@@ -1875,7 +1914,9 @@ list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($
   $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
   $paths= scan(array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))), $home);
   if (isset($parts[1]) && $parts[1] != '') {
-    $paths= array_merge($paths, array_map('xp\path', explode(PATH_SEPARATOR, $parts[1])));
+    foreach (explode(PATH_SEPARATOR, $parts[1]) as $path) {
+      $paths[]= path($path);
+    }
   }
   return $paths;
 });

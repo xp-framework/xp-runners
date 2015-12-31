@@ -19,11 +19,14 @@ return [
     }
 
     $this->boot= $path->compose($this->tmp, 'boot.pth');
-    unset($_SERVER['argc'], $_SERVER['argv']);
-    $this->env= array_merge($_SERVER, ['USE_XP' => $this->tmp, 'PATH' => dirname(PHP_BINARY).PATH_SEPARATOR.$_SERVER['PATH']]);
+    $this->env= [];
     $this->prepare();
 
-    file_put_contents($path->compose($this->tmp, 'xp.ini'), "[runtime]\ndate.timezone=Europe/Berlin");
+    file_put_contents($path->compose($this->tmp, 'xp.ini'), sprintf(
+      "use=%s\n[runtime]\ndefault=%s\nextension=\ndate.timezone=Europe/Berlin",
+      $this->tmp,
+      defined('HHVM_VERSION') ? 'php' : PHP_BINARY
+    ));
   },
 
   '@after' => function() use($path) {
