@@ -3,6 +3,13 @@ XP Runners ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 6.0.0 / 2015-12-31
+
+* Implemented xp-framework/rfc#306: Load modules, see PR #36.
+  (@thekid)
+* Allowed empty ini keys, treat them the same as being absent
+  (@thekid)
+
 ## 5.7.2 / 2015-12-20
 
 * Changed code to no longer set `iconv.internal_encoding` which is 
