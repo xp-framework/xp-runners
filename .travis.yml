@@ -7,7 +7,7 @@ php:
   - hhvm
   - nightly
 script:
-  - make test
+  - make unix.ar test
 before_deploy:
   - bash debian.sh
 deploy:
