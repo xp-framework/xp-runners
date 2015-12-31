@@ -1,0 +1,4 @@
+bsd.ar binary
+cygwin.ar binary
+unix.ar binary
+windows.ar binary
