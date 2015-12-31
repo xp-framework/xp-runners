@@ -1,6 +1,7 @@
 #include <common.in>
 
 INCLUDE_PATH="."
+MODULES=""
 TOOL=
 
 if [ 0 = $# ] ; then 
@@ -26,6 +27,10 @@ else
         ;;
       -cp)              # Add class path
         INCLUDE_PATH=${INCLUDE_PATH}${PATHSEP}$2
+        shift 2
+        ;;
+      -m)               # Add module
+        MODULES=${MODULES}${PATHSEP}$2
         shift 2
         ;;
       -xar)             # Run a xar
