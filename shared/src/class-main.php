@@ -85,8 +85,14 @@ foreach ($include as $path => $_) {
   \lang\ClassLoader::registerPath($path);
 }
 
+if (strpos($argv[0], \xp::CLASS_FILE_EXT)) {
+  $class= \lang\ClassLoader::getDefault()->loadUri(realpath($argv[0]));
+} else {
+  $class= \lang\ClassLoader::getDefault()->loadClass($argv[0]);
+}
+
 try {
-  exit(\lang\XPClass::forName($argv[0])->getMethod('main')->invoke(null, array(array_slice($argv, 1))));
+  exit($class->getMethod('main')->invoke(null, array(array_slice($argv, 1))));
 } catch (\lang\SystemExit $e) {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
