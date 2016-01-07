@@ -1,6 +1,12 @@
 XP Runners ChangeLog
 ========================================================================
 
+## 6.2.0 / 2016-01-07
+
+* Merged PR #38: Implement running .xar files directly without xp.runtime.Xar,
+  e.g. `xp test.xar`. Works with all XP 6 releases, XP 7.0-dev & XP 5.12.
+  (@thekid)
+
 ## 6.1.0 / 2016-01-07
 
 * Merged PR #37: Implement running class files by their file name, e.g.
