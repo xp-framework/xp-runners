@@ -86,7 +86,13 @@ foreach ($include as $path => $_) {
 }
 
 if (strpos($argv[0], \xp::CLASS_FILE_EXT)) {
-  $class= \lang\ClassLoader::getDefault()->loadUri(realpath($argv[0]));
+  if (false === ($uri= realpath($argv[0]))) {
+    throw new \Exception('Cannot load '.$argv[0].' - does not exist');
+  }
+  if (null === ($cl= \lang\ClassLoader::getDefault()->findUri($uri))) {
+    throw new \Exception('Cannot load '.$argv[0].' - not in class path');
+  }
+  $class= $cl->loadUri($uri);
 } else {
   $class= \lang\ClassLoader::getDefault()->loadClass($argv[0]);
 }
