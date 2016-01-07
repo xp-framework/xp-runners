@@ -16,6 +16,13 @@ exit($test->run(array_merge($base, [
     return '6.3.1-dev';
   },
 
+  'run test class from file' => function() use($path, $proc) {
+    $this->assertEquals(
+      [0 => ['Hello World']],
+      $proc->execute($this->exe, ['-cp', __DIR__.'/classes', 'classes/Test.class.php'], $this->env, $this->tmp)
+    );
+  },
+
   'uncaught throwables' => function() use($path, $proc) {
     $result= $proc->execute($this->exe, ['-e', '"throw new \lang\Error(\"Test\")"'], $this->env, $this->tmp);
     $this->assertEquals(255, key($result));
