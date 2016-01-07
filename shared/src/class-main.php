@@ -72,7 +72,7 @@ require 'class-path.php';
 
 // Start I/O layers
 $encoding= get_cfg_var('encoding');
-iconv_set_encoding('internal_encoding', \xp::ENCODING);
+PHP_VERSION < '5.6' && iconv_set_encoding('internal_encoding', \xp::ENCODING);
 array_shift($_SERVER['argv']);
 array_shift($argv);
 if ($encoding) {
