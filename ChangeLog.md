@@ -3,6 +3,9 @@ XP Runners ChangeLog
 
 ## 6.2.0 / 2016-01-07
 
+* Removed deprecation warning with "iconv.internal_encoding". See the PHP
+  RFC https://wiki.php.net/rfc/default_encoding
+  (@thekid)
 * Merged PR #38: Implement running .xar files directly without xp.runtime.Xar,
   e.g. `xp test.xar`. Works with all XP 6 releases, XP 7.0-dev & XP 5.12.
   (@thekid)
