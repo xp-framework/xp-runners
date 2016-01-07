@@ -1386,7 +1386,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---10540:class-main.php:--
+--10563:class-main.php:--
 <?php namespace xp;
 
 set_exception_handler(function($e) {
@@ -1680,7 +1680,7 @@ if (!class_exists('xp', false)) {
 
 // Start I/O layers
 $encoding= get_cfg_var('encoding');
-iconv_set_encoding('internal_encoding', \xp::ENCODING);
+PHP_VERSION < '5.6' && iconv_set_encoding('internal_encoding', \xp::ENCODING);
 array_shift($_SERVER['argv']);
 array_shift($argv);
 if ($encoding) {
