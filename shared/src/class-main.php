@@ -85,7 +85,8 @@ foreach ($include as $path => $_) {
   \lang\ClassLoader::registerPath($path);
 }
 
-if (strpos($argv[0], \xp::CLASS_FILE_EXT)) {
+$ext= substr($argv[0], -4, 4);
+if ('.php' === $ext) {
   if (false === ($uri= realpath($argv[0]))) {
     throw new \Exception('Cannot load '.$argv[0].' - does not exist');
   }
@@ -93,6 +94,15 @@ if (strpos($argv[0], \xp::CLASS_FILE_EXT)) {
     throw new \Exception('Cannot load '.$argv[0].' - not in class path');
   }
   $class= $cl->loadUri($uri);
+} else if ('.xar' === $ext) {
+  if (false === ($uri= realpath($argv[0]))) {
+    throw new \Exception('Cannot load '.$argv[0].' - does not exist');
+  }
+  $cl= \lang\ClassLoader::registerPath($uri);
+  if (!$cl->providesResource('META-INF/manifest.ini')) {
+    throw new \Exception($cl->toString().' does not provide a manifest');
+  }
+  $class= $cl->loadClass(parse_ini_string($cl->getResource('META-INF/manifest.ini'))['main-class']);
 } else {
   $class= \lang\ClassLoader::getDefault()->loadClass($argv[0]);
 }
