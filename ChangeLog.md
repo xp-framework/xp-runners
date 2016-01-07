@@ -4,7 +4,7 @@ XP Runners ChangeLog
 ## 6.1.0 / 2016-01-07
 
 * Merged PR #37: Implement running class files by their file name, e.g.
-  `xp Test.class.php`.
+  `xp Test.class.php`. Works with all XP 6 releases, XP 7.0-dev & XP 5.12.
   (@thekid)
 
 ## 6.0.0 / 2015-12-31
