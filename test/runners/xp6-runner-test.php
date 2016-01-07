@@ -17,9 +17,10 @@ exit($test->run(array_merge($base, [
   },
 
   'run test class from file' => function() use($path, $proc) {
+    $dir= $path->compose(__DIR__, 'classes');
     $this->assertEquals(
       [0 => ['Hello World']],
-      $proc->execute($this->exe, ['-cp', __DIR__.'/classes', 'classes/Test.class.php'], $this->env, $this->tmp)
+      $proc->execute($this->exe, ['-cp', $dir, $path->compose($dir, 'Test.class.php')], $this->env, $this->tmp)
     );
   },
 
