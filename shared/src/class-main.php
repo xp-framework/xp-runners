@@ -85,7 +85,8 @@ foreach ($include as $path => $_) {
   \lang\ClassLoader::registerPath($path);
 }
 
-if (strpos($argv[0], \xp::CLASS_FILE_EXT)) {
+$ext= substr($argv[0], -4, 4);
+if ('.php' === $ext) {
   if (false === ($uri= realpath($argv[0]))) {
     throw new \Exception('Cannot load '.$argv[0].' - does not exist');
   }
@@ -93,7 +94,7 @@ if (strpos($argv[0], \xp::CLASS_FILE_EXT)) {
     throw new \Exception('Cannot load '.$argv[0].' - not in class path');
   }
   $class= $cl->loadUri($uri);
-} else if (0 === substr_compare($argv[0], '.xar', -4, 4)) {
+} else if ('.xar' === $ext) {
   if (false === ($uri= realpath($argv[0]))) {
     throw new \Exception('Cannot load '.$argv[0].' - does not exist');
   }
