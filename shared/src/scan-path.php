@@ -12,48 +12,75 @@ function path($in, $bail= true) {
   }
 }
 
-function scan($paths, $home= '.') {
-  $include= array();
-  foreach ($paths as $path) {
-    if ('' === $path) {
-      continue;
-    } else if ('~' === $path{0}) {
-      $path= $home.substr($path, 1);
-    }
+function pathfiles($path) {
+  $result= [];
+  if ($pr= @opendir($path)) {
+    while ($file= readdir($pr)) {
+      if (0 !== substr_compare($file, '.pth', -4)) continue;
 
-    if (!($d= @opendir($path))) continue;
-    while ($e= readdir($d)) {
-      if ('.pth' !== substr($e, -4)) continue;
-
-      foreach (file($path.DIRECTORY_SEPARATOR.$e) as $line) {
+      foreach (file($path.DIRECTORY_SEPARATOR.$file) as $line) {
         $line= trim($line);
-        $bail= true;
         if ('' === $line || '#' === $line{0}) {
           continue;
-        } else if ('!' === $line{0}) {
-          $pre= true;
-          $line= '!' === $line ? '.' : substr($line, 1);
-        } else if ('?' === $line{0}) {
-          $bail= false;
-          $line= substr($line, 1);
         } else {
-          $pre= false;
-        }
-
-        if ('~' === $line{0}) {
-          $qn= $home.DIRECTORY_SEPARATOR.substr($line, 1);
-        } else if ('/' === $line{0} || strlen($line) > 2 && (':' === $line{1} && '\\' === $line{2})) {
-          $qn= $line;
-        } else {
-          $qn= $path.DIRECTORY_SEPARATOR.$line;
-        }
-
-        if ($resolved= path($qn, $bail)) {
-          $pre ? array_unshift($include, $resolved) : $include[]= $resolved;
+          $result[]= $line;
         }
       }
     }
-    closedir($d);
+    closedir($pr);
   }
-  return $include;
+  return $result;
+}
+
+function scanpath(&$result, $paths, $base, $home) {
+  $type= 'local';
+
+  foreach ($paths as $path) {
+    if ('' === $path) continue;
+
+    // Handle ? and ! prefixes
+    $bail= true;
+    $overlay= null;
+    if ('!' === $path{0}) {
+      $overlay= 'overlay';
+      $path= '!' === $path ? '.' : substr($path, 1);
+    } else if ('?' === $path{0}) {
+      $bail= false;
+      $path= substr($path, 1);
+    }
+
+    // Expand file path
+    if ('~' === $path{0}) {
+      $expanded= $home.DIRECTORY_SEPARATOR.substr($path, 1);
+    } else if ('/' === $path{0} || '\\' === $path{0} || strlen($path) > 2 && (':' === $path{1} && '\\' === $path{2})) {
+      $expanded= $path;
+    } else {
+      $expanded= $base.DIRECTORY_SEPARATOR.$path;
+    }
+
+    // Resolve, check for XP core
+    if ($resolved= path($expanded, $bail)) {
+      if (null === $result['base']) {
+        if (0 === substr_compare($resolved, '.xar', -4)) {
+          if (is_file($f= 'xar://'.$resolved.'?__xp.php')) {
+            $result['base']= $f;
+            $result['core']= array($resolved);
+            continue;
+          }
+        } else {
+          if (is_file($f= $resolved.'__xp.php')) {
+            $result['base']= $f;
+            $type= 'core';
+            // The rest of the path file is regarded as belonging to core
+          }
+        }
+      }
+
+      if (0 === substr_compare($resolved, '.php', -4)) {
+        $result['files'][]= $resolved;
+      } else {
+        $result[$overlay ?: $type][]= $resolved;
+      }
+    }
+  }
 }

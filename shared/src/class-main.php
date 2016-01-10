@@ -81,10 +81,6 @@ if ($encoding) {
   }
 }
 
-foreach ($include as $path => $_) {
-  \lang\ClassLoader::registerPath($path);
-}
-
 $ext= substr($argv[0], -4, 4);
 if ('.php' === $ext) {
   if (false === ($uri= realpath($argv[0]))) {

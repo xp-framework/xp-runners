@@ -1,21 +1,17 @@
 <?php namespace xp;
 
-list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($home) {
-  $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
-  $paths= scan(array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))), $home);
-  if (isset($parts[1]) && $parts[1] != '') {
-    foreach (explode(PATH_SEPARATOR, $parts[1]) as $path) {
-      $paths[]= path($path);
-    }
-  }
-  return $paths;
-});
+$bootstrap= bootstrap($cwd, $home);
 
-foreach ($bootstrap as $file => $xp) {
-  if ($xp && class_exists('xp', false)) continue;
-  include $file;
+foreach ($bootstrap['files'] as $file) {
+  require $file;
 }
 
-if (!class_exists('xp', false)) {
+if (class_exists('xp', false)) {
+  foreach ($bootstrap['overlay'] as $path) { \lang\ClassLoader::registerPath($path, true); }
+  foreach ($bootstrap['local'] as $path) { \lang\ClassLoader::registerPath($path); }
+} else if (isset($bootstrap['base'])) {
+  $paths= array_merge($bootstrap['overlay'], $bootstrap['core'], $bootstrap['local']);
+  require $bootstrap['base'];
+} else {
   throw new \Exception('[bootstrap] Cannot determine boot class path from '.get_include_path());
 }
