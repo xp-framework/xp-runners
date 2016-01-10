@@ -1,32 +1,36 @@
 <?php namespace xp;
 
-function bootstrap($paths, $merge) {
-  $bootstrap= array();
-  $include= array();
-  $merged= false;
-  do {
-    foreach ($paths as $path) {
-      if (DIRECTORY_SEPARATOR === $path{strlen($path) - 1}) {
-        $f= $path.'__xp.php';
-      } else if (0 === substr_compare($path, '.xar', -4)) {
-        $f= 'xar://'.$path.'?__xp.php';
-      } else if (0 === substr_compare($path, '__xp.php', -8)) {
-        $f= $path;
-        $path= substr($path, 0, -8);
-      } else {
-        $bootstrap[$path]= false;
-        continue;
-      }
+function bootstrap($cwd, $home) {
+  $result= array(
+    'base'     => null,
+    'overlay'  => array(),
+    'core'     => array(),
+    'local'    => array(),
+    'files'    => array()
+  );
+  $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
 
-      $include[$path]= true;
-      if (is_file($f)) $bootstrap[$f]= true;
-    }
+  // Check local module first
+  scanpath($result, pathfiles($cwd), $cwd, $home);
 
-    if ($merged) {
-      return array($bootstrap, $include);
-    } else {
-      $paths= $merge();
-      $merged= true;
+  // We rely classpath always includes "." at the beginning
+  if (isset($parts[1])) {
+    foreach (explode(PATH_SEPARATOR, substr($parts[1], 2)) as $path) {
+      scanpath($result, array($path), $cwd, $home);
     }
-  } while (true);
+  }
+
+  // We rely modules always includes "." at the beginning
+  foreach (array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))) as $path) {
+    if ('' === $path) {
+      continue;
+    } else if ('~' === $path{0}) {
+      $path= $home.substr($path, 1);
+    }
+    scanpath($result, pathfiles($path), $path, $home);
+  }
+
+  // Always add current directory
+  $result['local'][]= path($cwd);
+  return $result;
 }
