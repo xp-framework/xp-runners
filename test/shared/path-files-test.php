@@ -40,7 +40,9 @@ exit($test->run([
   'multiple path files' => function() use($path) {
     file_put_contents($path->compose($this->classpath, 'class.pth'), '.');
     file_put_contents($path->compose($this->classpath, 'glue.pth'), '..');
-    $this->assertEquals(['.', '..'], \xp\pathfiles($this->classpath));
+    $returned= \xp\pathfiles($this->classpath);
+    sort($returned);
+    $this->assertEquals(['.', '..'], $returned);
   },
 
   // Whitespace is ignored
