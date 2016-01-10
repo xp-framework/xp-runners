@@ -66,7 +66,7 @@ class Test {
       } catch (Failed $e) {
         echo 'F';
         $failed[$name]= $e;
-      } catch (Error $e) {
+      } catch (\Exception $e) {
         echo 'E';
         $failed[$name]= $e;
       }
@@ -112,7 +112,7 @@ class Run {
     if (is_array($a)) {
       if (sizeof($a) !== sizeof($b)) return false;
       foreach ($a as $key => $val) {
-        if (!isset($b[$key])) return false;
+        if (!array_key_exists($key, $b)) return false;
         if (!$this->equals($a[$key], $b[$key])) return false;
       }
       return true;
