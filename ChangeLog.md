@@ -1,7 +1,12 @@
 XP Runners ChangeLog
 ========================================================================
 
-## 6.2.0 / 2016-01-07
+## 6.3.0 / 2016-01-10
+
+* Merged PR #39: Refactor bootstrapping to match precedence definitions
+  (@thekid)
+
+## 6.3.0 / 2016-01-07
 
 * Removed deprecation warning with "iconv.internal_encoding". See the PHP
   RFC https://wiki.php.net/rfc/default_encoding

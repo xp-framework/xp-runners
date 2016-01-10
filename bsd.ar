@@ -1386,7 +1386,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---10563:class-main.php:--
+--11305:class-main.php:--
 <?php namespace xp;
 
 set_exception_handler(function($e) {
@@ -1580,103 +1580,127 @@ function path($in, $bail= true) {
   }
 }
 
-function scan($paths, $home= '.') {
-  $include= array();
+function pathfiles($path) {
+  $result= [];
+  if ($pr= @opendir($path)) {
+    while ($file= readdir($pr)) {
+      if (0 !== substr_compare($file, '.pth', -4)) continue;
+
+      foreach (file($path.DIRECTORY_SEPARATOR.$file) as $line) {
+        $line= trim($line);
+        if ('' === $line || '#' === $line{0}) {
+          continue;
+        } else {
+          $result[]= $line;
+        }
+      }
+    }
+    closedir($pr);
+  }
+  return $result;
+}
+
+function scanpath(&$result, $paths, $base, $home) {
+  $type= 'local';
+
   foreach ($paths as $path) {
+    if ('' === $path) continue;
+
+    // Handle ? and ! prefixes
+    $bail= true;
+    $overlay= null;
+    if ('!' === $path{0}) {
+      $overlay= 'overlay';
+      $path= '!' === $path ? '.' : substr($path, 1);
+    } else if ('?' === $path{0}) {
+      $bail= false;
+      $path= substr($path, 1);
+    }
+
+    // Expand file path
+    if ('~' === $path{0}) {
+      $expanded= $home.DIRECTORY_SEPARATOR.substr($path, 1);
+    } else if ('/' === $path{0} || '\\' === $path{0} || strlen($path) > 2 && (':' === $path{1} && '\\' === $path{2})) {
+      $expanded= $path;
+    } else {
+      $expanded= $base.DIRECTORY_SEPARATOR.$path;
+    }
+
+    // Resolve, check for XP core
+    if ($resolved= path($expanded, $bail)) {
+      if (null === $result['base']) {
+        if (0 === substr_compare($resolved, '.xar', -4)) {
+          if (is_file($f= 'xar://'.$resolved.'?__xp.php')) {
+            $result['base']= $f;
+            $result['core']= array($resolved);
+            continue;
+          }
+        } else {
+          if (is_file($f= $resolved.'__xp.php')) {
+            $result['base']= $f;
+            $type= 'core';
+            // The rest of the path file is regarded as belonging to core
+          }
+        }
+      }
+
+      if (0 === substr_compare($resolved, '.php', -4)) {
+        $result['files'][]= $resolved;
+      } else {
+        $result[$overlay ?: $type][]= $resolved;
+      }
+    }
+  }
+}
+function bootstrap($cwd, $home) {
+  $result= array(
+    'base'     => null,
+    'overlay'  => array(),
+    'core'     => array(),
+    'local'    => array(),
+    'files'    => array()
+  );
+  $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
+
+  // Check local module first
+  scanpath($result, pathfiles($cwd), $cwd, $home);
+
+  // We rely classpath always includes "." at the beginning
+  if (isset($parts[1])) {
+    foreach (explode(PATH_SEPARATOR, substr($parts[1], 2)) as $path) {
+      scanpath($result, array($path), $cwd, $home);
+    }
+  }
+
+  // We rely modules always includes "." at the beginning
+  foreach (array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))) as $path) {
     if ('' === $path) {
       continue;
     } else if ('~' === $path{0}) {
       $path= $home.substr($path, 1);
     }
-
-    if (!($d= @opendir($path))) continue;
-    while ($e= readdir($d)) {
-      if ('.pth' !== substr($e, -4)) continue;
-
-      foreach (file($path.DIRECTORY_SEPARATOR.$e) as $line) {
-        $line= trim($line);
-        $bail= true;
-        if ('' === $line || '#' === $line{0}) {
-          continue;
-        } else if ('!' === $line{0}) {
-          $pre= true;
-          $line= '!' === $line ? '.' : substr($line, 1);
-        } else if ('?' === $line{0}) {
-          $bail= false;
-          $line= substr($line, 1);
-        } else {
-          $pre= false;
-        }
-
-        if ('~' === $line{0}) {
-          $qn= $home.DIRECTORY_SEPARATOR.substr($line, 1);
-        } else if ('/' === $line{0} || strlen($line) > 2 && (':' === $line{1} && '\\' === $line{2})) {
-          $qn= $line;
-        } else {
-          $qn= $path.DIRECTORY_SEPARATOR.$line;
-        }
-
-        if ($resolved= path($qn, $bail)) {
-          $pre ? array_unshift($include, $resolved) : $include[]= $resolved;
-        }
-      }
-    }
-    closedir($d);
+    scanpath($result, pathfiles($path), $path, $home);
   }
-  return $include;
+
+  // Always add current directory
+  $result['local'][]= path($cwd);
+  return $result;
+}
+$bootstrap= bootstrap($cwd, $home);
+
+foreach ($bootstrap['files'] as $file) {
+  require $file;
 }
 
-function bootstrap($paths, $merge) {
-  $bootstrap= array();
-  $include= array();
-  $merged= false;
-  do {
-    foreach ($paths as $path) {
-      if (DIRECTORY_SEPARATOR === $path{strlen($path) - 1}) {
-        $f= $path.'__xp.php';
-      } else if (0 === substr_compare($path, '.xar', -4)) {
-        $f= 'xar://'.$path.'?__xp.php';
-      } else if (0 === substr_compare($path, '__xp.php', -8)) {
-        $f= $path;
-        $path= substr($path, 0, -8);
-      } else {
-        $bootstrap[$path]= false;
-        continue;
-      }
-
-      $include[$path]= true;
-      if (is_file($f)) $bootstrap[$f]= true;
-    }
-
-    if ($merged) {
-      return array($bootstrap, $include);
-    } else {
-      $paths= $merge();
-      $merged= true;
-    }
-  } while (true);
-}
-
-list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($home) {
-  $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
-  $paths= scan(array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))), $home);
-  if (isset($parts[1]) && $parts[1] != '') {
-    foreach (explode(PATH_SEPARATOR, $parts[1]) as $path) {
-      $paths[]= path($path);
-    }
-  }
-  return $paths;
-});
-
-foreach ($bootstrap as $file => $xp) {
-  if ($xp && class_exists('xp', false)) continue;
-  include $file;
-}
-
-if (!class_exists('xp', false)) {
+if (class_exists('xp', false)) {
+  foreach ($bootstrap['overlay'] as $path) { \lang\ClassLoader::registerPath($path, true); }
+  foreach ($bootstrap['local'] as $path) { \lang\ClassLoader::registerPath($path); }
+} else if (isset($bootstrap['base'])) {
+  $paths= array_merge($bootstrap['overlay'], $bootstrap['core'], $bootstrap['local']);
+  require $bootstrap['base'];
+} else {
   throw new \Exception('[bootstrap] Cannot determine boot class path from '.get_include_path());
 }
-
 
 // Start I/O layers
 $encoding= get_cfg_var('encoding');
@@ -1687,10 +1711,6 @@ if ($encoding) {
   foreach ($argv as $i => $val) {
     $_SERVER['argv'][$i]= $argv[$i]= iconv($encoding, \xp::ENCODING, $val);
   }
-}
-
-foreach ($include as $path => $_) {
-  \lang\ClassLoader::registerPath($path);
 }
 
 $ext= substr($argv[0], -4, 4);
@@ -1721,7 +1741,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---8403:web-main.php:--
+--9226:web-main.php:--
 <?php namespace xp;
 
 // Set WEB specific handling
@@ -1855,103 +1875,127 @@ function path($in, $bail= true) {
   }
 }
 
-function scan($paths, $home= '.') {
-  $include= array();
+function pathfiles($path) {
+  $result= [];
+  if ($pr= @opendir($path)) {
+    while ($file= readdir($pr)) {
+      if (0 !== substr_compare($file, '.pth', -4)) continue;
+
+      foreach (file($path.DIRECTORY_SEPARATOR.$file) as $line) {
+        $line= trim($line);
+        if ('' === $line || '#' === $line{0}) {
+          continue;
+        } else {
+          $result[]= $line;
+        }
+      }
+    }
+    closedir($pr);
+  }
+  return $result;
+}
+
+function scanpath(&$result, $paths, $base, $home) {
+  $type= 'local';
+
   foreach ($paths as $path) {
+    if ('' === $path) continue;
+
+    // Handle ? and ! prefixes
+    $bail= true;
+    $overlay= null;
+    if ('!' === $path{0}) {
+      $overlay= 'overlay';
+      $path= '!' === $path ? '.' : substr($path, 1);
+    } else if ('?' === $path{0}) {
+      $bail= false;
+      $path= substr($path, 1);
+    }
+
+    // Expand file path
+    if ('~' === $path{0}) {
+      $expanded= $home.DIRECTORY_SEPARATOR.substr($path, 1);
+    } else if ('/' === $path{0} || '\\' === $path{0} || strlen($path) > 2 && (':' === $path{1} && '\\' === $path{2})) {
+      $expanded= $path;
+    } else {
+      $expanded= $base.DIRECTORY_SEPARATOR.$path;
+    }
+
+    // Resolve, check for XP core
+    if ($resolved= path($expanded, $bail)) {
+      if (null === $result['base']) {
+        if (0 === substr_compare($resolved, '.xar', -4)) {
+          if (is_file($f= 'xar://'.$resolved.'?__xp.php')) {
+            $result['base']= $f;
+            $result['core']= array($resolved);
+            continue;
+          }
+        } else {
+          if (is_file($f= $resolved.'__xp.php')) {
+            $result['base']= $f;
+            $type= 'core';
+            // The rest of the path file is regarded as belonging to core
+          }
+        }
+      }
+
+      if (0 === substr_compare($resolved, '.php', -4)) {
+        $result['files'][]= $resolved;
+      } else {
+        $result[$overlay ?: $type][]= $resolved;
+      }
+    }
+  }
+}
+function bootstrap($cwd, $home) {
+  $result= array(
+    'base'     => null,
+    'overlay'  => array(),
+    'core'     => array(),
+    'local'    => array(),
+    'files'    => array()
+  );
+  $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
+
+  // Check local module first
+  scanpath($result, pathfiles($cwd), $cwd, $home);
+
+  // We rely classpath always includes "." at the beginning
+  if (isset($parts[1])) {
+    foreach (explode(PATH_SEPARATOR, substr($parts[1], 2)) as $path) {
+      scanpath($result, array($path), $cwd, $home);
+    }
+  }
+
+  // We rely modules always includes "." at the beginning
+  foreach (array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))) as $path) {
     if ('' === $path) {
       continue;
     } else if ('~' === $path{0}) {
       $path= $home.substr($path, 1);
     }
-
-    if (!($d= @opendir($path))) continue;
-    while ($e= readdir($d)) {
-      if ('.pth' !== substr($e, -4)) continue;
-
-      foreach (file($path.DIRECTORY_SEPARATOR.$e) as $line) {
-        $line= trim($line);
-        $bail= true;
-        if ('' === $line || '#' === $line{0}) {
-          continue;
-        } else if ('!' === $line{0}) {
-          $pre= true;
-          $line= '!' === $line ? '.' : substr($line, 1);
-        } else if ('?' === $line{0}) {
-          $bail= false;
-          $line= substr($line, 1);
-        } else {
-          $pre= false;
-        }
-
-        if ('~' === $line{0}) {
-          $qn= $home.DIRECTORY_SEPARATOR.substr($line, 1);
-        } else if ('/' === $line{0} || strlen($line) > 2 && (':' === $line{1} && '\\' === $line{2})) {
-          $qn= $line;
-        } else {
-          $qn= $path.DIRECTORY_SEPARATOR.$line;
-        }
-
-        if ($resolved= path($qn, $bail)) {
-          $pre ? array_unshift($include, $resolved) : $include[]= $resolved;
-        }
-      }
-    }
-    closedir($d);
+    scanpath($result, pathfiles($path), $path, $home);
   }
-  return $include;
+
+  // Always add current directory
+  $result['local'][]= path($cwd);
+  return $result;
+}
+$bootstrap= bootstrap($cwd, $home);
+
+foreach ($bootstrap['files'] as $file) {
+  require $file;
 }
 
-function bootstrap($paths, $merge) {
-  $bootstrap= array();
-  $include= array();
-  $merged= false;
-  do {
-    foreach ($paths as $path) {
-      if (DIRECTORY_SEPARATOR === $path{strlen($path) - 1}) {
-        $f= $path.'__xp.php';
-      } else if (0 === substr_compare($path, '.xar', -4)) {
-        $f= 'xar://'.$path.'?__xp.php';
-      } else if (0 === substr_compare($path, '__xp.php', -8)) {
-        $f= $path;
-        $path= substr($path, 0, -8);
-      } else {
-        $bootstrap[$path]= false;
-        continue;
-      }
-
-      $include[$path]= true;
-      if (is_file($f)) $bootstrap[$f]= true;
-    }
-
-    if ($merged) {
-      return array($bootstrap, $include);
-    } else {
-      $paths= $merge();
-      $merged= true;
-    }
-  } while (true);
-}
-
-list($bootstrap, $include)= bootstrap(scan(array($cwd), $home), function() use($home) {
-  $parts= explode(PATH_SEPARATOR.PATH_SEPARATOR, get_include_path());
-  $paths= scan(array_unique(explode(PATH_SEPARATOR, substr($parts[0], 2))), $home);
-  if (isset($parts[1]) && $parts[1] != '') {
-    foreach (explode(PATH_SEPARATOR, $parts[1]) as $path) {
-      $paths[]= path($path);
-    }
-  }
-  return $paths;
-});
-
-foreach ($bootstrap as $file => $xp) {
-  if ($xp && class_exists('xp', false)) continue;
-  include $file;
-}
-
-if (!class_exists('xp', false)) {
+if (class_exists('xp', false)) {
+  foreach ($bootstrap['overlay'] as $path) { \lang\ClassLoader::registerPath($path, true); }
+  foreach ($bootstrap['local'] as $path) { \lang\ClassLoader::registerPath($path); }
+} else if (isset($bootstrap['base'])) {
+  $paths= array_merge($bootstrap['overlay'], $bootstrap['core'], $bootstrap['local']);
+  require $bootstrap['base'];
+} else {
   throw new \Exception('[bootstrap] Cannot determine boot class path from '.get_include_path());
 }
-
 
 // Set error status to 516 by default - if a fatal error occurs,
 // this guarantees to at least send an error code.
