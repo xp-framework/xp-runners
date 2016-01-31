@@ -3,6 +3,8 @@
 [![Build Status on TravisCI](https://secure.travis-ci.org/xp-framework/xp-runners.png)](http://travis-ci.org/xp-framework/xp-runners)
 [![BSD Licence](https://raw.githubusercontent.com/xp-framework/web/master/static/licence-bsd.png)](https://github.com/xp-framework/core/blob/master/LICENCE.md)
 
+***Work now continues over at https://github.com/xp-runners/reference. There will only be bugfix releases to this 6.X series!***
+
 The XP runners are bash scripts (on Unix-like systems) or C# programs (Windows) that are used to start XP programs.
 
 ## Supported platforms
