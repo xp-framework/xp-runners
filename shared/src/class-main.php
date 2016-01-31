@@ -74,7 +74,7 @@ require 'class-path.php';
 PHP_VERSION < '5.6' && iconv_set_encoding('internal_encoding', \xp::ENCODING);
 array_shift($_SERVER['argv']);
 array_shift($argv);
-foreach ($argv as $i => $val) {
+if (get_cfg_var('encoding')) foreach ($argv as $i => $val) {
   $_SERVER['argv'][$i]= $argv[$i]= iconv('utf-7', \xp::ENCODING, $val);
 }
 
