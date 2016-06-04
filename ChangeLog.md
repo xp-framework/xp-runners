@@ -3,9 +3,9 @@ XP Runners ChangeLog
 
 ## 6.4.0 / 2016-06-04
 
-* Made argument encoding compatible with new XP runners: The default is
-  to encode them binary-safe using `utf-7`. Only difference: Passing
-  "utf-8" as encoding value will prevent any decoding from happening.
+* Merged PR #41: Made argument encoding compatible with new XP runners: 
+  The default is to encode them binary-safe using `utf-7`. Only difference: 
+  Passing "utf-8" as encoding value will prevent any decoding from happening.
   (@thekid)
 
 ## 6.3.1 / 2016-01-10
