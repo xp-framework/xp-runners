@@ -25,6 +25,8 @@ exit($test->run(array_merge($base, [
   },
 
   'uncaught throwables' => function() use($path, $proc) {
+    if (defined('HHVM_VERSION')) return;
+
     $result= $proc->execute($this->exe, ['-e', '"throw new \lang\Error(\"Test\")"'], $this->env, $this->tmp);
     $this->assertEquals(255, key($result));
     $this->assertEquals(true, (bool)preg_grep('/Uncaught exception/', current($result)));
