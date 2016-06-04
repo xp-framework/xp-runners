@@ -91,7 +91,7 @@ if [ "" = "$tool" ] ; then
   done
   set -- "${_args[@]}"
 #else
-  args="$args${ifs}-d${ifs}encoding=no"
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 #endif
 fi
 #ifdef __BSD
