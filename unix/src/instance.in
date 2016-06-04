@@ -90,7 +90,8 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-d${ifs}encoding=utf-7"
+#else
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 #endif
 fi
 #ifdef __BSD
