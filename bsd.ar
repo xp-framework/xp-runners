@@ -1,4 +1,4 @@
---3228:cgen:--
+--3271:cgen:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -122,6 +122,7 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
@@ -130,7 +131,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3227:doclet:--
+--3270:doclet:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -254,6 +255,7 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
@@ -262,7 +264,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3638:unittest:--
+--3681:unittest:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -386,6 +388,7 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
@@ -413,7 +416,7 @@ if [ -n "$WATCH" ] ; then
 else
   exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 fi
---3224:xar:--
+--3267:xar:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -537,6 +540,7 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
@@ -545,7 +549,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3229:xcc:--
+--3272:xcc:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -669,6 +673,7 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
@@ -677,7 +682,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4236:xp:--
+--4279:xp:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -847,6 +852,7 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
@@ -855,7 +861,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3228:xpcli:--
+--3271:xpcli:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -979,6 +985,7 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
@@ -987,7 +994,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3228:xpi:--
+--3271:xpi:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -1111,6 +1118,7 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
@@ -1119,7 +1127,7 @@ fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5513:xpws:--
+--5556:xpws:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -1324,6 +1332,7 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 if [ ! -d /proc/1 ] ; then
   XP_CMDLINE="$args${ifs}$tool${ifs}${ARGS}"
@@ -1386,7 +1395,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---11271:class-main.php:--
+--11339:class-main.php:--
 <?php namespace xp;
 
 set_exception_handler(function($e) {
@@ -1706,8 +1715,9 @@ if (class_exists('xp', false)) {
 PHP_VERSION < '5.6' && iconv_set_encoding('internal_encoding', \xp::ENCODING);
 array_shift($_SERVER['argv']);
 array_shift($argv);
-if (get_cfg_var('encoding')) foreach ($argv as $i => $val) {
-  $_SERVER['argv'][$i]= $argv[$i]= iconv('utf-7', \xp::ENCODING, $val);
+if (\xp::ENCODING !== get_cfg_var('encoding')) foreach ($argv as $i => $val) {
+  $decoded= iconv('utf-7', \xp::ENCODING, $val);
+  $_SERVER['argv'][$i]= $argv[$i]= false === $decoded ? $val : $decoded;
 }
 
 $ext= substr($argv[0], -4, 4);
@@ -1738,7 +1748,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---9226:web-main.php:--
+--9145:web-main.php:--
 <?php namespace xp;
 
 // Set WEB specific handling
@@ -2031,10 +2041,6 @@ switch (PHP_SAPI) {
 ini_set('error_prepend_string', '<xmp>');
 ini_set('error_append_string', '</xmp>');
 ini_set('html_errors', 0);
-
-foreach ($include as $path => $_) {
-  \lang\ClassLoader::registerPath($path);
-}
 
 try {
   exit(\xp\scriptlet\Runner::main(array($home, $config, $_SERVER['SERVER_PROFILE'], $_SERVER['SCRIPT_URL'])));

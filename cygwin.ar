@@ -1,4 +1,4 @@
---3363:cgen:--
+--3320:cgen:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -129,12 +129,11 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3362:doclet:--
+--3319:doclet:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -265,12 +264,11 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3773:unittest:--
+--3730:unittest:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -401,7 +399,6 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
@@ -425,7 +422,7 @@ if [ -n "$WATCH" ] ; then
 else
   exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 fi
---3359:xar:--
+--3316:xar:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -556,12 +553,11 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3364:xcc:--
+--3321:xcc:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -692,12 +688,11 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4371:xp:--
+--4328:xp:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -874,12 +869,11 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3363:xpcli:--
+--3320:xpcli:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1010,12 +1004,11 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3363:xpi:--
+--3320:xpi:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1146,12 +1139,11 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5648:xpws:--
+--5605:xpws:--
 #!/bin/sh
 PATHSEP=';'
 DIRSEP="\\"
@@ -1363,7 +1355,6 @@ if [ "" = "$tool" ] ; then
     _args=("${_args[@]}" "$(echo $arg | iconv -f utf-8 -t utf-7)")
   done
   set -- "${_args[@]}"
-  args="$args${ifs}-d${ifs}encoding=utf-7"
 fi
 export XP_EXE
 IFS="|"
@@ -1422,7 +1413,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---11271:class-main.php:--
+--11339:class-main.php:--
 <?php namespace xp;
 
 set_exception_handler(function($e) {
@@ -1742,8 +1733,9 @@ if (class_exists('xp', false)) {
 PHP_VERSION < '5.6' && iconv_set_encoding('internal_encoding', \xp::ENCODING);
 array_shift($_SERVER['argv']);
 array_shift($argv);
-if (get_cfg_var('encoding')) foreach ($argv as $i => $val) {
-  $_SERVER['argv'][$i]= $argv[$i]= iconv('utf-7', \xp::ENCODING, $val);
+if (\xp::ENCODING !== get_cfg_var('encoding')) foreach ($argv as $i => $val) {
+  $decoded= iconv('utf-7', \xp::ENCODING, $val);
+  $_SERVER['argv'][$i]= $argv[$i]= false === $decoded ? $val : $decoded;
 }
 
 $ext= substr($argv[0], -4, 4);
@@ -1774,7 +1766,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---9226:web-main.php:--
+--9145:web-main.php:--
 <?php namespace xp;
 
 // Set WEB specific handling
@@ -2067,10 +2059,6 @@ switch (PHP_SAPI) {
 ini_set('error_prepend_string', '<xmp>');
 ini_set('error_append_string', '</xmp>');
 ini_set('html_errors', 0);
-
-foreach ($include as $path => $_) {
-  \lang\ClassLoader::registerPath($path);
-}
 
 try {
   exit(\xp\scriptlet\Runner::main(array($home, $config, $_SERVER['SERVER_PROFILE'], $_SERVER['SCRIPT_URL'])));

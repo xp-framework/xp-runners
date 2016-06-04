@@ -1,4 +1,4 @@
---3133:cgen:--
+--3176:cgen:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -122,11 +122,12 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3132:doclet:--
+--3175:doclet:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -250,11 +251,12 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3543:unittest:--
+--3586:unittest:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -378,6 +380,7 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 export XP_EXE
 IFS="|"
@@ -401,7 +404,7 @@ if [ -n "$WATCH" ] ; then
 else
   exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
 fi
---3129:xar:--
+--3172:xar:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -525,11 +528,12 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3134:xcc:--
+--3177:xcc:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -653,11 +657,12 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---4141:xp:--
+--4184:xp:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -827,11 +832,12 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3133:xpcli:--
+--3176:xpcli:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -955,11 +961,12 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---3133:xpi:--
+--3176:xpi:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -1083,11 +1090,12 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 export XP_EXE
 IFS="|"
 exec ${XP_EXE}${ifs}${args}${ifs}$tool ${ARGS} "$@"
---5418:xpws:--
+--5461:xpws:--
 #!/bin/sh
 PATHSEP=':'
 DIRSEP='/'
@@ -1292,6 +1300,7 @@ args="-C${ifs}-q${ifs}-d${ifs}include_path=\".$PATHSEP$USE_XP$MODULES$PATHSEP$PA
 tool=$(locate "$USE_XP" "tools/"${RUNNER}".php" 0)
 if [ "" = "$tool" ] ; then
   tool=$(locate "$DIRNAME" ${RUNNER}"-main.php" 1)
+  args="$args${ifs}-d${ifs}encoding=utf-8"
 fi
 export XP_EXE
 IFS="|"
@@ -1350,7 +1359,7 @@ echo "$i file(s) copied"
 
 rmdir $TARGET
 echo "===> Done, runners have been updated"
---11271:class-main.php:--
+--11339:class-main.php:--
 <?php namespace xp;
 
 set_exception_handler(function($e) {
@@ -1670,8 +1679,9 @@ if (class_exists('xp', false)) {
 PHP_VERSION < '5.6' && iconv_set_encoding('internal_encoding', \xp::ENCODING);
 array_shift($_SERVER['argv']);
 array_shift($argv);
-if (get_cfg_var('encoding')) foreach ($argv as $i => $val) {
-  $_SERVER['argv'][$i]= $argv[$i]= iconv('utf-7', \xp::ENCODING, $val);
+if (\xp::ENCODING !== get_cfg_var('encoding')) foreach ($argv as $i => $val) {
+  $decoded= iconv('utf-7', \xp::ENCODING, $val);
+  $_SERVER['argv'][$i]= $argv[$i]= false === $decoded ? $val : $decoded;
 }
 
 $ext= substr($argv[0], -4, 4);
@@ -1702,7 +1712,7 @@ try {
   if ($message= $e->getMessage()) echo $message, "\n";
   exit($e->getCode());
 }
---9226:web-main.php:--
+--9145:web-main.php:--
 <?php namespace xp;
 
 // Set WEB specific handling
@@ -1995,10 +2005,6 @@ switch (PHP_SAPI) {
 ini_set('error_prepend_string', '<xmp>');
 ini_set('error_append_string', '</xmp>');
 ini_set('html_errors', 0);
-
-foreach ($include as $path => $_) {
-  \lang\ClassLoader::registerPath($path);
-}
 
 try {
   exit(\xp\scriptlet\Runner::main(array($home, $config, $_SERVER['SERVER_PROFILE'], $_SERVER['SCRIPT_URL'])));
