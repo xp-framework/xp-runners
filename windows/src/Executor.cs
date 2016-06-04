@@ -156,7 +156,6 @@ namespace Net.XpFramework.Runner
             {
                 argument = Encode;
                 redirect = true;
-                argv += " -d encoding=utf-7";
             }
             else
             {
