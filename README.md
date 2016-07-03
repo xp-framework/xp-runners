@@ -30,7 +30,7 @@ This is the preferrred way of installing the runners:
 
 ```sh
 $ cd ~/bin
-$ wget 'https://github.com/xp-framework/xp-runners/releases/download/v6.3.0/setup' -O - | php
+$ wget 'https://github.com/xp-framework/xp-runners/releases/download/v6.4.0/setup' -O - | php
 ```
 
 ### From this directory
